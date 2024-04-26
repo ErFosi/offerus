@@ -18,7 +18,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
-    // viewModel initialization
+    // viewModel initialize
     // viewmodel general y de autenticacion
     // private val viewmodel by viewModels<>()  //hiltviewmodel
 
