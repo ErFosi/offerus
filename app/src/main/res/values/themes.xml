@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <style name="Theme.OfferUSSplashScreen" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/green</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/iconoofferus</item>
+        <item name="postSplashScreenTheme">@style/Theme.OfferUS</item>
+        <item name="android:windowSplashScreenAnimationDuration">1500</item>
+        <item name="android:windowSplashScreenBehavior">icon_preferred</item>
+    </style>
+
     <style name="Theme.OfferUS" parent="Theme.AppCompat.Light.NoActionBar" />
 </resources>

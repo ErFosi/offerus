@@ -12,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.offerus.navigation.MainNavigation
 import com.offerus.ui.theme.OfferUSTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -26,6 +27,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        installSplashScreen()
         setContent {
             OfferUSTheme {
                 // A surface container using the 'background' color from the theme
