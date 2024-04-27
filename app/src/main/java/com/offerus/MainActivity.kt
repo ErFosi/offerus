@@ -12,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.offerus.navigation.MainNavigation
 import com.offerus.ui.theme.OfferUSTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -32,7 +33,7 @@ class MainActivity : AppCompatActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    Greeting("Android")
+                    MainNavigation()
                 }
             }
         }
