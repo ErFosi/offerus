@@ -103,4 +103,7 @@ dependencies {
     implementation("com.google.android.material:material:1.11.0")
     implementation("androidx.compose.material3:material3-window-size-class-android:1.2.1")
 
+    // coil
+    implementation("io.coil-kt:coil-compose:2.6.0")
+
 }

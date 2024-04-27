@@ -8,6 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.offerus.screens.MainScreen
+import com.offerus.screens.UserScreen
 
 @Composable
 fun MainNavigation() {
@@ -21,14 +22,5 @@ fun MainNavigation() {
         composable(AppScreens.UserScreen.route){
             UserScreen(navController)
         }
-    }
-}
-
-
-
-@Composable
-fun UserScreen(navController: NavController){
-    Surface {
-        Text(text = "USER SCREEN")
     }
 }

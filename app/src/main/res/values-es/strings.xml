@@ -1,6 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">OfferUS</string>
-    <string name="fileprovider" translatable="false">com.offerus.fileprovider</string>
     <string name="tomarFoto">Tomar una foto</string>
     <string name="select_photo">Seleccionar imagen</string>
     <string name="elige_opcion">Elige una opción</string>
