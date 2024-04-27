@@ -2,6 +2,22 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
+      <entry key="PreviewElemento">
+        <State>
+          <targetSelectedWithDropDown>
+            <Target>
+              <type value="QUICK_BOOT_TARGET" />
+              <deviceKey>
+                <Key>
+                  <type value="VIRTUAL_DEVICE_PATH" />
+                  <value value="C:\Users\Aimar\.android\avd\Medium_Phone_API_33.avd" />
+                </Key>
+              </deviceKey>
+            </Target>
+          </targetSelectedWithDropDown>
+          <timeTargetWasSelectedWithDropDown value="2024-04-27T15:44:10.241582300Z" />
+        </State>
+      </entry>
       <entry key="PreviewImageArea">
         <State>
           <targetSelectedWithDropDown>
@@ -26,13 +42,16 @@
               <deviceKey>
                 <Key>
                   <type value="VIRTUAL_DEVICE_PATH" />
-                  <value value="$USER_HOME$/.android/avd/Pixel_3a_API_33_x86_64.avd" />
+                  <value value="C:\Users\Aimar\.android\avd\Medium_Phone_API_32.avd" />
                 </Key>
               </deviceKey>
             </Target>
           </targetSelectedWithDropDown>
-          <timeTargetWasSelectedWithDropDown value="2024-04-26T17:54:17.591044839Z" />
+          <timeTargetWasSelectedWithDropDown value="2024-04-27T16:05:27.207219200Z" />
         </State>
+      </entry>
+      <entry key="previewDialogoSobreMi">
+        <State />
       </entry>
     </value>
   </component>

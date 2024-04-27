@@ -109,4 +109,8 @@ dependencies {
     // splash screen
     implementation("androidx.core:core-splashscreen:1.0.1")
 
+    // rating bar
+    implementation("com.github.a914-gowtham:compose-ratingbar:1.3.4")
+
+
 }
