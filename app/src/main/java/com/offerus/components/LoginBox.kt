@@ -4,7 +4,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -34,7 +33,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -46,14 +44,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.wear.compose.material.ContentAlpha
 import androidx.wear.compose.material.ExperimentalWearMaterialApi
 import androidx.wear.compose.material.FractionalThreshold
 import androidx.wear.compose.material.rememberSwipeableState
@@ -80,7 +74,7 @@ fun LoginBox() {
 
     Column(
         modifier = Modifier
-            .background(MaterialTheme.colorScheme.secondary, shape = RoundedCornerShape(16.dp))
+            //.background(shape = RoundedCornerShape(16.dp))
             .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -104,7 +98,7 @@ fun LoginBox() {
             modifier = Modifier
                 .height(2.dp)
                 .fillMaxWidth(0.9f)
-                .background(MaterialTheme.colorScheme.onPrimary)
+                //.background(MaterialTheme.colorScheme.onPrimary)
         )
         Box(
             modifier = Modifier
@@ -151,7 +145,7 @@ fun LoginBox() {
             ) {
                 Text(
                     "Log in",
-                    fontSize = 20.sp,
+                    style = MaterialTheme.typography.titleLarge,
                     textAlign = TextAlign.Center
                 )
 
@@ -175,11 +169,12 @@ fun OptionSelector(selectedOption: Int, onOptionSelected: (Int) -> Unit) {
         ) {
             Text(
                 "Login",
-                style = TextStyle(
-                    color = MaterialTheme.colorScheme.primary,
+                /*style = TextStyle(
+                    //color = MaterialTheme.colorScheme.primary,
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Medium
-                ),
+                ),*/
+                style = MaterialTheme.typography.titleLarge,
                 textDecoration = if (selectedOption == 1) TextDecoration.Underline else TextDecoration.None
             )
         }
@@ -189,11 +184,12 @@ fun OptionSelector(selectedOption: Int, onOptionSelected: (Int) -> Unit) {
         ) {
             Text(
                 "Register",
-                style = TextStyle(
-                    color = MaterialTheme.colorScheme.primary,
+                /*style = TextStyle(
+                    //color = MaterialTheme.colorScheme.primary,
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Medium
-                ),
+                ),*/
+                style = MaterialTheme.typography.titleLarge,
                 textDecoration = if (selectedOption == 2) TextDecoration.Underline else TextDecoration.None
             )
         }
@@ -203,7 +199,7 @@ fun OptionSelector(selectedOption: Int, onOptionSelected: (Int) -> Unit) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterFieldView() {
-    val backgroundColor = MaterialTheme.colorScheme.secondary
+    //val backgroundColor = MaterialTheme.colorScheme.secondary
     val scrollState = rememberScrollState()
     Column(
         modifier = Modifier
@@ -227,11 +223,6 @@ fun RegisterFieldView() {
             leadingIcon = {
                 Icon(Icons.Filled.Person, contentDescription = stringResource(R.string.username))
             },
-            colors = TextFieldDefaults.textFieldColors(
-                containerColor = backgroundColor,
-                unfocusedIndicatorColor = MaterialTheme.colorScheme.onSurface.copy(alpha = ContentAlpha.disabled),
-                focusedIndicatorColor = MaterialTheme.colorScheme.primary
-            ),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 16.dp)
@@ -245,11 +236,6 @@ fun RegisterFieldView() {
             leadingIcon = {
                 Icon(Icons.Filled.AccountCircle, contentDescription = stringResource(R.string.full_name))
             },
-            colors = TextFieldDefaults.textFieldColors(
-                containerColor = backgroundColor,
-                unfocusedIndicatorColor = MaterialTheme.colorScheme.onSurface.copy(alpha = ContentAlpha.disabled),
-                focusedIndicatorColor = MaterialTheme.colorScheme.primary
-            ),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 16.dp)
@@ -262,11 +248,7 @@ fun RegisterFieldView() {
             leadingIcon = {
                 Icon(Icons.Filled.DateRange, contentDescription = stringResource(R.string.age))
             },
-            colors = TextFieldDefaults.textFieldColors(
-                containerColor = backgroundColor,
-                unfocusedIndicatorColor = MaterialTheme.colorScheme.onSurface.copy(alpha = ContentAlpha.disabled),
-                focusedIndicatorColor = MaterialTheme.colorScheme.primary
-            ),keyboardOptions = KeyboardOptions.Default.copy(
+            keyboardOptions = KeyboardOptions.Default.copy(
                 keyboardType = KeyboardType.Number),
             modifier = Modifier
                 .fillMaxWidth()
@@ -282,11 +264,7 @@ fun RegisterFieldView() {
             leadingIcon = {
                 Icon(Icons.Filled.Email, contentDescription = stringResource(R.string.email))
             },
-            colors = TextFieldDefaults.textFieldColors(
-                containerColor = backgroundColor,
-                unfocusedIndicatorColor = MaterialTheme.colorScheme.onSurface.copy(alpha = ContentAlpha.disabled),
-                focusedIndicatorColor = MaterialTheme.colorScheme.primary
-            ),keyboardOptions = KeyboardOptions.Default.copy(
+            keyboardOptions = KeyboardOptions.Default.copy(
                 keyboardType = KeyboardType.Email
             ),
             modifier = Modifier
@@ -303,11 +281,7 @@ fun RegisterFieldView() {
             leadingIcon = {
                 Icon(Icons.Filled.Phone, contentDescription = stringResource(R.string.phone))
             },
-            colors = TextFieldDefaults.textFieldColors(
-                containerColor = backgroundColor,
-                unfocusedIndicatorColor = MaterialTheme.colorScheme.onSurface.copy(alpha = ContentAlpha.disabled),
-                focusedIndicatorColor = MaterialTheme.colorScheme.primary
-            ), keyboardOptions = KeyboardOptions.Default.copy(
+            keyboardOptions = KeyboardOptions.Default.copy(
                 keyboardType = KeyboardType.Phone
             ),
             modifier = Modifier
@@ -325,7 +299,7 @@ fun RegisterFieldView() {
 @Composable
 fun LoginFieldView() {
 
-    val backgroundColor = MaterialTheme.colorScheme.secondary
+    //val backgroundColor = MaterialTheme.colorScheme.secondary
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -343,11 +317,7 @@ fun LoginFieldView() {
             leadingIcon = {
                 Icon(Icons.Filled.Person, contentDescription = stringResource(R.string.username))
             },
-            colors = TextFieldDefaults.textFieldColors(
-                containerColor = backgroundColor,
-                unfocusedIndicatorColor = MaterialTheme.colorScheme.onSurface.copy(alpha = ContentAlpha.disabled),
-                focusedIndicatorColor = MaterialTheme.colorScheme.primary
-            ),
+
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 16.dp)
@@ -360,11 +330,7 @@ fun LoginFieldView() {
             leadingIcon = {
                 Icon(Icons.Filled.Lock, contentDescription = stringResource(R.string.password))
             },
-            colors = TextFieldDefaults.textFieldColors(
-                containerColor = backgroundColor,
-                unfocusedIndicatorColor = MaterialTheme.colorScheme.onSurface.copy(alpha = ContentAlpha.disabled),
-                focusedIndicatorColor = MaterialTheme.colorScheme.primary
-            ),
+
             modifier = Modifier.fillMaxWidth()
         )
     }

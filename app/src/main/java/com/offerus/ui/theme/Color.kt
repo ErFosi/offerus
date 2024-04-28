@@ -2,7 +2,7 @@ package com.offerus.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val primaryLight = Color(0xFF002713)
+val primaryLight = Color(0xFF013a20)
 val onPrimaryLight = Color(0xFFFFFFFF)
 val primaryContainerLight = Color(0xFF164A2E)
 val onPrimaryContainerLight = Color(0xFFADE3BD)
@@ -38,7 +38,7 @@ val surfaceContainerLight = Color(0xFFEDEEEA)
 val surfaceContainerHighLight = Color(0xFFE7E9E4)
 val surfaceContainerHighestLight = Color(0xFFE1E3DE)
 
-val primaryLightMediumContrast = Color(0xFF002713)
+val primaryLightMediumContrast = Color(0xFF013a20)
 val onPrimaryLightMediumContrast = Color(0xFFFFFFFF)
 val primaryContainerLightMediumContrast = Color(0xFF164A2E)
 val onPrimaryContainerLightMediumContrast = Color(0xFFFFFFFF)
@@ -74,7 +74,7 @@ val surfaceContainerLightMediumContrast = Color(0xFFEDEEEA)
 val surfaceContainerHighLightMediumContrast = Color(0xFFE7E9E4)
 val surfaceContainerHighestLightMediumContrast = Color(0xFFE1E3DE)
 
-val primaryLightHighContrast = Color(0xFF002713)
+val primaryLightHighContrast = Color(0xFF013a20)
 val onPrimaryLightHighContrast = Color(0xFFFFFFFF)
 val primaryContainerLightHighContrast = Color(0xFF164A2E)
 val onPrimaryContainerLightHighContrast = Color(0xFFFFFFFF)
