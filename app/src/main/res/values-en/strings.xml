@@ -4,4 +4,15 @@
     <string name="tomarFoto">Take a picture</string>
     <string name="select_photo">Select a picture</string>
     <string name="elige_opcion">Choose an option</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="full_name">Full name</string>
+    <string name="age">Age</string>
+    <string name="email">Eemail</string>
+    <string name="phone">Phone</string>
+    <string name="sex">Sex</string>
+    <string name="select_option">Select an option</string>
+    <string name="hombre">Man</string>
+    <string name="mujer">Woman</string>
+    <string name="otros">Other</string>
 </resources>

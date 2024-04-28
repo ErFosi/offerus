@@ -4,4 +4,15 @@
     <string name="tomarFoto">Argazki bat atera</string>
     <string name="select_photo">Argazki bat aukeratu</string>
     <string name="elige_opcion">Aukeratu bat</string>
+    <string name="username">Erabiltzaile izena</string>
+    <string name="password">Pasahitza</string>
+    <string name="full_name">Izen abizenak</string>
+    <string name="age">Adina</string>
+    <string name="email">E-posta</string>
+    <string name="phone">Telefono</string>
+    <string name="sex">Sexua</string>
+    <string name="select_option">Aukeratu</string>
+    <string name="hombre">Gizona</string>
+    <string name="mujer">Emakumea</string>
+    <string name="otros">Beste bat</string>
 </resources>
