@@ -4,23 +4,34 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -43,6 +54,7 @@ import androidx.compose.ui.window.Dialog
 import com.offerus.ui.theme.OfferUSTheme
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DialogoDatosPersonales(
     onDismissRequest: () -> Unit,
@@ -81,7 +93,10 @@ fun DialogoDatosPersonales(
                 onValueChange = {  }, // TODO
                 label = { Text("Nombre y apellidos") }, // TODO
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() })
+                keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
+                        leadingIcon = {
+                    Icon(Icons.Filled.Person, contentDescription = null, modifier = Modifier.padding(0.dp).size(20.dp))
+                }
             )
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween
@@ -90,31 +105,28 @@ fun DialogoDatosPersonales(
                 OutlinedTextField(
                     modifier = Modifier
                         .padding(start = 20.dp, top = 5.dp, bottom = 5.dp)
-                        .width(150.dp),
+                        .width(103.dp),
                     value = "", // TODO
                     onValueChange = {  }, // TODO
                     label = { Text("Edad") }, // TODO
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done, keyboardType = KeyboardType.Number),
                     keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() })
                 )
-                OutlinedTextField(
+                /*OutlinedTextField(
                     modifier = Modifier
                         .padding(horizontal = 20.dp, vertical = 5.dp)
-                        .width(125.dp)
-                        .onGloballyPositioned { coordinates ->
-                            // This value is used to assign to
-                            // the DropDown the same width
-                            mTextFieldSize = coordinates.size.toSize()
-                        }
-                        .clickable(onClick = {
-                            sexExpanded = !sexExpanded
-                        }),
+                        .width(125.dp),
+                        //.clickable(onClick = {
+                        //    sexExpanded = !sexExpanded
+                        //}),
+                    readOnly = true,
                     value = "", // TODO
                     onValueChange = {  }, // TODO
                     label = { Text("Sexo") }, // TODO
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done, keyboardType = KeyboardType.Number),
-                    keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() })
+                    //keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done, keyboardType = KeyboardType.Number),
+                    //keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() })
                 )
+
 
                 DropdownMenu(
                     expanded = sexExpanded,
@@ -126,9 +138,50 @@ fun DialogoDatosPersonales(
                             text = { Text(sexo) },
                             onClick = {
                                 sexExpanded = false
-                                //viewModel.updateIdioma(idioma, context)
                             }
                         )
+                    }
+                }*/
+
+                ExposedDropdownMenuBox(
+                    expanded = sexExpanded,
+                    onExpandedChange = {sexExpanded = !sexExpanded }
+                )
+                {
+                    OutlinedTextField(
+                        modifier = Modifier
+                            .padding(horizontal = 20.dp, vertical = 5.dp)
+                            .width(118.dp)
+                            .menuAnchor(),
+                        //.clickable(onClick = {
+                        //    sexExpanded = !sexExpanded
+                        //}),
+                        readOnly = true,
+                        value = "", // TODO
+                        onValueChange = {  }, // TODO
+                        label = { Text("Sexo") }, // TODO
+                        //keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done, keyboardType = KeyboardType.Number),
+                        //keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() })
+                        trailingIcon = {
+                            if (sexExpanded) Icon(Icons.Filled.KeyboardArrowUp, contentDescription = null, modifier = Modifier.padding(0.dp).size(20.dp))
+                            else Icon(Icons.Filled.KeyboardArrowDown, contentDescription = null, modifier = Modifier.padding(0.dp).size(20.dp))
+                        }
+                            //ExposedDropdownMenuDefaults.TrailingIcon(expanded = sexExpanded)},
+                    )
+                    ExposedDropdownMenu(
+                        expanded = sexExpanded,
+                        onDismissRequest = { sexExpanded = false },
+                        //modifier =  Modifier.width(with(LocalDensity.current){mTextFieldSize.width.toDp()})
+                    ) {
+                        Sexo.forEach { sexo ->
+                            DropdownMenuItem(
+                                text = { Text(sexo) },
+                                onClick = {
+                                    sexExpanded = false
+                                    //viewModel.updateIdioma(idioma, context)
+                                }
+                            )
+                        }
                     }
                 }
             }
@@ -139,7 +192,10 @@ fun DialogoDatosPersonales(
                 onValueChange = {  }, // TODO
                 label = { Text("Telefono") }, // TODO
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done, keyboardType = KeyboardType.Number),
-                keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() })
+                keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
+                leadingIcon = {
+                    Icon(Icons.Filled.Phone, contentDescription = null, modifier = Modifier.padding(0.dp).size(20.dp))
+                }
             )
             OutlinedTextField(
                 modifier = Modifier.padding(horizontal = 20.dp, vertical = 5.dp),
@@ -147,7 +203,10 @@ fun DialogoDatosPersonales(
                 onValueChange = {  }, // TODO
                 label = { Text("Email") }, // TODO
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done, keyboardType = KeyboardType.Email),
-                keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() })
+                keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
+                leadingIcon = {
+                    Icon(Icons.Filled.Email, contentDescription = null, modifier = Modifier.padding(0.dp).size(20.dp))
+                }
             )
 
             Row(
