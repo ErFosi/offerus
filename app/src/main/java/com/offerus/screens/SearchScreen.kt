@@ -88,8 +88,8 @@ fun SearchScreen(
     var selectedSubscreen by remember { mutableStateOf("Ofertas") }
 
     Surface {
-        EditDescriptionDialog()
-        //SearchDialog()
+        //EditDescriptionDialog()
+        SearchDialog()
         //CreateDialog()
         Column {
             SelectableButtonRow(
@@ -303,10 +303,9 @@ fun SearchDialog(){
                         ) {
                             TextField(
                                 value = "", onValueChange = { }, modifier = Modifier.height(50.dp),
-                                placeholder = {
-                                    Text("Titulo Oferta")
-                                },
+                                label = {Text(text = "Titulo")}
                             )
+
                         }
                         Row(
                             modifier = Modifier.padding(vertical = 5.dp),
@@ -422,9 +421,7 @@ fun CreateDialog(){
                         ) {
                             TextField(
                                 value = "", onValueChange = { }, modifier = Modifier.height(50.dp),
-                                placeholder = {
-                                    Text("Titulo Oferta")
-                                },
+                                label = {Text(text = "Titulo")}
                             )
                         }
                         Row(
