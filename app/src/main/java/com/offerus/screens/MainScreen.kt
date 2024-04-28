@@ -225,12 +225,7 @@ fun MyOffersScreen() {
     }
 }
 
-@Composable
-fun SearchScreen() {
-    Surface {
-        Text(text = "SEARCH SCREEN")
-    }
-}
+
 
 @Composable
 fun HomeScreen() {
