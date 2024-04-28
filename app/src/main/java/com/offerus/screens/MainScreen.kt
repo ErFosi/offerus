@@ -44,6 +44,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -121,11 +122,34 @@ fun MainScreen(navControllerMain: NavHostController){
 fun AppBottomBar(currentRoute: String?, onNavigate: (String) -> Unit) {
     NavigationBar {
         SECTIONS.forEach { destinations ->
-            NavigationBarItem(
-                icon = { Icon(ImageVector.vectorResource(id = destinations.selectedIcon), contentDescription = null) },
+            when (destinations.route) {
+                BottomBarRoute.HOME -> {
+                    NavigationBarItem(
+                        icon = { Icon(painter = painterResource(destinations.selectedIcon), contentDescription = null, modifier = Modifier.size(28.dp)) },
+                        selected = currentRoute == destinations.route,
+                        onClick = { onNavigate(destinations.route) }
+                    )
+                }
+                BottomBarRoute.SEARCH -> {
+                    NavigationBarItem(
+                        icon = { Icon(ImageVector.vectorResource(id = destinations.selectedIcon), contentDescription = null, modifier = Modifier.size(24.dp)) },
+                        selected = currentRoute == destinations.route,
+                        onClick = { onNavigate(destinations.route) }
+                    )
+                }
+                BottomBarRoute.MYOFFERS -> {
+                    NavigationBarItem(
+                        icon = { Icon(ImageVector.vectorResource(id = destinations.selectedIcon), contentDescription = null, modifier = Modifier.size(24.dp)) },
+                        selected = currentRoute == destinations.route,
+                        onClick = { onNavigate(destinations.route) }
+                    )
+                }
+            }
+            /*NavigationBarItem(
+                icon = { Icon(ImageVector.vectorResource(id = destinations.selectedIcon), contentDescription = null, modifier = Modifier.size(24.dp)) },
                 selected = currentRoute == destinations.route,
                 onClick = { onNavigate(destinations.route) }
-            )
+            )*/
         }
     }
 }

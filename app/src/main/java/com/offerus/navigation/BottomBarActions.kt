@@ -16,12 +16,12 @@ val SECTIONS = listOf(
         ),
     BottomBarActions(
         route = BottomBarRoute.HOME,
-        selectedIcon = R.drawable.ic_launcher_foreground,
+        selectedIcon = R.drawable.logorecortado,
 
         ),
     BottomBarActions(
         route = BottomBarRoute.MYOFFERS,
-        selectedIcon = R.drawable.ic_launcher_foreground,
+        selectedIcon = R.drawable.misofertas,
 
         )
 )
