@@ -1,10 +1,11 @@
 package com.offerus.components
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -43,118 +44,112 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
-import androidx.wear.compose.material.ExperimentalWearMaterialApi
-import androidx.wear.compose.material.FractionalThreshold
-import androidx.wear.compose.material.rememberSwipeableState
-import androidx.wear.compose.material.swipeable
 import com.offerus.R
 import kotlinx.coroutines.launch
 
-@OptIn(
-    ExperimentalAnimationApi::class, ExperimentalWearMaterialApi::class,
-    ExperimentalWearMaterialApi::class
-)
+
 @Composable
 fun LoginBox() {
-    val swipeableState = rememberSwipeableState(initialValue = 1)
-
-    val anchors = mapOf(0f to 2, 300f to 1)
+    val screenWidth = LocalConfiguration.current.screenWidthDp
     val coroutineScope = rememberCoroutineScope()
+    val offsetX = remember { mutableStateOf(0f) } // Estado para almacenar el desplazamiento en X
 
-    val onOptionSelected: (Int) -> Unit = { option ->
-        coroutineScope.launch {
-            swipeableState.animateTo(option)
-        }
+    // Calculamos el ancho de la pantalla en píxeles
+    val screenWidthInPx = with(LocalDensity.current) { screenWidth.dp.toPx() }
+    val triggerThreshold = screenWidthInPx * 0.8f
+    // Estado draggable
+    val draggableState = rememberDraggableState { delta ->
+        offsetX.value += delta
+        offsetX.value = offsetX.value.coerceIn(0f, screenWidthInPx)
     }
 
-    Column(
-        modifier = Modifier
-            //.background(shape = RoundedCornerShape(16.dp))
-            .fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Box(
-            modifier = Modifier
-                .height(50.dp)
-                .fillMaxWidth()
-                .swipeable(
-                    state = swipeableState,
-                    anchors = anchors,
-                    thresholds = { _, _ -> FractionalThreshold(0.3f) },
-                    orientation = Orientation.Horizontal
-                )
-        ) {
-            OptionSelector(
-                swipeableState.currentValue,
-                onOptionSelected= onOptionSelected
-            )
-        }
-        Spacer(
-            modifier = Modifier
-                .height(2.dp)
-                .fillMaxWidth(0.9f)
-                //.background(MaterialTheme.colorScheme.onPrimary)
+    Column(modifier = Modifier.fillMaxSize()) {
+        // OptionSelector fijo en la parte superior
+        OptionSelector(
+            selectedOption = if (offsetX.value > screenWidthInPx / 2) 1 else 2,
+            onOptionSelected = { option ->
+                coroutineScope.launch {
+                    offsetX.value = if (option == 1) screenWidthInPx else 0f
+                }
+            }
         )
-        Box(
+        Spacer(modifier = Modifier.height(2.dp).fillMaxWidth(0.9f))
+
+        Column(
             modifier = Modifier
-                .weight(0.75f)
-                .padding(8.dp)
-                .clipToBounds()
-                .swipeable(
-                    state = swipeableState,
-                    anchors = anchors,
-                    thresholds = { _, _ -> FractionalThreshold(0.3f) },
-                    orientation = Orientation.Horizontal
+                .weight(1f)
+                .draggable(
+                    state = draggableState,
+                    orientation = Orientation.Horizontal,
+                    onDragStopped = {
+                        coroutineScope.launch {
+                            if (offsetX.value > triggerThreshold && offsetX.value < screenWidthInPx - triggerThreshold) {
+                                // Si el usuario desplaza menos del umbral en cualquier dirección,
+                                // reestablecer a la posición más cercana
+                                if (offsetX.value < screenWidthInPx / 2) {
+                                    offsetX.value = 0f
+                                } else {
+                                    offsetX.value = screenWidthInPx
+                                }
+                            }
+                        }
+                    }
                 )
         ) {
-            this@Column.AnimatedVisibility(
-                visible = swipeableState.currentValue == 1,
-                enter = slideInHorizontally(initialOffsetX = { -1000 }),
-                exit = slideOutHorizontally(targetOffsetX = { -1000 })
+            Box(
+                modifier = Modifier
+                    .weight(0.75f)
+                    .padding(8.dp)
+                    .clipToBounds()
             ) {
-                LoginFieldView()
+                this@Column.AnimatedVisibility(
+                    visible = offsetX.value > screenWidthInPx / 2,
+                    enter = slideInHorizontally(initialOffsetX = { -1000 }),
+                    exit = slideOutHorizontally(targetOffsetX = { -1000 })
+                ) {
+                    LoginFieldView()
+                }
+                this@Column.AnimatedVisibility(
+                    visible = offsetX.value <= screenWidthInPx / 2,
+                    enter = slideInHorizontally(initialOffsetX = { 1000 }),
+                    exit = slideOutHorizontally(targetOffsetX = { 1000 })
+                ) {
+                    RegisterFieldView()
+                }
             }
-            this@Column.AnimatedVisibility(
-                visible = swipeableState.currentValue == 2,
-                enter = slideInHorizontally(initialOffsetX = { 1000 }),
-                exit = slideOutHorizontally(targetOffsetX = { 1000 })
+
+            Button(
+                onClick = { /* TO DO */ },
+                modifier = Modifier
+                    .height(70.dp)
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                shape = RoundedCornerShape(24.dp)
             ) {
-                RegisterFieldView()
-            }
-        }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        "Log in",
+                        style = MaterialTheme.typography.titleLarge,
+                        textAlign = TextAlign.Center
+                    )
 
-
-
-        Button(
-            onClick = { /* TO DO */ },
-            modifier = Modifier
-                .height(70.dp)
-                .fillMaxWidth()
-                .padding(8.dp),
-            shape = RoundedCornerShape(24.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    "Log in",
-                    style = MaterialTheme.typography.titleLarge,
-                    textAlign = TextAlign.Center
-                )
-
-
-                Icon(
-                    imageVector = Icons.Filled.ExitToApp,
-                    contentDescription = "Enviar",
-                    modifier = Modifier.padding(start = 8.dp)
-                )
+                    Icon(
+                        imageVector = Icons.Filled.ExitToApp,
+                        contentDescription = "Enviar",
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+                }
             }
         }
     }
@@ -169,11 +164,6 @@ fun OptionSelector(selectedOption: Int, onOptionSelected: (Int) -> Unit) {
         ) {
             Text(
                 "Login",
-                /*style = TextStyle(
-                    //color = MaterialTheme.colorScheme.primary,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Medium
-                ),*/
                 style = MaterialTheme.typography.titleLarge,
                 textDecoration = if (selectedOption == 1) TextDecoration.Underline else TextDecoration.None
             )
@@ -184,11 +174,6 @@ fun OptionSelector(selectedOption: Int, onOptionSelected: (Int) -> Unit) {
         ) {
             Text(
                 "Register",
-                /*style = TextStyle(
-                    //color = MaterialTheme.colorScheme.primary,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Medium
-                ),*/
                 style = MaterialTheme.typography.titleLarge,
                 textDecoration = if (selectedOption == 2) TextDecoration.Underline else TextDecoration.None
             )
