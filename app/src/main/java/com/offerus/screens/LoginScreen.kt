@@ -23,7 +23,10 @@ import com.offerus.ui.theme.primaryLight
 
 
 @Composable
-fun Login() {
+fun Login(
+    onLogedIn: () -> Unit = {},
+    OnRegister: () -> Unit = {},
+) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
@@ -45,7 +48,10 @@ fun Login() {
 
 
             Card(modifier = Modifier.weight(0.7f)) {
-                LoginBox()
+                LoginBox(
+                    onLogedIn = onLogedIn,
+                    OnRegister = OnRegister
+                )
             }
 
 

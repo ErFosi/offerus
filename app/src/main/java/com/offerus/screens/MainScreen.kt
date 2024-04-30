@@ -145,11 +145,6 @@ fun AppBottomBar(currentRoute: String?, onNavigate: (String) -> Unit) {
                     )
                 }
             }
-            /*NavigationBarItem(
-                icon = { Icon(ImageVector.vectorResource(id = destinations.selectedIcon), contentDescription = null, modifier = Modifier.size(24.dp)) },
-                selected = currentRoute == destinations.route,
-                onClick = { onNavigate(destinations.route) }
-            )*/
         }
     }
 }
@@ -263,11 +258,29 @@ fun OfferusNavigationRail(currentRoute: String, onNavigate: (String) -> Unit) {
     NavigationRail {
         SECTIONS.forEach { destinations ->
 
-            NavigationRailItem(
-                icon = { Icon(ImageVector.vectorResource(id = destinations.selectedIcon), contentDescription = null) },
-                selected = currentRoute == destinations.route,
-                onClick = { onNavigate(destinations.route) }
-            )
+            when (destinations.route) {
+                BottomBarRoute.HOME -> {
+                    NavigationRailItem(
+                        icon = { Icon(painter = painterResource(destinations.selectedIcon), contentDescription = null, modifier = Modifier.size(28.dp)) },
+                        selected = currentRoute == destinations.route,
+                        onClick = { onNavigate(destinations.route) }
+                    )
+                }
+                BottomBarRoute.SEARCH -> {
+                    NavigationRailItem(
+                        icon = { Icon(ImageVector.vectorResource(id = destinations.selectedIcon), contentDescription = null, modifier = Modifier.size(24.dp)) },
+                        selected = currentRoute == destinations.route,
+                        onClick = { onNavigate(destinations.route) }
+                    )
+                }
+                BottomBarRoute.MYOFFERS -> {
+                    NavigationRailItem(
+                        icon = { Icon(ImageVector.vectorResource(id = destinations.selectedIcon), contentDescription = null, modifier = Modifier.size(24.dp)) },
+                        selected = currentRoute == destinations.route,
+                        onClick = { onNavigate(destinations.route) }
+                    )
+                }
+            }
         }
     }
 }

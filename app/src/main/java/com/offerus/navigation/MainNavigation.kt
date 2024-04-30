@@ -9,18 +9,37 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.offerus.screens.MainScreen
 import com.offerus.screens.UserScreen
+import com.offerus.screens.Login
 
 @Composable
-fun MainNavigation() {
+fun MainNavigation(
+    logedIn: Boolean
+) {
     //hay que añadir el viewmodel como parametro
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = AppScreens.MainScreen.route){
+    var startDestination = AppScreens.MainScreen.route
+    if (!logedIn){
+        startDestination = AppScreens.LoginScreen.route
+    }
+
+
+    NavHost(navController = navController, startDestination = startDestination){
         composable(AppScreens.MainScreen.route){
             MainScreen(navController)
         }
         composable(AppScreens.UserScreen.route){
             UserScreen()
+        }
+        composable(AppScreens.LoginScreen.route){
+            Login(
+                onLogedIn = {
+                    navController.popBackStack()
+                    navController.navigate(AppScreens.MainScreen.route)
+                },
+                OnRegister = {
+                }
+            )
         }
     }
 }

@@ -60,7 +60,10 @@ import kotlinx.coroutines.launch
     ExperimentalWearMaterialApi::class
 )
 @Composable
-fun LoginBox() {
+fun LoginBox(
+    onLogedIn: () -> Unit = {},
+    OnRegister: () -> Unit = {},
+) {
     val swipeableState = rememberSwipeableState(initialValue = 1)
 
     val anchors = mapOf(0f to 2, 300f to 1)
@@ -131,7 +134,7 @@ fun LoginBox() {
 
 
         Button(
-            onClick = { /* TO DO */ },
+            onClick = { onLogedIn() },
             modifier = Modifier
                 .height(70.dp)
                 .fillMaxWidth()
