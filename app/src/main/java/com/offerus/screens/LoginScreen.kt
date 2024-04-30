@@ -59,7 +59,7 @@ fun Login() {
 
 @Preview(showBackground = true)
 @Composable
-fun PreviewMainScreen() {
+fun PreviewLogInScreen() {
     OfferUSTheme {
         Login()
     }
