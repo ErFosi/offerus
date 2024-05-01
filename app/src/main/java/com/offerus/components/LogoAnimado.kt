@@ -57,7 +57,7 @@ fun AnimatedLogo() {
             modifier = Modifier
                 .fillMaxSize()
                 .wrapContentSize(Alignment.Center)
-                .size(90.dp)
+                .size(70.dp)
         )
     }
 }

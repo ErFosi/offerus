@@ -129,6 +129,7 @@ dependencies {
     implementation ("io.ktor:ktor-client-cio:$ktor_version")
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
     implementation ("io.ktor:ktor-client-serialization-jvm:$ktor_version")
+    implementation ("io.ktor:ktor-client-okhttp:$ktor_version")
     // firebase
     // Import the Firebase BoM
     implementation(platform("com.google.firebase:firebase-bom:32.8.0"))

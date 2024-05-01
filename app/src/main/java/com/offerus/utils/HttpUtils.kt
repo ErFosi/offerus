@@ -1,6 +1,6 @@
 package com.offerus.utils
 
-import io.ktor.client.plugins.auth.providers.*
+import io.ktor.client.plugins.auth.providers.BearerTokens
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -11,6 +11,8 @@ import kotlinx.serialization.Serializable
 
 class AuthenticationException : Exception()
 class UserExistsException : Exception()
+
+class UnprocessableEntityException : Exception()
 
 
 /************************************************************************

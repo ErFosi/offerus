@@ -2,6 +2,7 @@ package com.offerus.screens
 
 
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -56,6 +57,7 @@ fun Login() {
 }
 
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @Preview(showBackground = true)
 @Composable
 fun PreviewLogInScreen() {
@@ -63,6 +65,4 @@ fun PreviewLogInScreen() {
         Login()
     }
 }
-
-
 
