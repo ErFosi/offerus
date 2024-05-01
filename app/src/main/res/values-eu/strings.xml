@@ -15,4 +15,5 @@
     <string name="hombre">Gizona</string>
     <string name="mujer">Emakumea</string>
     <string name="otros">Beste bat</string>
+    <string name="SeleccionarIdioma">Seleccionar idioma</string>
 </resources>

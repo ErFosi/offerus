@@ -29,8 +29,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         installSplashScreen()
         setContent {
-            OfferUSTheme {
-                // A surface container using the 'background' color from the theme
+            OfferUSTheme(
+                /* TODO darkTheme = viewmodel.tema.collectAsState(initial = true).value */
+            ) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background

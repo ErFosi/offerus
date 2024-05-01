@@ -1,8 +1,14 @@
 package com.offerus.components
 
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
 import android.location.Location
 import android.util.Log
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -11,16 +17,21 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.content.ContextCompat
+import com.google.android.gms.maps.model.BitmapDescriptor
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapType
+import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerInfoWindow
 import com.google.maps.android.compose.MarkerState
-import com.google.maps.android.compose.Polyline
+import com.google.maps.android.compose.rememberCameraPositionState
+import com.offerus.R
 import com.offerus.utils.locationUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -37,13 +48,24 @@ data class Marcador(
     @SerialName("nombre") val nombre: String,
     @SerialName("latitud") val latitud: Double,
     @SerialName("longitud") val longitud: Double,
+    @SerialName("categoría") val categoria: String,
+    @SerialName("precio") val precio: String
 )
 
+
+/**
+ * Muestra un mapa con los marcadores dados, en caso de haberlos
+ * @param marcadores lista de marcadores a mostrar
+ * @param permisoUbicacion si se tiene permiso para acceder a la ubicación
+ * @param sePuedeDesplazar si se puede desplazar el mapa
+ * @param cameraPosition posición inicial de la cámara (default: centro del mundo)
+ */
 @Composable
 fun mapa(
-    //viewModel: SeriesViewModel
     marcadores: List<Marcador>,
-    permisoUbicacion: Boolean
+    permisoUbicacion: Boolean,
+    sePuedeDesplazar: Boolean,
+    cameraPosition: CameraPosition = CameraPosition.Builder().target(LatLng(0.0, 0.0)).zoom(10f).build()
 ){
     val context = LocalContext.current
     var ubicacion: Location? by rememberSaveable { mutableStateOf(null) }
@@ -64,48 +86,139 @@ fun mapa(
 
         }
     }
+    var settings = MapUiSettings(
+        zoomControlsEnabled = true
+    )
+    if (!sePuedeDesplazar){
+        // establecer los mapuisettings para que no se pueda mover el mapa
+        settings = MapUiSettings(
+            scrollGesturesEnabled = false,
+            tiltGesturesEnabled = false,
+            zoomGesturesEnabled = false,
+            mapToolbarEnabled = false,
+            myLocationButtonEnabled = false,
+            zoomControlsEnabled = false,
+            compassEnabled = false,
+            rotationGesturesEnabled = false,
+            indoorLevelPickerEnabled = false,
+            scrollGesturesEnabledDuringRotateOrZoom = false
+        )
+    }
+    val cameraPositionState = rememberCameraPositionState {
+        position = cameraPosition
+    }
 
-    var colorLinea = Color.Black
     GoogleMap(
         modifier = Modifier.fillMaxSize(),
         properties = MapProperties(
             isMyLocationEnabled = permisoUbicacion,
             mapType = MapType.HYBRID
-        )
+        ),
+        uiSettings = settings,
+        cameraPositionState = cameraPositionState
 
     ){
-        marcadores.forEach{ marcador ->
-            // Crear el marcador
-            val marker = LatLng(marcador.latitud, marcador.longitud)
-            Marker(MarkerState(position = marker), title = marcador.nombre)
-        }
+
         if (permisoUbicacion) {
             if (ubicacion != null) {
-                Log.d("mapa", "Dibujando líneas")
-                Log.d("mapa", "Marcadores ordenados: $marcadoresOrdenados")
-                for ((index, marcador) in marcadoresOrdenados.withIndex()) {
-                    val colorLinea = if (index == 0) Color.Red else Color.Black
-                    val marker = LatLng(marcador.latitud, marcador.longitud)
 
-                    Polyline(
-                        points = listOf(
-                            marker,
-                            LatLng(ubicacion!!.latitude, ubicacion!!.longitude)
-                        ),
-                        color = colorLinea
+                // LOS MARCADORES ESTAN ORDENADOS POR DISTANCIA
+
+                for ((index, marcador) in marcadoresOrdenados.withIndex()) {
+                    val marker = LatLng(marcador.latitud, marcador.longitud)
+                    /**
+                     * posibles categorias:
+                     * Gratis
+                     * Deporte
+                     * Entretenimiento
+                     * Académico
+                     * Hogar
+                     * Online
+                     * Otros
+                     */
+
+                }
+
+            }
+        }else{
+            marcadores.forEach{ marcador ->
+                // Crear el marcador
+                Log.d("mapa", "Marcador: ${marcador.nombre}")
+                val marker = LatLng(marcador.latitud, marcador.longitud)
+
+                when (marcador.categoria) {
+                    "Gratis" -> MarkerInfoWindow(
+                            state = MarkerState(position = marker),
+                            icon = bitmapDescriptor(context, R.drawable.gratis, Color.GREEN),
+                            title = marcador.nombre,
+                            snippet = marcador.precio
                     )
+                    "Deporte" -> MarkerInfoWindow(
+                        state = MarkerState(position = marker),
+                        icon = bitmapDescriptor(context, R.drawable.deporte, Color.YELLOW),
+                        title = marcador.nombre,
+                        snippet = marcador.precio
+                    )
+                    "Entretenimiento" -> MarkerInfoWindow(
+                        state = MarkerState(position = marker),
+                        icon = bitmapDescriptor(context, R.drawable.ocio, Color.RED),
+                        title = marcador.nombre,
+                        snippet = marcador.precio
+                    )
+                    "Academico" -> MarkerInfoWindow(
+                        state = MarkerState(position = marker),
+                        icon = bitmapDescriptor(context, R.drawable.academico, Color.BLUE),
+                        title = marcador.nombre,
+                        snippet = marcador.precio
+                    )
+                    "Hogar" -> MarkerInfoWindow(
+                        state = MarkerState(position = marker),
+                        icon = bitmapDescriptor(context, R.drawable.hogar, Color.GRAY),
+                        title = marcador.nombre,
+                        snippet = marcador.precio
+                    )
+                    "Online" -> MarkerInfoWindow(
+                        state = MarkerState(position = marker),
+                        icon = bitmapDescriptor(context, R.drawable.online, Color.DKGRAY),
+                        title = marcador.nombre,
+                        snippet = marcador.precio
+                    )
+                    "Otros" -> MarkerInfoWindow(
+                        state = MarkerState(position = marker),
+                        icon = bitmapDescriptor(context, R.drawable.otros, Color.MAGENTA),
+                        title = marcador.nombre,
+                        snippet = marcador.precio
+                    )
+
+                    else -> Marker(MarkerState(position = marker), title = marcador.nombre)
+
                 }
             }
         }
-
     }
 }
+
+/**
+ * Ordena los marcadores por distancia a la ubicación dada
+ * @param marcadores lista de marcadores a ordenar
+ * @param ubicacion ubicación de referencia
+ * @return lista de marcadores ordenados por distancia
+ */
+
 fun ordenarMarcadoresPorDistancia(marcadores: List<Marcador>, ubicacion: Location): List<Marcador> {
     return marcadores.sortedBy { marcador ->
         distanciaEntrePuntos(marcador.latitud, marcador.longitud, ubicacion.latitude, ubicacion.longitude)
     }
 }
 
+/**
+ * Calcula la distancia en kilómetros entre dos puntos geográficos
+ * @param lat1 latitud del primer punto
+ * @param lon1 longitud del primer punto
+ * @param lat2 latitud del segundo punto
+ * @param lon2 longitud del segundo punto
+ * @return distancia en kilómetros
+ */
 fun distanciaEntrePuntos(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
     val R = 6371.0 // Radio de la Tierra en kilómetros
 
@@ -123,9 +236,36 @@ fun distanciaEntrePuntos(lat1: Double, lon1: Double, lat2: Double, lon2: Double)
     return R * c
 }
 
-// preview
-@Composable
-@Preview
-fun mapaPreview(){
-    //mapa()
+/**
+ * Crea un BitmapDescriptor a partir de un recurso drawable
+ * @param context contexto de la aplicación
+ * @param resId id del recurso drawable
+ * @param color color del círculo que rodea al icono
+ * @return BitmapDescriptor creado
+ */
+fun bitmapDescriptor(
+    context: Context,
+    resId: Int,
+    color: Int = Color.RED// Color predeterminado del icono
+): BitmapDescriptor? {
+    val drawable = ContextCompat.getDrawable(context, resId) ?: return null
+    val size = drawable.intrinsicWidth.coerceAtLeast(drawable.intrinsicHeight)
+    val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+    val canvas = Canvas(bitmap)
+
+    // Dibujar el fondo circular con padding
+    val padding = size / 4
+    val paint = Paint().apply {
+        isAntiAlias = true
+        this.color = color
+    }
+    val radius = (size - 2 * padding) / 2f
+    canvas.drawCircle(size / 2f, size / 2f, radius + padding, paint)
+
+    // Dibujar el icono con padding
+    drawable.setBounds(padding, padding, size - padding, size - padding)
+    drawable.draw(canvas)
+
+    return BitmapDescriptorFactory.fromBitmap(bitmap)
 }
+

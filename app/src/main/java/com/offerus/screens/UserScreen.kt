@@ -23,9 +23,9 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -41,7 +41,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
@@ -50,12 +49,19 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
 import com.gowtham.ratingbar.RatingBar
 import com.gowtham.ratingbar.RatingBarStyle
 import com.offerus.R
 import com.offerus.components.DialogoDatosPersonales
+import com.offerus.components.DialogoSeleccionarUbicacion
 import com.offerus.components.DialogoSobreMi
+import com.offerus.components.Marcador
 import com.offerus.components.ProfilePicture
+import com.offerus.components.ThemeSwitcher
+import com.offerus.components.languageSwitcher
+import com.offerus.components.mapa
 import com.offerus.ui.theme.OfferUSTheme
 import java.io.File
 
@@ -71,10 +77,16 @@ fun UserScreen(){
     var contrasenaExpanded by rememberSaveable {
         mutableStateOf(false)
     }
+    var suscripcionesExpanded by rememberSaveable {
+        mutableStateOf(false)
+    }
     var sobreMiEdit by rememberSaveable {
         mutableStateOf(false)
     }
     var datosPersonalesEdit by rememberSaveable {
+        mutableStateOf(false)
+    }
+    var ubicacionEdit by rememberSaveable {
         mutableStateOf(false)
     }
 
@@ -83,7 +95,7 @@ fun UserScreen(){
             .verticalScroll(rememberScrollState())
             .fillMaxSize()
             .wrapContentSize(Alignment.Center)
-            //.padding(horizontal = 50.dp)
+            .padding(vertical = 35.dp)
         )
     {
         Row(
@@ -286,6 +298,108 @@ fun UserScreen(){
                 }
             }
         }
+        // Suscripciones
+        Row {
+            Text(
+                text = "Suscripciones a temas", // TODO: poner stringresource
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier
+                    .padding(start = 30.dp, top = 20.dp, end = 20.dp)
+                    .weight(1f)
+                    .clickable(onClick = { suscripcionesExpanded = !suscripcionesExpanded })
+            )
+            IconButton(
+                onClick = { suscripcionesExpanded = !suscripcionesExpanded },
+                modifier = Modifier.padding(top = 8.dp, end = 30.dp, bottom = 0.dp)
+            ) {
+                Icon(
+                    imageVector = if (!suscripcionesExpanded) Icons.Filled.KeyboardArrowDown else Icons.Filled.KeyboardArrowUp,
+                    contentDescription = "Edit",
+                    modifier = Modifier
+                        .size(20.dp)
+                        .padding(0.dp)
+                )
+            }
+        }
+        Divider(
+            modifier = Modifier.padding(top = 0.dp, start = 30.dp, end = 30.dp, bottom = 10.dp),
+            thickness = 0.75.dp,
+            color = MaterialTheme.colorScheme.secondary
+        )
+        AnimatedVisibility(visible = suscripcionesExpanded){
+            val keyboardController = LocalSoftwareKeyboardController.current
+            Card(modifier = Modifier.padding(start = 30.dp, end = 30.dp)) {
+                Column(
+                    modifier = Modifier
+                        .padding(10.dp)
+                        .fillMaxWidth(),
+                ) {
+                    Row (verticalAlignment = Alignment.CenterVertically){
+
+                        Column(modifier = Modifier.width(135.dp)) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Checkbox(checked = false, onCheckedChange = {})
+                                Text(text = "Gratis")
+                            }
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Checkbox(checked = false, onCheckedChange = {})
+                                Text(text = "Deporte")
+                            }
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Checkbox(checked = false, onCheckedChange = {})
+                                Text(text = "Hogar")
+                            }
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Checkbox(checked = false, onCheckedChange = {})
+                                Text(text = "Otros")
+                            }
+                        }
+                        Column(modifier = Modifier.width(180.dp)) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Checkbox(checked = false, onCheckedChange = {})
+                                Text(text = "Entretenimiento")
+                            }
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Checkbox(checked = false, onCheckedChange = {})
+                                Text(text = "Academico")
+                            }
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Checkbox(checked = false, onCheckedChange = {})
+                                Text(text = "Online")
+                            }
+                        }
+                    }
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        //horizontalArrangement = Arrangement.Center,
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .align(Alignment.CenterHorizontally),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        OutlinedButton(onClick = {
+                            /*TODO*/
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.Clear,
+                                contentDescription = ""// stringResource(R.string.Cancelar)
+                            )
+                        }
+
+                        Button(onClick = {
+                            /*TODO*/
+                        }) {
+                            Text(text = "")
+                            Icon(
+                                imageVector = Icons.Default.Check,
+                                contentDescription = ""//stringResource(R.string.Borrar)
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
         // Contrasena
         Row {
             Text(
@@ -331,7 +445,9 @@ fun UserScreen(){
                         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done, keyboardType = KeyboardType.Password),
                         keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
                         leadingIcon = {
-                            Icon(Icons.Filled.Lock, contentDescription = null, modifier = Modifier.padding(0.dp).size(20.dp))
+                            Icon(Icons.Filled.Lock, contentDescription = null, modifier = Modifier
+                                .padding(0.dp)
+                                .size(20.dp))
                         }
                     )
                     OutlinedTextField(
@@ -343,7 +459,9 @@ fun UserScreen(){
                         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done, keyboardType = KeyboardType.Password),
                         keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
                         leadingIcon = {
-                            Icon(Icons.Filled.Lock, contentDescription = null, modifier = Modifier.padding(0.dp).size(20.dp))
+                            Icon(Icons.Filled.Lock, contentDescription = null, modifier = Modifier
+                                .padding(0.dp)
+                                .size(20.dp))
                         }
                     )
                     OutlinedTextField(
@@ -355,7 +473,9 @@ fun UserScreen(){
                         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done, keyboardType = KeyboardType.Password),
                         keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
                         leadingIcon = {
-                            Icon(Icons.Filled.Lock, contentDescription = null, modifier = Modifier.padding(0.dp).size(20.dp))
+                            Icon(Icons.Filled.Lock, contentDescription = null, modifier = Modifier
+                                .padding(0.dp)
+                                .size(20.dp))
                         }
                     )
                     Row(
@@ -403,13 +523,31 @@ fun UserScreen(){
         }
 
         // MAPA
-        Text(
-            text = "Mi ubicación", // TODO: poner stringresource
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier
-                .padding(start = 30.dp, top = 20.dp, end = 20.dp)
-                .weight(1f)
-                .clickable(onClick = { contrasenaExpanded = !contrasenaExpanded })
+        Row {
+            Text(
+                text = "Mi ubicación", // TODO: poner stringresource
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier
+                    .padding(start = 30.dp, top = 20.dp, end = 20.dp)
+                    .weight(1f)
+            )
+            IconButton(
+                onClick = { ubicacionEdit = !ubicacionEdit },
+                modifier = Modifier.padding(top = 8.dp, end = 30.dp, bottom = 0.dp)
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.editar),
+                    contentDescription = "Edit",
+                    modifier = Modifier
+                        .size(20.dp)
+                        .padding(0.dp)
+                )
+            }
+        }
+        Divider(
+            modifier = Modifier.padding(top = 0.dp, start = 30.dp, end = 30.dp, bottom = 10.dp),
+            thickness = 0.75.dp,
+            color = MaterialTheme.colorScheme.secondary
         )
         Card(modifier = Modifier.padding(start = 30.dp, end = 30.dp)) {
             Column(
@@ -418,10 +556,53 @@ fun UserScreen(){
                     .fillMaxWidth()
                     .height(200.dp),
             ){
-                Text("Aqui va el mapa")
+                val marcador1 = Marcador(
+                    // TODO poner aquí la ubicación del usuarioo
+                    latitud = 43.2628005,
+                    longitud = -2.9479811,
+                    nombre = "Mi ubicación",
+                    categoria = "null",
+                    precio = "null"
+                )
+                val marcador2 = Marcador(
+                    // TODO poner aquí la ubicación del usuarioo
+                    latitud = 43.2628005,
+                    longitud = -2.9479819,
+                    nombre = "Mi ubicación",
+                    categoria = "Gratis",
+                    precio = "null"
+                )
+                val marcador3 = Marcador(
+                    // TODO poner aquí la ubicación del usuarioo
+                    latitud = 43.2628405,
+                    longitud = -2.9479834,
+                    nombre = "Mi ubicación",
+                    categoria = "Deporte",
+                    precio = "null"
+                )
+                mapa(
+                    permisoUbicacion = false,
+                    marcadores = listOf(marcador1, marcador2, marcador3),
+                    sePuedeDesplazar = false,
+                    cameraPosition = CameraPosition.fromLatLngZoom(LatLng(marcador1.latitud, marcador1.longitud), 15F)
+                )
             }
         }
-
+        if (ubicacionEdit){
+            DialogoSeleccionarUbicacion(
+                onDismissRequest = { ubicacionEdit = false},
+                onConfirmation = { ubicacionEdit = false /*TODO*/ }
+            )
+        }
+        Row(
+            modifier = Modifier
+                .padding(horizontal = 40.dp, vertical = 20.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            languageSwitcher()
+            ThemeSwitcher(onClick = {})
+        }
     }
 }
 

@@ -15,4 +15,5 @@
     <string name="hombre">Hombre</string>
     <string name="mujer">Mujer</string>
     <string name="otros">Otro</string>
+    <string name="SeleccionarIdioma">Seleccionar idioma</string>
 </resources>
