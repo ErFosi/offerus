@@ -312,7 +312,8 @@ class UserClient @Inject constructor() {
     }
 
     /*
-    *@Description: Función que manda la petición de buscar peticiones/servicio dados parámetros de búsqueda
+    *@Description: Función que manda la petición de buscar peticiones/servicio dados parámetros de búsqueda, NOTA IMPORTANTE: la busqueda
+    * debe ser precio_desc, precio_asc ó distancia.
     * @Param busqueda: BusquedaPeticionServicio
     * @Throws UnprocessableEntityException
     * @Throws Exception
