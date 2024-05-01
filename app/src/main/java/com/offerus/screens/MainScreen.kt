@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.util.Log
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,9 +16,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -46,11 +42,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -103,7 +97,7 @@ fun MainScreen(navControllerMain: NavHostController){
             NavHost(navController, startDestination = BottomBarRoute.HOME) {
                 composable(BottomBarRoute.HOME) {
                     // Contenido de la pestaña Home
-                    HomeScreen()
+                    HomeScreen(navControllerMain)
                 }
                 composable(BottomBarRoute.SEARCH) {
                     // Contenido de la pestaña Team
@@ -125,7 +119,7 @@ fun AppBottomBar(currentRoute: String?, onNavigate: (String) -> Unit) {
             when (destinations.route) {
                 BottomBarRoute.HOME -> {
                     NavigationBarItem(
-                        icon = { Icon(painter = painterResource(destinations.selectedIcon), contentDescription = null, modifier = Modifier.size(28.dp)) },
+                        icon = { Icon(painter = painterResource(destinations.selectedIcon), contentDescription = null, modifier = Modifier.size(32.dp)) },
                         selected = currentRoute == destinations.route,
                         onClick = { onNavigate(destinations.route) }
                     )
@@ -173,19 +167,14 @@ fun ToolBar(onUserClick: () -> Unit) {
 
                 ) {
 
-                    // Columna a la izquierda con "Zapete" en grande y "Fantasy" abajo
+                    // Columna a la izquierda con el logo de OFFERUS
                     Column(
                         modifier = Modifier
                             .padding(8.dp),
                         verticalArrangement = Arrangement.spacedBy(0.dp)
                     ) {
-                        Text(
-                            "OFFERUS",
-                            fontSize = 20.sp,
-                            lineHeight = 20.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            fontStyle = FontStyle.Italic
-                        )
+                        Icon(painter = painterResource(id = R.drawable.offerus_letras_sinbg), contentDescription = null, modifier = Modifier.size(132.dp))
+
                     }
 
                     Spacer(modifier = Modifier.weight(1f))
@@ -249,25 +238,33 @@ fun MyOffersScreen() {
     }
 }
 
-
-
-@Composable
-fun HomeScreen() {
-    Surface {
-        Text(text = "HOME SCREEN")
-    }
-}
-
 @Composable
 fun OfferusNavigationRail(currentRoute: String, onNavigate: (String) -> Unit) {
     NavigationRail {
         SECTIONS.forEach { destinations ->
-
-            NavigationRailItem(
-                icon = { Icon(ImageVector.vectorResource(id = destinations.selectedIcon), contentDescription = null) },
-                selected = currentRoute == destinations.route,
-                onClick = { onNavigate(destinations.route) }
-            )
+            when (destinations.route) {
+                BottomBarRoute.HOME -> {
+                    NavigationRailItem(
+                        icon = { Icon(painter = painterResource(destinations.selectedIcon), contentDescription = null, modifier = Modifier.size(32.dp)) },
+                        selected = currentRoute == destinations.route,
+                        onClick = { onNavigate(destinations.route) }
+                    )
+                }
+                BottomBarRoute.SEARCH -> {
+                    NavigationRailItem(
+                        icon = { Icon(ImageVector.vectorResource(id = destinations.selectedIcon), contentDescription = null) },
+                        selected = currentRoute == destinations.route,
+                        onClick = { onNavigate(destinations.route) }
+                    )
+                }
+                BottomBarRoute.MYOFFERS -> {
+                    NavigationRailItem(
+                        icon = { Icon(ImageVector.vectorResource(id = destinations.selectedIcon), contentDescription = null) },
+                        selected = currentRoute == destinations.route,
+                        onClick = { onNavigate(destinations.route) }
+                    )
+                }
+            }
         }
     }
 }

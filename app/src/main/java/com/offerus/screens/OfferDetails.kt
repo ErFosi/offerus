@@ -1,9 +1,9 @@
 package com.offerus.screens
 
-import android.annotation.SuppressLint
+import android.Manifest
+import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -28,19 +28,21 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import androidx.compose.ui.unit.dp
-import com.offerus.ui.theme.OfferUSTheme
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
+import com.offerus.utils.crearContacto
+import com.offerus.utils.enviarEmail
 
 @Composable
 fun OfferDetails() {
@@ -190,9 +192,22 @@ fun OfferDetails() {
     }
 }
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun BotonesDetalles() {
+    val context = LocalContext.current
 
+    val permissions = arrayOf(
+        Manifest.permission.WRITE_CONTACTS,
+        Manifest.permission.READ_CONTACTS,
+    )
+    val permissionState = rememberMultiplePermissionsState(
+        permissions = permissions.toList()
+
+    )
+    LaunchedEffect(true) {
+        permissionState.launchMultiplePermissionRequest()
+    }
     //botones de accion
     Row(
         modifier = Modifier
@@ -203,13 +218,13 @@ fun BotonesDetalles() {
     ) {
 
         //boton de llamar
-        ElevatedButton(onClick = { /*TODO*/ }) {
+        ElevatedButton(onClick = { nuevoContacto(context) }) {
             Icon(Icons.Filled.Call, contentDescription = "Llamar")
         }
 
         Spacer(modifier = Modifier.width(16.dp))
 
-        ElevatedButton(onClick = { /*TODO*/ }) {
+        ElevatedButton(onClick = { }) {
             Icon(
                 Icons.Filled.AddCircle, contentDescription = "Solicitar", modifier = Modifier
                     .padding(vertical = 2.dp, horizontal = 8.dp)
@@ -217,24 +232,27 @@ fun BotonesDetalles() {
             )
         }
 
-
-
         Spacer(modifier = Modifier.width(16.dp))
 
-        ElevatedButton(onClick = { /*TODO*/ }) {
+        ElevatedButton(onClick = {
+            enviarEmail(
+                context,
+                "ejemplo@gmail.com",
+                "Servicio de Offerus",
+                "Hola, me gustaria tener mas información acerca de tu servicio."
+            )
+        }) {
             Icon(Icons.Filled.Email, contentDescription = "Email")
         }
     }
 }
 
 
-//preview of the composable
-
-@Preview(showBackground = true, showSystemUi = false)
-@Composable
-fun OfferDetailsPreview() {
-    OfferUSTheme {
-        OfferDetails()
-    }
+fun nuevoContacto(context: Context) {
+    //var contactos = obtenerContactos(context.contentResolver)
+    //Log.d("contactos", contactos.toString())
+    crearContacto(context.contentResolver, "Prueba Test", "123456789")
 }
+
+
 

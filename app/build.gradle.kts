@@ -129,4 +129,7 @@ dependencies {
     // https://firebase.google.com/docs/android/setup#available-libraries
     implementation("com.google.firebase:firebase-messaging-ktx")
 
+    //PERMISSIONS
+    implementation("com.google.accompanist:accompanist-permissions:0.24.13-rc")
+
 }
