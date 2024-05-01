@@ -20,9 +20,13 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
@@ -243,6 +247,7 @@ fun UserScreen(){
                 modifier = Modifier
                     .padding(start = 30.dp, top = 20.dp, end = 20.dp)
                     .weight(1f)
+                    .clickable(onClick = { datosPersonalesExpanded = !datosPersonalesExpanded })
             )
             IconButton(
                 onClick = { datosPersonalesExpanded = !datosPersonalesExpanded },
@@ -277,11 +282,26 @@ fun UserScreen(){
                     Column(
                         modifier = Modifier.width(270.dp)
                     ) {
-                        Text(text = "Nombre y apellidos") // TODO: get user name
-                        Text(text = "Telefono")
-                        Text(text = "Email")
-                        Text(text = "Edad")
-                        Text(text = "Sexo")
+                        Row(modifier = Modifier.padding(vertical = 5.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Filled.Person, contentDescription = null, modifier = Modifier.padding(end = 5.dp).size(20.dp))
+                            Text(text = "Nombre y apellidos") // TODO: get user name
+                        }
+                        Row(modifier = Modifier.padding(vertical = 5.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Filled.Phone, contentDescription = null, modifier = Modifier.padding(end = 5.dp).size(20.dp))
+                            Text(text = "Telefono") // TODO: get user name
+                        }
+                        Row(modifier = Modifier.padding(vertical = 5.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Filled.Email, contentDescription = null, modifier = Modifier.padding(end = 5.dp).size(20.dp))
+                            Text(text = "Email") // TODO: get user name
+                        }
+                        Row(modifier = Modifier.padding(vertical = 5.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Filled.DateRange, contentDescription = null, modifier = Modifier.padding(end = 5.dp).size(20.dp))
+                            Text(text = "Edad") // TODO: get user name
+                        }
+                        Row(modifier = Modifier.padding(vertical = 5.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Icon(painter = painterResource(R.drawable.gender), contentDescription = null, modifier = Modifier.padding(end = 5.dp).size(20.dp))
+                            Text(text = "Sexo") // TODO: get user name
+                        }
                     }
                     IconButton(
                         onClick = { datosPersonalesEdit = true },
