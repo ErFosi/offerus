@@ -8,6 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.offerus.screens.MainScreen
+import com.offerus.screens.OfferDetails
 import com.offerus.screens.UserScreen
 import com.offerus.screens.Login
 
@@ -40,6 +41,9 @@ fun MainNavigation(
                 OnRegister = {
                 }
             )
+        }
+        composable(AppScreens.OfferDetailsScreen.route){
+            OfferDetails()
         }
     }
 }

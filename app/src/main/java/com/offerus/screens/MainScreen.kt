@@ -103,7 +103,7 @@ fun MainScreen(navControllerMain: NavHostController){
             NavHost(navController, startDestination = BottomBarRoute.HOME) {
                 composable(BottomBarRoute.HOME) {
                     // Contenido de la pestaña Home
-                    HomeScreen()
+                    HomeScreen(navControllerMain)
                 }
                 composable(BottomBarRoute.SEARCH) {
                     // Contenido de la pestaña Team
@@ -125,7 +125,7 @@ fun AppBottomBar(currentRoute: String?, onNavigate: (String) -> Unit) {
             when (destinations.route) {
                 BottomBarRoute.HOME -> {
                     NavigationBarItem(
-                        icon = { Icon(painter = painterResource(destinations.selectedIcon), contentDescription = null, modifier = Modifier.size(28.dp)) },
+                        icon = { Icon(painter = painterResource(destinations.selectedIcon), contentDescription = null, modifier = Modifier.size(32.dp)) },
                         selected = currentRoute == destinations.route,
                         onClick = { onNavigate(destinations.route) }
                     )
@@ -168,19 +168,14 @@ fun ToolBar(onUserClick: () -> Unit) {
 
                 ) {
 
-                    // Columna a la izquierda con "Zapete" en grande y "Fantasy" abajo
+                    // Columna a la izquierda con el logo de OFFERUS
                     Column(
                         modifier = Modifier
                             .padding(8.dp),
                         verticalArrangement = Arrangement.spacedBy(0.dp)
                     ) {
-                        Text(
-                            "OFFERUS",
-                            fontSize = 20.sp,
-                            lineHeight = 20.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            fontStyle = FontStyle.Italic
-                        )
+                        Icon(painter = painterResource(id = R.drawable.offerus_letras_sinbg), contentDescription = null, modifier = Modifier.size(132.dp))
+
                     }
 
                     Spacer(modifier = Modifier.weight(1f))
@@ -244,38 +239,28 @@ fun MyOffersScreen() {
     }
 }
 
-
-
-@Composable
-fun HomeScreen() {
-    Surface {
-        Text(text = "HOME SCREEN")
-    }
-}
-
 @Composable
 fun OfferusNavigationRail(currentRoute: String, onNavigate: (String) -> Unit) {
     NavigationRail {
         SECTIONS.forEach { destinations ->
-
             when (destinations.route) {
                 BottomBarRoute.HOME -> {
                     NavigationRailItem(
-                        icon = { Icon(painter = painterResource(destinations.selectedIcon), contentDescription = null, modifier = Modifier.size(28.dp)) },
+                        icon = { Icon(painter = painterResource(destinations.selectedIcon), contentDescription = null, modifier = Modifier.size(32.dp)) },
                         selected = currentRoute == destinations.route,
                         onClick = { onNavigate(destinations.route) }
                     )
                 }
                 BottomBarRoute.SEARCH -> {
                     NavigationRailItem(
-                        icon = { Icon(ImageVector.vectorResource(id = destinations.selectedIcon), contentDescription = null, modifier = Modifier.size(24.dp)) },
+                        icon = { Icon(ImageVector.vectorResource(id = destinations.selectedIcon), contentDescription = null) },
                         selected = currentRoute == destinations.route,
                         onClick = { onNavigate(destinations.route) }
                     )
                 }
                 BottomBarRoute.MYOFFERS -> {
                     NavigationRailItem(
-                        icon = { Icon(ImageVector.vectorResource(id = destinations.selectedIcon), contentDescription = null, modifier = Modifier.size(24.dp)) },
+                        icon = { Icon(ImageVector.vectorResource(id = destinations.selectedIcon), contentDescription = null) },
                         selected = currentRoute == destinations.route,
                         onClick = { onNavigate(destinations.route) }
                     )
