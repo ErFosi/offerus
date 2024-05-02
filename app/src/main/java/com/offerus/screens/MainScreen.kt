@@ -111,11 +111,11 @@ fun MainScreen(
                 }
                 composable(BottomBarRoute.SEARCH) {
                     // Contenido de la pestaña Team
-                    SearchScreen(mainViewModel = mainViewModel )
+                    OffersScreen(mainViewModel = mainViewModel, myOffers = false, navController = navControllerMain)
                 }
                 composable(BottomBarRoute.MYOFFERS) {
                     // Contenido de la pestaña Table
-                    MyOffersScreen()
+                    OffersScreen(mainViewModel = mainViewModel, myOffers = true, navController = navControllerMain)
                 }
             }
         }

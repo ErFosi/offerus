@@ -1,29 +1,38 @@
 package com.offerus.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Refresh
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenuItem
@@ -57,19 +66,28 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.navigation.NavController
 import androidx.wear.compose.material.ExperimentalWearMaterialApi
 import androidx.wear.compose.material.rememberSwipeableState
 import com.offerus.R
+import com.offerus.model.database.entities.Deal
+import com.offerus.navigation.AppScreens
+import com.offerus.utils.createDealList
+import com.offerus.utils.showToastOnMainThread
 import com.offerus.viewModels.MainViewModel
+
 
 
 @OptIn(ExperimentalWearMaterialApi::class)
 @Composable
-fun SearchScreen(
-    mainViewModel: MainViewModel
+fun OffersScreen(
+    navController: NavController,
+    mainViewModel: MainViewModel,
+    myOffers: Boolean // Si es pagina MisOfertas true, si es pagina buscar false
 ) {
 
     val openCreateDialog = remember { mutableStateOf(false) }
@@ -120,16 +138,7 @@ fun SearchScreen(
     Surface {
 
         Column {
-            /*
-            SelectableButtonRow(
-                button1Text = "Ofertas",
-                button2Text = "Solicitudes",
-                onButton1Selected = { subPaginaOfertas.value = true },
-                onButton2Selected = { subPaginaOfertas.value = false },
-                subPaginaOfertasSelected = subPaginaOfertas.value
-            )
 
-             */
             TabRow(selectedTabIndex) {
                 // Crear una pestaña para cada elemento en la lista de pestañas
                 tabs.forEachIndexed { index, title ->
@@ -141,13 +150,19 @@ fun SearchScreen(
 
             Spacer(modifier = Modifier.height(20.dp))
             SubPageSearch(
-                onOpenCreateDialog = { openCreateDialog.value = true },
-                onOpenFilterDialog = {  openFilterDialog.value = true }
+                onOpenFilterDialog = {  openFilterDialog.value = true },
+                myOffers = myOffers,
+                navController = navController
             )
+            ListaOfertas(myOffers = myOffers, onItemClick = {navController.navigate(AppScreens.OfferDetailsScreen.route)} )
+
+
+            if ( myOffers ) {
+                CreateOferRequestFloatingButton (
+                    onOpenCreateDialog = { openCreateDialog.value = true }
+                )
+            }
         }
-
-
-
 
     }
 }
@@ -155,8 +170,9 @@ fun SearchScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SubPageSearch(
+    navController: NavController,
     onOpenFilterDialog: () -> Unit,
-    onOpenCreateDialog: () -> Unit
+    myOffers: Boolean
 
 ){
     Column {
@@ -193,17 +209,19 @@ fun SubPageSearch(
 
             ){
 
-            OutlinedButton(
-                modifier = Modifier
+            if ( !myOffers ){
+                OutlinedButton(
+                    modifier = Modifier
 
-                    .width(80.dp),
-                onClick = { /*TODO*/ }
+                        .width(80.dp),
+                    onClick = { /*TODO*/ }
 
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.baseline_map_24),
-                    null
-                )
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.baseline_map_24),
+                        null
+                    )
+                }
             }
 
             OutlinedButton(
@@ -220,26 +238,7 @@ fun SubPageSearch(
 
 
         }
-        OfferList()
 
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight()
-                .wrapContentSize(Alignment.BottomEnd)
-                .padding(16.dp)
-        ) {
-            FloatingActionButton(
-                onClick = { onOpenCreateDialog() },
-
-                modifier = Modifier
-                    .padding(16.dp)
-                    .size(56.dp),
-                shape = CircleShape
-            ) {
-                Icon(Icons.Filled.Add, "Floating action button.")
-            }
-        }
 
     }
 }
@@ -710,6 +709,113 @@ fun DropdownCategorias(
                     )
                 }
             }
+        }
+    }
+}
+@Composable
+fun CreateOferRequestFloatingButton(
+    onOpenCreateDialog: () -> Unit
+){
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight()
+            .wrapContentSize(Alignment.BottomEnd)
+            .padding(16.dp)
+    ) {
+        FloatingActionButton(
+            onClick = { onOpenCreateDialog() },
+
+            modifier = Modifier
+                .padding(16.dp)
+                .size(56.dp),
+            shape = CircleShape
+        ) {
+            Icon(Icons.Filled.Add, "Floating action button.")
+        }
+    }
+}
+
+@Composable
+fun ListaOfertas(onItemClick: () -> Unit, myOffers: Boolean) {
+    //obtenemos la lista del viemodel
+    var listaEntrantes = createDealList()
+    //mostramos la lista
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(8.dp)
+    ) {
+        LazyColumn {
+            items(listaEntrantes.size) { index ->
+                OfertasCard(deal = listaEntrantes[index], myOffers = myOffers, onItemClick = onItemClick)
+            }
+        }
+    }
+}
+
+@Composable
+fun OfertasCard(deal: Deal, onItemClick: () -> Unit, myOffers: Boolean) {
+    var context = LocalContext.current
+    Card(
+        modifier = Modifier
+            .padding(8.dp)
+            .clickable(onClick = onItemClick)
+    ) {
+
+        OfferInfo(deal = deal) {
+            if ( myOffers ) {
+                BotonesMisOfertas()
+            } else {
+                BotonesOfertas()
+            }
+
+        }
+    }
+}
+
+@Composable
+fun BotonesOfertas() {
+    var context = LocalContext.current
+    Column {
+        IconButton(onClick = {  }) {
+            Icon(
+                imageVector = Icons.Filled.LocationOn,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary
+            )
+        }
+        IconButton(onClick = {
+            showToastOnMainThread(context, "Petición rechazada")
+        }) {
+            Icon(
+                imageVector = Icons.Filled.Close,
+                contentDescription = "Rechazar",
+                tint = MaterialTheme.colorScheme.error
+            )
+        }
+    }
+}
+
+@Composable
+fun BotonesMisOfertas() {
+    var context = LocalContext.current
+    Column {
+        IconButton(onClick = {  }) {
+            Icon(
+                imageVector = Icons.Filled.Edit,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary
+            )
+        }
+        IconButton(onClick = {
+
+        }) {
+            Icon(
+                imageVector = Icons.Filled.Delete,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.error
+            )
         }
     }
 }

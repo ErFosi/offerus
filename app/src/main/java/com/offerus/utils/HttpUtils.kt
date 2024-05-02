@@ -11,7 +11,6 @@ import kotlinx.serialization.Serializable
 
 class AuthenticationException : Exception()
 class UserExistsException : Exception()
-
 class UnprocessableEntityException : Exception()
 
 
