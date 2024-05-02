@@ -48,8 +48,8 @@ import com.offerus.utils.enviarEmail
 fun OfferDetails() {
 
     // lista de categorias
-    var categories = listOf("Deportes", "Gratis")
-    var favorito = rememberSaveable { mutableStateOf(false) }
+    val categories = listOf("Deportes", "Gratis")
+    val favorito = rememberSaveable { mutableStateOf(false) }
 
     Surface {
         Column(

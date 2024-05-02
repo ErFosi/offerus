@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
@@ -37,12 +38,15 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -56,30 +60,90 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.wear.compose.material.ExperimentalWearMaterialApi
+import androidx.wear.compose.material.rememberSwipeableState
 import com.offerus.R
+import com.offerus.viewModels.MainViewModel
 
 
+@OptIn(ExperimentalWearMaterialApi::class)
 @Composable
 fun SearchScreen(
-
+    mainViewModel: MainViewModel
 ) {
-    // SubPagina seleccionada ( Ofertas / Solicitudes )
-    var selectedSubscreen by remember { mutableStateOf("Ofertas") }
+
+    val openCreateDialog = remember { mutableStateOf(false) }
+    val openFilterDialog = remember { mutableStateOf(false) }
+    val openDescriptionDialog = remember { mutableStateOf(false) }
+
+    var selectedTabIndex by remember { mutableIntStateOf(0) }
+    val tabs = listOf("Ofertas", "Solicitudes")
+
+    when {
+
+        openFilterDialog.value -> {
+            SearchDialog(
+                onDismissRequest = { openFilterDialog.value = false },
+                onConfirmation = { openFilterDialog.value = false },
+                onRefresh = { }
+            )
+
+        }
+
+        openCreateDialog.value -> {
+            CreateDialog(
+                onDismissRequest = { openCreateDialog.value = false },
+                onConfirmation = { openCreateDialog.value = false },
+                onDescription = { openDescriptionDialog.value = true
+                                    openCreateDialog.value = false},
+                selectedTab = selectedTabIndex
+            )
+
+        }
+
+        openDescriptionDialog.value -> {
+            EditDescriptionDialog(
+                onDismissRequest = { openDescriptionDialog.value = false
+                                        openCreateDialog.value = true},
+                onConfirmation = { openDescriptionDialog.value = false
+                                     openCreateDialog.value = true},
+            )
+        }
+
+
+
+
+    }
+
+
 
     Surface {
-        //EditDescriptionDialog()
-        SearchDialog()
-        //CreateDialog()
+
         Column {
+            /*
             SelectableButtonRow(
                 button1Text = "Ofertas",
                 button2Text = "Solicitudes",
-                onButton1Selected = { selectedSubscreen = "Ofertas" },
-                onButton2Selected = { selectedSubscreen = "Solicitudes" },
-                selectedSubScreen = selectedSubscreen
+                onButton1Selected = { subPaginaOfertas.value = true },
+                onButton2Selected = { subPaginaOfertas.value = false },
+                subPaginaOfertasSelected = subPaginaOfertas.value
             )
+
+             */
+            TabRow(selectedTabIndex) {
+                // Crear una pestaña para cada elemento en la lista de pestañas
+                tabs.forEachIndexed { index, title ->
+                    Tab(selected = selectedTabIndex == index,
+                        onClick = { selectedTabIndex = index },
+                        text = { Text(title) })
+                }
+            }
+
             Spacer(modifier = Modifier.height(20.dp))
-            SubPageSearch()
+            SubPageSearch(
+                onOpenCreateDialog = { openCreateDialog.value = true },
+                onOpenFilterDialog = {  openFilterDialog.value = true }
+            )
         }
 
 
@@ -90,7 +154,11 @@ fun SearchScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SubPageSearch(){
+fun SubPageSearch(
+    onOpenFilterDialog: () -> Unit,
+    onOpenCreateDialog: () -> Unit
+
+){
     Column {
 
         Row ( modifier = Modifier
@@ -141,7 +209,7 @@ fun SubPageSearch(){
             OutlinedButton(
                 modifier = Modifier
                     .weight(1f),
-                onClick = { /*TODO*/ }
+                onClick = { onOpenFilterDialog() }
 
             ) {
                 Icon(
@@ -162,7 +230,7 @@ fun SubPageSearch(){
                 .padding(16.dp)
         ) {
             FloatingActionButton(
-                onClick = {  },
+                onClick = { onOpenCreateDialog() },
 
                 modifier = Modifier
                     .padding(16.dp)
@@ -188,8 +256,8 @@ fun SelectableButtonRow(
     button2Text: String,
     onButton1Selected: () -> Unit,
     onButton2Selected: () -> Unit,
-    selectedSubScreen: String
-) {
+    subPaginaOfertasSelected: Boolean
+    ) {
 
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -197,11 +265,11 @@ fun SelectableButtonRow(
         verticalAlignment = Alignment.CenterVertically
     ) {
         TextButton(
-            onClick = { onButton1Selected },
+            onClick = { onButton1Selected() },
 
 
             ) {
-            if (selectedSubScreen == button1Text) {
+            if (subPaginaOfertasSelected) {
                 Text(
                     text = button1Text,
                     fontSize = 23.sp,
@@ -221,11 +289,11 @@ fun SelectableButtonRow(
             }
         }
         TextButton(
-            onClick = { onButton2Selected },
+            onClick = { onButton2Selected() },
 
 
             ) {
-            if (selectedSubScreen == button2Text) {
+            if (!subPaginaOfertasSelected) {
                 Text(
                     text = button2Text,
                     fontSize = 23.sp,
@@ -253,10 +321,15 @@ fun SelectableButtonRow(
 }
 
 @Composable
-fun SearchDialog(){
+fun SearchDialog(
+    onDismissRequest: () -> Unit,
+    onConfirmation: () -> Unit,
+    onRefresh: () -> Unit
+
+    ){
     var sliderValue by remember { mutableStateOf(0f) }
 
-    Dialog(onDismissRequest = { /*TODO*/ }) {
+    Dialog(onDismissRequest = { onDismissRequest() }) {
         Card (
             modifier = Modifier
                 //.background(Color.White, shape = RoundedCornerShape(8.dp))
@@ -345,7 +418,19 @@ fun SearchDialog(){
                     OutlinedButton(
                         modifier = Modifier
                             .padding(horizontal = 5.dp),
-                        onClick = { /*TODO*/ }
+                        onClick = { onDismissRequest() }
+
+                    ) {
+                        Icon(
+                            Icons.Default.Close,
+                            null
+                        )
+
+                    }
+                    OutlinedButton(
+                        modifier = Modifier
+                            .padding(horizontal = 5.dp),
+                        onClick = { onRefresh() }
 
                     ) {
                         Icon(
@@ -356,7 +441,7 @@ fun SearchDialog(){
                     OutlinedButton(
                         modifier = Modifier
                             .padding(horizontal = 5.dp),
-                        onClick = { /*TODO*/ }
+                        onClick = { onConfirmation() }
 
                     ) {
                         Icon(
@@ -372,22 +457,37 @@ fun SearchDialog(){
 
 
 @Composable
-fun CreateDialog(){
+fun CreateDialog(
+    onDismissRequest: () -> Unit,
+    onConfirmation: () -> Unit,
+    onDescription: () -> Unit,
+    selectedTab: Int
 
-    Dialog(onDismissRequest = { /*TODO*/ }) {
-        Box (
+    ){
+
+    Dialog(onDismissRequest = { onDismissRequest() }) {
+        Card (
             modifier = Modifier
-                .background(Color.White, shape = RoundedCornerShape(8.dp))
+              //  .background(Color.White, shape = RoundedCornerShape(8.dp))
         ){
             Column {
 
+                if ( selectedTab == 0 ) {
+                    Text(
+                        text = "Crear Oferta",
+                        style = MaterialTheme.typography.headlineMedium,
+                        modifier = Modifier
+                            .padding(horizontal = 30.dp, vertical = 10.dp)
+                    )
+                } else {
+                    Text(
+                        text = "Crear Solicitud",
+                        style = MaterialTheme.typography.headlineMedium,
+                        modifier = Modifier
+                            .padding(horizontal = 30.dp, vertical = 10.dp)
+                    )
+                }
 
-                Text(
-                    text = "Crear Oferta",
-                    style = MaterialTheme.typography.headlineMedium,
-                    modifier = Modifier
-                        .padding(horizontal = 30.dp, vertical = 10.dp)
-                )
                 Divider(color = Color.Gray, thickness = 1.dp, modifier = Modifier.fillMaxWidth())
                 Box(
                     modifier = Modifier
@@ -409,28 +509,31 @@ fun CreateDialog(){
                             DropdownCategorias()
                         }
 
+                        if ( selectedTab == 0 ) {
+                            Row(
+                                modifier = Modifier.padding(vertical = 5.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(text = "Precio: ", fontSize = 25.sp)
+                                OutlinedTextField(
+                                    value = "", onValueChange = { }, modifier = Modifier
+                                        .height(50.dp)
+                                        .width(65.dp),
+                                )
+                                Text(text = " €", fontSize = 25.sp)
+                            }
+                        }
 
                         Row(
                             modifier = Modifier.padding(vertical = 5.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(text = "Precio: ", fontSize = 25.sp)
-                            OutlinedTextField(
-                                value = "", onValueChange = { }, modifier = Modifier
-                                    .height(50.dp)
-                                    .width(65.dp),
-                            )
-                            Text(text = " €", fontSize = 25.sp)
-                        }
-                        Row(
-                            modifier = Modifier.padding(vertical = 5.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
                             Text(text = "Descripción: ", fontSize = 25.sp)
+
                             OutlinedButton(
                                 modifier = Modifier
                                     .padding(horizontal = 5.dp),
-                                onClick = { /*TODO*/ }
+                                onClick = { onDescription() }
 
                             ) {
                                 Icon(
@@ -455,9 +558,22 @@ fun CreateDialog(){
                     OutlinedButton(
                         modifier = Modifier
                             .padding(horizontal = 5.dp),
-                        onClick = { /*TODO*/ }
+                        onClick = { onDismissRequest() }
 
                     ) {
+                        Icon(
+                            Icons.Default.Close,
+                            null
+                        )
+
+                    }
+                    OutlinedButton(
+                        modifier = Modifier
+                            .padding(horizontal = 5.dp),
+                        onClick = { onConfirmation() }
+
+                    ) {
+
                         Icon(
                             Icons.Default.Add,
                             null
@@ -472,16 +588,19 @@ fun CreateDialog(){
 }
 
 @Composable
-fun EditDescriptionDialog(){
+fun EditDescriptionDialog(
+    onDismissRequest: () -> Unit,
+    onConfirmation: () -> Unit,
+){
 
     var texto by remember {
         mutableStateOf("")
     }
 
-    Dialog(onDismissRequest = { /*TODO*/ }) {
-        Box(
+    Dialog(onDismissRequest = { onDismissRequest() }) {
+        Card(
             modifier = Modifier
-                .background(Color.White, shape = RoundedCornerShape(8.dp))
+                //.background(Color.White, shape = RoundedCornerShape(8.dp))
         ) {
 
             Column {
@@ -511,10 +630,23 @@ fun EditDescriptionDialog(){
                         .padding(vertical = 5.dp),
                     horizontalArrangement = Arrangement.Center
                 ){
+
                     OutlinedButton(
                         modifier = Modifier
                             .padding(horizontal = 5.dp),
-                        onClick = { /*TODO*/ }
+                        onClick = { onDismissRequest() }
+
+                    ) {
+                        Icon(
+                            Icons.Default.Close,
+                            null
+                        )
+
+                    }
+                    OutlinedButton(
+                        modifier = Modifier
+                            .padding(horizontal = 5.dp),
+                        onClick = { onConfirmation() }
 
                     ) {
                         Icon(

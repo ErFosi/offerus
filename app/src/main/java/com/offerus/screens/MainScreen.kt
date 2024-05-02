@@ -60,11 +60,15 @@ import com.offerus.R
 import com.offerus.navigation.AppScreens
 import com.offerus.navigation.BottomBarRoute
 import com.offerus.navigation.SECTIONS
+import com.offerus.viewModels.MainViewModel
 
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @SuppressLint("UnrememberedMutableState")
 @Composable
-fun MainScreen(navControllerMain: NavHostController){
+fun MainScreen(
+    navControllerMain: NavHostController,
+    mainViewModel: MainViewModel
+){
 
     //navControler para el BOTTOM BAR
     val navController = rememberNavController()
@@ -107,7 +111,7 @@ fun MainScreen(navControllerMain: NavHostController){
                 }
                 composable(BottomBarRoute.SEARCH) {
                     // Contenido de la pestaña Team
-                    SearchScreen()
+                    SearchScreen(mainViewModel = mainViewModel )
                 }
                 composable(BottomBarRoute.MYOFFERS) {
                     // Contenido de la pestaña Table

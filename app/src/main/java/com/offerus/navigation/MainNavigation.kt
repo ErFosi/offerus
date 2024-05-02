@@ -11,10 +11,12 @@ import com.offerus.screens.MainScreen
 import com.offerus.screens.OfferDetails
 import com.offerus.screens.UserScreen
 import com.offerus.screens.Login
+import com.offerus.viewModels.MainViewModel
 
 @Composable
 fun MainNavigation(
-    logedIn: Boolean
+    logedIn: Boolean,
+    mainViewModel: MainViewModel
 ) {
     //hay que añadir el viewmodel como parametro
     val navController = rememberNavController()
@@ -27,7 +29,7 @@ fun MainNavigation(
 
     NavHost(navController = navController, startDestination = startDestination){
         composable(AppScreens.MainScreen.route){
-            MainScreen(navController)
+            MainScreen(navController, mainViewModel )
         }
         composable(AppScreens.UserScreen.route){
             UserScreen()
