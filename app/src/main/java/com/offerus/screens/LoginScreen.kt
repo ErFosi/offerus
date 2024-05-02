@@ -2,6 +2,7 @@ package com.offerus.screens
 
 
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -10,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Card
-
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -63,13 +63,12 @@ fun Login(
 }
 
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @Preview(showBackground = true)
 @Composable
-fun PreviewMainScreen() {
+fun PreviewLogInScreen() {
     OfferUSTheme {
         Login()
     }
 }
-
-
 

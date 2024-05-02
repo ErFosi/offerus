@@ -7,7 +7,8 @@ plugins {
     id ("com.google.dagger.hilt.android") version "2.48.1" apply false
 
     // version 1.9.0 en lugar de 1.9.22
-    kotlin("jvm") version "1.9.0" // or kotlin("multiplatform") or any other kotlin plugin
+    kotlin("jvm") version "1.9.0"
+
     kotlin("plugin.serialization") version "1.9.0"
 
 
