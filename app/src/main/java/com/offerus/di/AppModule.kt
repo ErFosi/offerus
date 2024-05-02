@@ -1,12 +1,12 @@
 package com.offerus.di
 
+import com.offerus.utils.AuthClient
 import android.content.Context
 import androidx.room.Room
 import com.offerus.model.database.OfferusDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
@@ -33,5 +33,11 @@ object AppModule {
     @Singleton
     @Provides
     fun providePetiServDao(db: OfferusDatabase) = db.petiServDao()
+
+    @Provides
+    @Singleton
+    fun provideWebClient(): AuthClient {
+        return AuthClient()
+    }
 
 }

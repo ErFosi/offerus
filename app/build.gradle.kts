@@ -119,7 +119,17 @@ dependencies {
 
     // geolocalizaccion
     implementation ("com.google.android.gms:play-services-location:21.0.1")
+    //ktor para cliente http
+    val ktor_version="2.3.8"
 
+    implementation ("io.ktor:ktor-client-android:$ktor_version")
+    implementation ("io.ktor:ktor-client-content-negotiation:$ktor_version")
+    implementation ("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
+    implementation ("io.ktor:ktor-client-auth:$ktor_version")
+    implementation ("io.ktor:ktor-client-cio:$ktor_version")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
+    implementation ("io.ktor:ktor-client-serialization-jvm:$ktor_version")
+    implementation ("io.ktor:ktor-client-okhttp:$ktor_version")
     // firebase
     // Import the Firebase BoM
     implementation(platform("com.google.firebase:firebase-bom:32.8.0"))
