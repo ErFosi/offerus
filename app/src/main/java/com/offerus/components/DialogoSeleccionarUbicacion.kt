@@ -1,5 +1,9 @@
 package com.offerus.components
 
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,20 +22,30 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.core.content.ContextCompat
+import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.rememberCameraPositionState
 import com.offerus.ui.theme.OfferUSTheme
+import com.offerus.utils.locationUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -39,8 +53,59 @@ fun DialogoSeleccionarUbicacion(
     onDismissRequest: () -> Unit,
     onConfirmation: () -> Unit
 ) {
-    var latLng by rememberSaveable { mutableStateOf(LatLng(0.0,0.0)) }
     var abrirMapa by rememberSaveable { mutableStateOf(false) }
+    var ubicacion by rememberSaveable {
+        mutableStateOf(LatLng(0.0, 0.0))
+    }
+    val locationUtils = locationUtils()
+    val context = LocalContext.current
+
+    val cameraPosition = CameraPosition.Builder().target(ubicacion).zoom(10f).build()
+    val cameraPositionState = rememberCameraPositionState {
+        position = cameraPosition
+    }
+
+    val coroutineScope = rememberCoroutineScope()
+
+    var permisoUbicacion by rememberSaveable {
+        mutableStateOf(false)
+    }
+    val requestPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        if (permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
+            permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+        ) {
+            // Permission is granted
+            permisoUbicacion = true
+        } else {
+            // Permission is denied
+            permisoUbicacion = false
+        }
+    }
+
+    val permissions = arrayOf(
+        Manifest.permission.ACCESS_FINE_LOCATION,
+        Manifest.permission.ACCESS_COARSE_LOCATION
+    )
+    if (ContextCompat.checkSelfPermission(
+            LocalContext.current,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED ||
+        ContextCompat.checkSelfPermission(
+            LocalContext.current,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+    ) {
+        // Permission is already granted
+        permisoUbicacion = true
+    } else {
+        // Request for permission
+        LaunchedEffect(permissions) {
+            requestPermissionLauncher.launch(permissions)
+        }
+    }
+
     Dialog(
         onDismissRequest = { onDismissRequest() },
     ) {
@@ -48,18 +113,27 @@ fun DialogoSeleccionarUbicacion(
             Column(
                 modifier = Modifier
                     .padding(16.dp)
-                    .fillMaxWidth(),
-                //.verticalScroll(rememberScrollState()),
+                    .fillMaxWidth()
+                .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(
-                    text = "Selecciona tu ubicación",
+                    text = "Selecciona la nueva ubicación",
 
                     )
-                Button(
-                    onClick = /*TODO*/ {}
-                ) {
-                    Text(text = "Elegir mi ubicación actual")
+                if (permisoUbicacion) {
+                    Button(
+                        onClick = {
+                            coroutineScope.launch(Dispatchers.IO) {
+                                val ubi = locationUtils.getLocation(context)
+                                if (ubi != null) {
+                                    ubicacion = LatLng(ubi.latitude, ubi.longitude)
+                                }
+                            }
+                        }
+                    ) {
+                        Text(text = "Elegir mi ubicación actual")
+                    }
                 }
 
                 Button(
@@ -72,19 +146,21 @@ fun DialogoSeleccionarUbicacion(
                         modifier = Modifier
                             .padding(10.dp)
                             .fillMaxWidth()
-                            .height(200.dp),
+                            .height(300.dp),
                     ) {
                         GoogleMap(
-                            onMapClick = { latLng = it },
+                            onMapClick = { ubicacion = it },
+                            cameraPositionState = cameraPositionState
                         ) {
-                            if (latLng.latitude != 0.0 && latLng.longitude != 0.0) {
+                            if (ubicacion.latitude != 0.0 && ubicacion.longitude != 0.0) {
                                 // Add a marker to the map
-                                Marker(MarkerState(position = latLng))
+                                Marker(MarkerState(position = ubicacion))
                             }
                         }
                     }
 
                 }
+                Text(text = "Ubicación seleccionada: ${ubicacion.latitude}, ${ubicacion.longitude}")
 
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -127,8 +203,8 @@ fun DialogoSeleccionarUbicacion(
 @Composable
 fun previewDialogoSeleccionarUbicacion() {
     OfferUSTheme(content = {
-        DialogoSeleccionarUbicacion(onDismissRequest = {  }) {
+        DialogoSeleccionarUbicacion(onDismissRequest = {  }, {
 
-        }
+        })
     })
 }

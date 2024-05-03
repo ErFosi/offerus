@@ -1,6 +1,5 @@
 package com.offerus.screens
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,7 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
@@ -23,7 +21,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Done
@@ -32,7 +29,6 @@ import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Refresh
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenuItem
@@ -66,16 +62,15 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import androidx.wear.compose.material.ExperimentalWearMaterialApi
-import androidx.wear.compose.material.rememberSwipeableState
 import com.offerus.R
 import com.offerus.model.database.entities.Deal
 import com.offerus.navigation.AppScreens
+import com.offerus.navigation.BottomBarRoute
 import com.offerus.utils.createDealList
 import com.offerus.utils.showToastOnMainThread
 import com.offerus.viewModels.MainViewModel
@@ -87,7 +82,7 @@ import com.offerus.viewModels.MainViewModel
 fun OffersScreen(
     navController: NavController,
     mainViewModel: MainViewModel,
-    myOffers: Boolean // Si es pagina MisOfertas true, si es pagina buscar false
+    myOffers: Boolean, // Si es pagina MisOfertas true, si es pagina buscar false
 ) {
 
     val openCreateDialog = remember { mutableStateOf(false) }
@@ -214,7 +209,9 @@ fun SubPageSearch(
                     modifier = Modifier
 
                         .width(80.dp),
-                    onClick = { /*TODO*/ }
+                    onClick = {
+                            navController.navigate(AppScreens.MapScreen.route)
+                    }
 
                 ) {
                     Icon(

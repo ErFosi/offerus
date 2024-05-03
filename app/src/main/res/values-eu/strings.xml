@@ -16,4 +16,5 @@
     <string name="mujer">Emakumea</string>
     <string name="otros">Beste bat</string>
     <string name="SeleccionarIdioma">Seleccionar idioma</string>
+    <string name="no_internet">Ez dago internetera konexiorik, mesedez saiatu berriro.</string>
 </resources>

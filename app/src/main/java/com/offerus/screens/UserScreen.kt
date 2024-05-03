@@ -1,6 +1,11 @@
 package com.offerus.screens
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -38,6 +43,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,13 +51,17 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -93,6 +103,8 @@ fun UserScreen(){
     var ubicacionEdit by rememberSaveable {
         mutableStateOf(false)
     }
+
+    val config = LocalConfiguration.current
 
     Column(
         modifier = Modifier
@@ -171,7 +183,7 @@ fun UserScreen(){
                             .padding(bottom = 20.dp, top = 15.dp, start = 0.dp, end = 0.dp)
                             //.scale(0.6F)
                             ,
-                        value = 3.5F,
+                        value = 3.5F, // TODO poner la valoracion del usuario
                         style = RatingBarStyle.Fill(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.outline),
                         onValueChange = {},
                         onRatingChanged = {},
@@ -179,6 +191,37 @@ fun UserScreen(){
                         spaceBetween = 4.dp
                     )
                     Text(text = "(20)", modifier = Modifier.padding(start =5.dp , top = 13.dp))
+                }
+            }
+            if (config.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                // si esta horizontal otra columna
+                Column (
+                    modifier = Modifier
+                        .padding(start = 70.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .padding(bottom = 5.dp),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        languageSwitcher()
+                        ThemeSwitcher(onClick = {})
+                    }
+                    OutlinedButton(
+                        onClick = {
+                            /*TODO*/
+                        },
+                        modifier = Modifier.weight(1f).padding(bottom = 5.dp),
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.baseline_logout_24),
+                            contentDescription = "",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Text(text = "Cerrar sesión", modifier = Modifier.padding(start = 10.dp))
+                    }
                 }
             }
         }
@@ -283,23 +326,33 @@ fun UserScreen(){
                         modifier = Modifier.width(270.dp)
                     ) {
                         Row(modifier = Modifier.padding(vertical = 5.dp), verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Filled.Person, contentDescription = null, modifier = Modifier.padding(end = 5.dp).size(20.dp))
+                            Icon(Icons.Filled.Person, contentDescription = null, modifier = Modifier
+                                .padding(end = 5.dp)
+                                .size(20.dp))
                             Text(text = "Nombre y apellidos") // TODO: get user name
                         }
                         Row(modifier = Modifier.padding(vertical = 5.dp), verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Filled.Phone, contentDescription = null, modifier = Modifier.padding(end = 5.dp).size(20.dp))
+                            Icon(Icons.Filled.Phone, contentDescription = null, modifier = Modifier
+                                .padding(end = 5.dp)
+                                .size(20.dp))
                             Text(text = "Telefono") // TODO: get user name
                         }
                         Row(modifier = Modifier.padding(vertical = 5.dp), verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Filled.Email, contentDescription = null, modifier = Modifier.padding(end = 5.dp).size(20.dp))
+                            Icon(Icons.Filled.Email, contentDescription = null, modifier = Modifier
+                                .padding(end = 5.dp)
+                                .size(20.dp))
                             Text(text = "Email") // TODO: get user name
                         }
                         Row(modifier = Modifier.padding(vertical = 5.dp), verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Filled.DateRange, contentDescription = null, modifier = Modifier.padding(end = 5.dp).size(20.dp))
+                            Icon(Icons.Filled.DateRange, contentDescription = null, modifier = Modifier
+                                .padding(end = 5.dp)
+                                .size(20.dp))
                             Text(text = "Edad") // TODO: get user name
                         }
                         Row(modifier = Modifier.padding(vertical = 5.dp), verticalAlignment = Alignment.CenterVertically) {
-                            Icon(painter = painterResource(R.drawable.gender), contentDescription = null, modifier = Modifier.padding(end = 5.dp).size(20.dp))
+                            Icon(painter = painterResource(R.drawable.gender), contentDescription = null, modifier = Modifier
+                                .padding(end = 5.dp)
+                                .size(20.dp))
                             Text(text = "Sexo") // TODO: get user name
                         }
                     }
@@ -353,6 +406,7 @@ fun UserScreen(){
                     modifier = Modifier
                         .padding(10.dp)
                         .fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Row (verticalAlignment = Alignment.CenterVertically){
 
@@ -455,6 +509,7 @@ fun UserScreen(){
                     modifier = Modifier
                         .padding(10.dp)
                         .fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     OutlinedTextField(
                         modifier = Modifier.padding(horizontal = 20.dp, vertical = 5.dp),
@@ -608,20 +663,45 @@ fun UserScreen(){
                 )
             }
         }
-        if (ubicacionEdit){
+        if (ubicacionEdit) {
             DialogoSeleccionarUbicacion(
-                onDismissRequest = { ubicacionEdit = false},
+                onDismissRequest = { ubicacionEdit = false },
                 onConfirmation = { ubicacionEdit = false /*TODO*/ }
             )
         }
-        Row(
-            modifier = Modifier
-                .padding(horizontal = 40.dp, vertical = 20.dp)
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            languageSwitcher()
-            ThemeSwitcher(onClick = {})
+
+        if (config.orientation != Configuration.ORIENTATION_LANDSCAPE) {
+            // si esta vertical
+            Row(
+                modifier = Modifier
+                    .padding(horizontal = 40.dp, vertical = 20.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(30.dp)
+            ) {
+                languageSwitcher()
+                ThemeSwitcher(onClick = {})
+            }
+
+            Row(
+                modifier = Modifier
+                    .padding(horizontal = 80.dp, vertical = 20.dp)
+                    .width(350.dp),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                OutlinedButton(
+                    onClick = {
+                        /*TODO*/
+                    },
+                    modifier = Modifier.weight(1f),
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.baseline_logout_24),
+                        contentDescription = "",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                    Text(text = "Cerrar sesión", modifier = Modifier.padding(start = 10.dp))
+                }
+            }
         }
     }
 }

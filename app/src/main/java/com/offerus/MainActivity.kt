@@ -1,5 +1,9 @@
 package com.offerus
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -59,4 +63,7 @@ fun GreetingPreview() {
         Greeting("Android")
     }
 }
+
+
+
 

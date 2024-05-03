@@ -11,6 +11,7 @@ import com.offerus.screens.MainScreen
 import com.offerus.screens.OfferDetails
 import com.offerus.screens.UserScreen
 import com.offerus.screens.Login
+import com.offerus.screens.MapaScreen
 import com.offerus.viewModels.MainViewModel
 
 @Composable
@@ -46,6 +47,10 @@ fun MainNavigation(
         }
         composable(AppScreens.OfferDetailsScreen.route){
             OfferDetails()
+        }
+        composable(AppScreens.MapScreen.route){
+            // Contenido de la pestaña Map
+            MapaScreen()
         }
     }
 }

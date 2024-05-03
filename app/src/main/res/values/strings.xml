@@ -16,4 +16,5 @@
     <string name="mujer">Woman</string>
     <string name="otros">Other</string>
     <string name="SeleccionarIdioma">Seleccionar idioma</string>
+    <string name="no_internet">No hay conexión a internet, por favor, inténtalo de nuevo.</string>
 </resources>
