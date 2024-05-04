@@ -14,6 +14,7 @@ data class ServicioPeticion(
     val titulo: String,
     val peticion: Boolean,
     val descripcion: String,
+    val peticion: Boolean,
     val precio: Double,
     val fecha: String,
     val latitud: Double,
@@ -23,11 +24,12 @@ data class ServicioPeticion(
 @Serializable
 data class Deal(
     val id: Int,
-    val nota: String,
     val username_cliente: String,
     val username_host: String,
     val id_peticion: Int,
-    val aceptado: Boolean
+    val estado: String,  // Modified to match the original schema using estado instead of aceptado
+    val nota_cliente: Int = -1,  // Defaults to -1 as per your SQLAlchemy model
+    val nota_host: Int = -1  // Defaults to -1 as per your SQLAlchemy model
 )
 /************************************************************************
  * Clases para la gestion de los usuarios
@@ -44,10 +46,44 @@ data class Usuario(
     val longitud: Double,
     val mail: String,
     val telefono: String,
+    val sexo: String,  // Sex as a string to match 'M', 'F', or 'O'
+    val descripcion: String,
+    val suscripciones: String
+)
+
+
+@Serializable
+data class UsuarioUpdate(
+    val nombre_apellido: String,
+    val edad: Int,
+    val latitud: Double,
+    val longitud: Double,
+    val mail: String,
+    val telefono: String,
     val sexo: String,
     val descripcion: String,
     val suscripciones: String
 )
+@Serializable
+data class UsuarioData(
+    val username: String,
+    val nombre_apellido: String,
+    val edad: Int,
+    val latitud: Double,
+    val longitud: Double,
+    val mail: String,
+    val telefono: String,
+    val sexo: String,
+    val descripcion: String,
+    val suscripciones: String
+)
+
+@Serializable
+data class ContraseñaChange(
+    val contraseña: String,
+    val nueva_contraseña: String
+)
+
 /************************************************************************
  * Clases para gestionar las peticiones http
  *************************************************************************/
@@ -56,8 +92,7 @@ data class UsuarioCred(
     val usuario:String,
     val contraseña:String
 )
-@Serializable
-data class UsuarioResponse(val message: String)
+
 
 @Serializable
 data class ErrorDetail(
@@ -83,10 +118,31 @@ data class ServicioPeticionCreate(
     val longitud: Double,
     val categorias: String
 )
-
 @Serializable
-data class DealPeticion(
+data class ServicioPeticionMod(
+    val id: Int,
+    val titulo: String,
+    val descripcion: String,
+    val peticion: Boolean,
+    val precio: Double,
+    val fecha: String,
+    val latitud: Double,
+    val longitud: Double,
+    val categorias: String
+)
+@Serializable
+data class PeticionId(
     val id_peticion: Int
+)
+@Serializable
+data class DealPeticionAceptar(
+    val id_peticion: Int,
+    val Boolean: Boolean
+)
+@Serializable
+data class ValorarDeal(
+    val deal_id: Int,
+    val nota: Int
 )
 
 /************************************************************************
@@ -105,4 +161,13 @@ data class BusquedaPeticionServicio(
     val latitud: Double,
     val longitud: Double,
     val ordenar_por: String
+)
+
+/************************************************************************
+ * Clases para gestionar las peticiones de favoritos
+ *************************************************************************/
+@Serializable
+data class Favoritos(
+    val username: String,
+    val id_peticion: Int
 )

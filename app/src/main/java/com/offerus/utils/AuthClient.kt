@@ -141,4 +141,6 @@ class AuthClient @Inject constructor() {
             else -> throw Exception("No se ha conseguido registrar el usuario: HTTP ${response.status}")
         }
     }
+
+
 }
