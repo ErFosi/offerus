@@ -1,11 +1,7 @@
 package com.offerus.screens
 
-import android.Manifest
-import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.net.Uri
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -43,7 +39,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -61,12 +57,12 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.gowtham.ratingbar.RatingBar
 import com.gowtham.ratingbar.RatingBarStyle
+import com.offerus.Idioma
 import com.offerus.R
 import com.offerus.components.DialogoDatosPersonales
 import com.offerus.components.DialogoSeleccionarUbicacion
@@ -77,11 +73,14 @@ import com.offerus.components.ThemeSwitcher
 import com.offerus.components.languageSwitcher
 import com.offerus.components.mapa
 import com.offerus.ui.theme.OfferUSTheme
+import com.offerus.viewModels.MainViewModel
 import java.io.File
 
 
 @Composable
-fun UserScreen(){
+fun UserScreen(
+    viewModel: MainViewModel
+){
     var sobreMiExpanded by rememberSaveable {
         mutableStateOf(false)
     }
@@ -105,6 +104,8 @@ fun UserScreen(){
     }
 
     val config = LocalConfiguration.current
+    val context = LocalContext.current
+    val booleanState by viewModel.tema.collectAsState(initial = true)
 
     Column(
         modifier = Modifier
@@ -206,21 +207,32 @@ fun UserScreen(){
                             .padding(bottom = 5.dp),
                         horizontalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
-                        languageSwitcher()
-                        ThemeSwitcher(onClick = {})
+                        languageSwitcher(
+                            idiomaSeleccionado = viewModel.idioma.collectAsState(initial = Idioma.Castellano).value,
+                            onLanguageSelected =  { it: Idioma -> viewModel.updateIdioma(it, context = context) })
+                        ThemeSwitcher(
+                            darkTheme = booleanState,
+                            onClick = {
+                            if (booleanState){
+                                viewModel.updateTheme(false)
+                            }else{
+                                viewModel.updateTheme(true)
+                            } })
                     }
                     OutlinedButton(
                         onClick = {
                             /*TODO*/
                         },
-                        modifier = Modifier.weight(1f).padding(bottom = 5.dp),
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(bottom = 5.dp),
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.baseline_logout_24),
                             contentDescription = "",
                             tint = MaterialTheme.colorScheme.primary
                         )
-                        Text(text = "Cerrar sesión", modifier = Modifier.padding(start = 10.dp))
+                        Text(text = stringResource(id = R.string.signout), modifier = Modifier.padding(start = 10.dp))
                     }
                 }
             }
@@ -229,7 +241,7 @@ fun UserScreen(){
         // Sobre mi
         Row {
             Text(
-                text = "Sobre mi", // TODO: poner stringresource
+                text = stringResource(id = R.string.sobreMi), 
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier
                     .padding(start = 30.dp, top = 20.dp, end = 20.dp)
@@ -285,7 +297,7 @@ fun UserScreen(){
         // Datos personales
         Row {
             Text(
-                text = "Datos personales", // TODO: poner stringresource
+                text = stringResource(id = R.string.datosPersonales), 
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier
                     .padding(start = 30.dp, top = 20.dp, end = 20.dp)
@@ -302,7 +314,6 @@ fun UserScreen(){
                     modifier = Modifier
                         .size(20.dp)
                         .padding(0.dp)
-                        .clickable(onClick = { datosPersonalesExpanded = !datosPersonalesExpanded })
                 )
             }
         }
@@ -374,7 +385,7 @@ fun UserScreen(){
         // Suscripciones
         Row {
             Text(
-                text = "Suscripciones a temas", // TODO: poner stringresource
+                text = stringResource(id = R.string.suscripciones),
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier
                     .padding(start = 30.dp, top = 20.dp, end = 20.dp)
@@ -401,6 +412,14 @@ fun UserScreen(){
         )
         AnimatedVisibility(visible = suscripcionesExpanded){
             val keyboardController = LocalSoftwareKeyboardController.current
+            var gratisChecked by rememberSaveable { mutableStateOf(false) }
+            var deporteChecked by rememberSaveable { mutableStateOf(false) }
+            var hogarChecked by rememberSaveable { mutableStateOf(false) }
+            var otrosChecked by rememberSaveable { mutableStateOf(false) }
+            var entretenimientoChecked by rememberSaveable { mutableStateOf(false) }
+            var academicoChecked by rememberSaveable { mutableStateOf(false) }
+            var onlineChecked by rememberSaveable { mutableStateOf(false) }
+
             Card(modifier = Modifier.padding(start = 30.dp, end = 30.dp)) {
                 Column(
                     modifier = Modifier
@@ -412,33 +431,33 @@ fun UserScreen(){
 
                         Column(modifier = Modifier.width(135.dp)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Checkbox(checked = false, onCheckedChange = {})
+                                Checkbox(checked = gratisChecked, onCheckedChange = { gratisChecked = it })
                                 Text(text = "Gratis")
                             }
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Checkbox(checked = false, onCheckedChange = {})
+                                Checkbox(checked = deporteChecked, onCheckedChange = { deporteChecked = it })
                                 Text(text = "Deporte")
                             }
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Checkbox(checked = false, onCheckedChange = {})
+                                Checkbox(checked = hogarChecked, onCheckedChange = { hogarChecked = it })
                                 Text(text = "Hogar")
                             }
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Checkbox(checked = false, onCheckedChange = {})
+                                Checkbox(checked = otrosChecked, onCheckedChange = { otrosChecked = it})
                                 Text(text = "Otros")
                             }
                         }
                         Column(modifier = Modifier.width(180.dp)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Checkbox(checked = false, onCheckedChange = {})
+                                Checkbox(checked = entretenimientoChecked, onCheckedChange = { entretenimientoChecked = it})
                                 Text(text = "Entretenimiento")
                             }
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Checkbox(checked = false, onCheckedChange = {})
+                                Checkbox(checked = academicoChecked, onCheckedChange = { academicoChecked = it})
                                 Text(text = "Academico")
                             }
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Checkbox(checked = false, onCheckedChange = {})
+                                Checkbox(checked = onlineChecked, onCheckedChange = { onlineChecked = it})
                                 Text(text = "Online")
                             }
                         }
@@ -477,7 +496,7 @@ fun UserScreen(){
         // Contrasena
         Row {
             Text(
-                text = "Cambiar contraseña", // TODO: poner stringresource
+                text = stringResource(R.string.changepasswd),
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier
                     .padding(start = 30.dp, top = 20.dp, end = 20.dp)
@@ -504,6 +523,9 @@ fun UserScreen(){
         )
         AnimatedVisibility(visible = contrasenaExpanded){
             val keyboardController = LocalSoftwareKeyboardController.current
+            var oldPass by rememberSaveable { mutableStateOf("") }
+            var password by rememberSaveable { mutableStateOf("") }
+            var confirmPassword by rememberSaveable { mutableStateOf("") }
             Card(modifier = Modifier.padding(start = 30.dp, end = 30.dp)) {
                 Column(
                     modifier = Modifier
@@ -513,9 +535,9 @@ fun UserScreen(){
                 ) {
                     OutlinedTextField(
                         modifier = Modifier.padding(horizontal = 20.dp, vertical = 5.dp),
-                        value = "", // TODO
-                        onValueChange = {  }, // TODO
-                        label = { Text("Contraseña actual") }, // TODO
+                        value = oldPass,
+                        onValueChange = { oldPass = it },
+                        label = { Text(stringResource(id = R.string.currentpass)) },
                         visualTransformation = PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done, keyboardType = KeyboardType.Password),
                         keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
@@ -527,9 +549,9 @@ fun UserScreen(){
                     )
                     OutlinedTextField(
                         modifier = Modifier.padding(horizontal = 20.dp, vertical = 5.dp),
-                        value = "", // TODO
-                        onValueChange = {  }, // TODO
-                        label = { Text("Nueva contraseña") }, // TODO
+                        value = password,
+                        onValueChange = { password = it },
+                        label = { Text(stringResource(id = R.string.newpass)) }, 
                         visualTransformation = PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done, keyboardType = KeyboardType.Password),
                         keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
@@ -541,9 +563,9 @@ fun UserScreen(){
                     )
                     OutlinedTextField(
                         modifier = Modifier.padding(horizontal = 20.dp, vertical = 5.dp),
-                        value = "", // TODO
-                        onValueChange = {  }, // TODO
-                        label = { Text("Confirma la contraseña") }, // TODO
+                        value = confirmPassword,
+                        onValueChange = { confirmPassword = it },
+                        label = { Text(stringResource(id = R.string.confirmpass)) }, 
                         visualTransformation = PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done, keyboardType = KeyboardType.Password),
                         keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
@@ -600,7 +622,7 @@ fun UserScreen(){
         // MAPA
         Row {
             Text(
-                text = "Mi ubicación", // TODO: poner stringresource
+                text = stringResource(id = R.string.miubicacion),
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier
                     .padding(start = 30.dp, top = 20.dp, end = 20.dp)
@@ -678,8 +700,17 @@ fun UserScreen(){
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(30.dp)
             ) {
-                languageSwitcher()
-                ThemeSwitcher(onClick = {})
+                languageSwitcher(
+                    idiomaSeleccionado = viewModel.idioma.collectAsState(initial = Idioma.Castellano).value,
+                    onLanguageSelected =  { it: Idioma -> viewModel.updateIdioma(it, context = context) })
+                ThemeSwitcher(
+                    darkTheme = booleanState,
+                    onClick = {
+                        if (booleanState){
+                            viewModel.updateTheme(false)
+                        }else{
+                            viewModel.updateTheme(true)
+                        } })
             }
 
             Row(
@@ -699,7 +730,7 @@ fun UserScreen(){
                         contentDescription = "",
                         tint = MaterialTheme.colorScheme.primary
                     )
-                    Text(text = "Cerrar sesión", modifier = Modifier.padding(start = 10.dp))
+                    Text(text = stringResource(id = R.string.signout), modifier = Modifier.padding(start = 10.dp))
                 }
             }
         }
@@ -727,6 +758,6 @@ fun validateFields(
 @Composable
 fun PreviewElemento() {
     OfferUSTheme(content = {
-        UserScreen()
+        //UserScreen()
     })
 }

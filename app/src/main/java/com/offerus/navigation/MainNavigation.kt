@@ -33,7 +33,7 @@ fun MainNavigation(
             MainScreen(navController, mainViewModel )
         }
         composable(AppScreens.UserScreen.route){
-            UserScreen()
+            UserScreen(viewModel = mainViewModel)
         }
         composable(AppScreens.LoginScreen.route){
             Login(

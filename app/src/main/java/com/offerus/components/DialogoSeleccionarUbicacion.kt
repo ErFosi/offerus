@@ -31,6 +31,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -42,6 +43,7 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.offerus.ui.theme.OfferUSTheme
+import com.offerus.R
 import com.offerus.utils.locationUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
@@ -114,11 +116,11 @@ fun DialogoSeleccionarUbicacion(
                 modifier = Modifier
                     .padding(16.dp)
                     .fillMaxWidth()
-                .verticalScroll(rememberScrollState()),
+                    .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(
-                    text = "Selecciona la nueva ubicación",
+                    text = stringResource(id = R.string.seleccionarUbicacion),
 
                     )
                 if (permisoUbicacion) {
@@ -132,14 +134,14 @@ fun DialogoSeleccionarUbicacion(
                             }
                         }
                     ) {
-                        Text(text = "Elegir mi ubicación actual")
+                        Text(text = stringResource(id = R.string.seleccionarMiUbicacion))
                     }
                 }
 
                 Button(
                     onClick = { abrirMapa = !abrirMapa }
                 ) {
-                    Text(text = "Elegir mi ubicación en el mapa")
+                    Text(text = stringResource(id = R.string.ubicacionMapa))
                 }
                 AnimatedVisibility(visible = abrirMapa) {
                     Column(
@@ -160,7 +162,7 @@ fun DialogoSeleccionarUbicacion(
                     }
 
                 }
-                Text(text = "Ubicación seleccionada: ${ubicacion.latitude}, ${ubicacion.longitude}")
+                Text(text = "Ubicación seleccionada DEBUG: ${ubicacion.latitude}, ${ubicacion.longitude}")
 
                 Row(
                     verticalAlignment = Alignment.CenterVertically,

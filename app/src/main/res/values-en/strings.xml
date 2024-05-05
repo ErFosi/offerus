@@ -17,4 +17,17 @@
     <string name="otros">Other</string>
     <string name="SeleccionarIdioma">Seleccionar idioma</string>
     <string name="no_internet">There is no internet connection, please try again</string>
+    <string name="sobreMiEdit">Add a description</string>
+    <string name="sobreMi">About me</string>
+    <string name="datosPersonales">Personal information</string>
+    <string name="signout">Sign out</string>
+    <string name="suscripciones">Topic subscription</string>
+    <string name="changepasswd">Change password</string>
+    <string name="currentpass">Current password</string>
+    <string name="newpass">New password</string>
+    <string name="confirmpass">Confirm new password</string>
+    <string name="miubicacion">My location</string>
+    <string name="seleccionarUbicacion">Choose your location</string>
+    <string name="ubicacionMapa">Choose a location in the map</string>
+    <string name="seleccionarMiUbicacion">Select my current location</string>
 </resources>
