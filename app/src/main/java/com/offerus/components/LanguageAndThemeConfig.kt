@@ -3,15 +3,12 @@ package com.offerus.components
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -43,21 +40,19 @@ import androidx.compose.ui.unit.dp
 import com.offerus.Idioma
 import com.offerus.R
 import com.offerus.ui.theme.OfferUSTheme
-import com.offerus.ui.theme.onPrimaryContainerLight
 
 @Composable
 fun languageSwitcher(
     size: Dp = 70.dp,
     parentShape: Shape = CircleShape,
-    // idiomaSeleccionado: Idioma,
-    // cambiarIdioma: (Idioma) -> Unit
+    onLanguageSelected: (Idioma) -> Unit,
+    idiomaSeleccionado: Idioma,
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
     Card(modifier = Modifier
         .width(size * 2)
         .height(size)
         .clip(shape = parentShape),
-        //.background(MaterialTheme.colorScheme.secondaryContainer)
     ) {
         Row(
             modifier = Modifier
@@ -79,13 +74,6 @@ fun languageSwitcher(
                 modifier = Modifier
                     .fillMaxSize()
             ) {
-                //var expanded by remember { mutableStateOf(false) }
-                //val idiomaSeleccionado by viewModel.idioma.collectAsState(initial = Idioma.Castellano)
-                val idiomaSeleccionado by remember { mutableStateOf(Idioma.Castellano) }
-                /*Text(
-                    text = stringResource(R.string.SeleccionarIdioma),
-                    modifier = Modifier.padding(start = 10.dp)
-                )*/
                 TextButton(onClick = { expanded = !expanded }) {
                     Text(text = idiomaSeleccionado.name)
                 }
@@ -98,7 +86,7 @@ fun languageSwitcher(
                             text = { Text(idioma.name) },
                             onClick = {
                                 expanded = false
-                                //viewModel.updateIdioma(idioma, context)
+                                onLanguageSelected(idioma)
                             }
                         )
                     }
@@ -143,7 +131,7 @@ fun ThemeSwitcher(
         .width(size * 2)
         .height(size)
         .clip(shape = parentShape)
-        .clickable { onClick() }
+        .clickable { onClick( ) }
         .background(MaterialTheme.colorScheme.surfaceVariant)
     ) {
         Box(
@@ -206,7 +194,7 @@ fun ThemeSwitcherPreview() {
 @Preview
 fun LanguageSwitcherPreview() {
     OfferUSTheme {
-        languageSwitcher()
+        //languageSwitcher { it: com.offerus.Idioma -> viewModel.updateIdioma(it, context = context) }
     }
 
 }

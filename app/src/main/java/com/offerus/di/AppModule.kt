@@ -4,6 +4,8 @@ import com.offerus.utils.AuthClient
 import android.content.Context
 import androidx.room.Room
 import com.offerus.model.database.OfferusDatabase
+import com.offerus.utils.AESCipher
+import com.offerus.utils.CipherUtil
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -40,5 +42,10 @@ object AppModule {
     fun provideWebClient(): AuthClient {
         return AuthClient()
     }
+
+
+    @Singleton
+    @Provides
+    fun provideCipher(): CipherUtil = AESCipher()
 
 }

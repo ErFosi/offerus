@@ -16,4 +16,18 @@
     <string name="mujer">Woman</string>
     <string name="otros">Other</string>
     <string name="SeleccionarIdioma">Seleccionar idioma</string>
+    <string name="no_internet">No hay conexión a internet, por favor, inténtalo de nuevo.</string>
+    <string name="sobreMiEdit">Añade una descripción</string>
+    <string name="sobreMi">Sobre mi</string>
+    <string name="datosPersonales">Datos personales</string>
+    <string name="signout">Cerrar sesión</string>
+    <string name="suscripciones">Suscripciones a temas</string>
+    <string name="changepasswd">Cambiar contraseña</string>
+    <string name="currentpass">Contraseña actual</string>
+    <string name="newpass">Nueva contraseña</string>
+    <string name="confirmpass">Confirma la nueva contraseña</string>
+    <string name="miubicacion">Mi ubicación</string>
+    <string name="seleccionarUbicacion">Selecciona la ubicación</string>
+    <string name="ubicacionMapa">Seleccionar ubicación en el mapa</string>
+    <string name="seleccionarMiUbicacion">Seleccionar mi ubicación actual</string>
 </resources>

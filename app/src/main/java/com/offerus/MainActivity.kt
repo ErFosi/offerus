@@ -1,5 +1,9 @@
 package com.offerus
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -9,6 +13,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -31,7 +36,7 @@ class MainActivity : AppCompatActivity() {
         installSplashScreen()
         setContent {
             OfferUSTheme(
-                /* TODO darkTheme = viewmodel.tema.collectAsState(initial = true).value */
+                darkTheme = mainViewModel.tema.collectAsState(initial = true).value
             ) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
@@ -59,4 +64,7 @@ fun GreetingPreview() {
         Greeting("Android")
     }
 }
+
+
+
 

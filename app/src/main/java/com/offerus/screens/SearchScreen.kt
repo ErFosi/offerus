@@ -71,6 +71,8 @@ import com.offerus.R
 import com.offerus.data.Deal
 import com.offerus.navigation.AppScreens
 import com.offerus.utils.createDealListExample
+import com.offerus.navigation.BottomBarRoute
+import com.offerus.utils.createDealList
 import com.offerus.utils.showToastOnMainThread
 import com.offerus.viewModels.MainViewModel
 
@@ -207,7 +209,9 @@ fun SubPageSearch(
                     modifier = Modifier
 
                         .width(80.dp),
-                    onClick = { /*TODO*/ }
+                    onClick = {
+                            navController.navigate(AppScreens.MapScreen.route)
+                    }
 
                 ) {
                     Icon(

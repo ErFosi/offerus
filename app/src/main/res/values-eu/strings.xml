@@ -9,11 +9,25 @@
     <string name="full_name">Izen abizenak</string>
     <string name="age">Adina</string>
     <string name="email">E-posta</string>
-    <string name="phone">Telefono</string>
+    <string name="phone">Telefonoa</string>
     <string name="sex">Sexua</string>
     <string name="select_option">Aukeratu</string>
     <string name="hombre">Gizona</string>
     <string name="mujer">Emakumea</string>
     <string name="otros">Beste bat</string>
     <string name="SeleccionarIdioma">Seleccionar idioma</string>
+    <string name="no_internet">Ez dago internetera konexiorik, mesedez saiatu berriro.</string>
+    <string name="sobreMiEdit">Idatzi deskribapena</string>
+    <string name="sobreMi">Niri buruz</string>
+    <string name="datosPersonales">Datu pertsonalak</string>
+    <string name="signout">Saioa itxi</string>
+    <string name="suscripciones">Harpitdetzak</string>
+    <string name="changepasswd">Pasahitza aldatu</string>
+    <string name="currentpass">Oraingo pasahitza</string>
+    <string name="newpass">Pasahitz berria</string>
+    <string name="confirmpass">Pasahitz berria errepikatu</string>
+    <string name="miubicacion">Nire kokapena</string>
+    <string name="seleccionarUbicacion">Aukeratu kokapena</string>
+    <string name="ubicacionMapa">Aukeratu kokapena mapan</string>
+    <string name="seleccionarMiUbicacion">Aukeratu nire oraingo kokapena</string>
 </resources>

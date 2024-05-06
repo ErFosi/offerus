@@ -109,7 +109,7 @@ fun MainScreen(
                 }
                 composable(BottomBarRoute.MYOFFERS) {
                     // Contenido de la pestaña Table
-                    OffersScreen(mainViewModel = mainViewModel, myOffers = true, navController = navControllerMain)
+                    OffersScreen(navController = navControllerMain, mainViewModel = mainViewModel, myOffers = true)
                 }
             }
         }
@@ -156,8 +156,8 @@ fun ToolBar(onUserClick: () -> Unit) {
     if(username!=null) {
         TopAppBar(
             colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.background,
-                titleContentColor = MaterialTheme.colorScheme.primary,
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                titleContentColor = MaterialTheme.colorScheme.tertiaryContainer,
             ),
             title = {
                 Row(
