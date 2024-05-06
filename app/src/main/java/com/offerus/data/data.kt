@@ -133,6 +133,11 @@ data class ServicioPeticionMod(
 data class PeticionId(
     val id_peticion: Int
 )
+
+@Serializable
+data class PeticionesRequestBody(
+    val ids_pet: List<Int>
+)
 @Serializable
 data class DealPeticionAceptar(
     val id_peticion: Int,

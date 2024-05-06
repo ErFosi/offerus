@@ -9,6 +9,7 @@ import com.offerus.data.Deal
 import com.offerus.data.DealPeticionAceptar
 import com.offerus.data.ErrorResponse
 import com.offerus.data.PeticionId
+import com.offerus.data.PeticionesRequestBody
 import com.offerus.data.ServicioPeticion
 import com.offerus.data.ServicioPeticionCreate
 import com.offerus.data.ServicioPeticionMod
@@ -221,6 +222,33 @@ class UserClient @Inject constructor() {
             return Json.decodeFromString(response.bodyAsText())
         } else {
             throw Exception("Failed to fetch request: HTTP ${response.status}")
+        }
+    }
+
+    /**
+     * @Description: Función que manda la petición para obtener una lista de peticiones/servicios
+     * @Param idsPet: Lista de enteros que representan los IDs de las peticiones
+     * @Throws Exception
+     * @Return Lista de ServicioPeticion
+     */
+    @Throws(Exception::class)
+    suspend fun obtenerPeticiones(idsPet: List<Int>): List<ServicioPeticion> {
+        val jsonBody = Json.encodeToString(PeticionesRequestBody(idsPet))
+        val response: HttpResponse = clienteHttp.post("https://offerus.zapto.org/peticiones") {
+            contentType(ContentType.Application.Json)
+            accept(ContentType.Application.Json)
+            setBody(jsonBody)
+        }
+        when (response.status) {
+            HttpStatusCode.OK -> {
+                return Json.decodeFromString(response.bodyAsText())
+            }
+            HttpStatusCode.NotFound -> {
+                throw Exception("Peticiones no encontradas: HTTP ${response.status}")
+            }
+            else -> {
+                throw Exception("Error al realizar la solicitud: HTTP ${response.status}")
+            }
         }
     }
 
@@ -621,5 +649,28 @@ class UserClient @Inject constructor() {
         }
     }
 
+
+    /**
+     * @Description: Funcion que manda la peticion de suscripcion a FCM dado el token
+     * @Param token: String
+     * @Throws AuthenticationException
+     * @Throws Exception
+     * @Return Unit
+     */
+    @Throws(AuthenticationException::class, Exception::class)
+    suspend fun subscribeToFCM(token: String) {
+        val token = bearerTokenStorage.last().accessToken
+        val response: HttpResponse = clienteHttp.post("https://offerus.zapto.org/suscribir_fcm") {
+            header(HttpHeaders.Authorization, "Bearer $token")
+            parameter("fcm_client_token", token)
+            accept(ContentType.Application.Json)
+        }
+
+        when (response.status) {
+            HttpStatusCode.OK -> println("FCM token registrado")
+            HttpStatusCode.Unauthorized -> throw AuthenticationException()
+            else -> throw Exception("Error al registrar el token FCM: HTTP ${response.status}")
+        }
+    }
 
 }
