@@ -14,7 +14,6 @@ data class ServicioPeticion(
     val titulo: String,
     val peticion: Boolean,
     val descripcion: String,
-    val peticion: Boolean,
     val precio: Double,
     val fecha: String,
     val latitud: Double,

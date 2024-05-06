@@ -114,11 +114,11 @@ fun MainScreen(
                 }
                 composable(BottomBarRoute.SEARCH) {
                     // Contenido de la pestaña Team
-                    OffersScreen(mainViewModel = mainViewModel, myOffers = false, navController = navControllerMain)
+                    OffersScreen(mainViewModel = mainViewModel, myOffers = false, navController = navControllerMain, myLikes = false)
                 }
                 composable(BottomBarRoute.MYOFFERS) {
                     // Contenido de la pestaña Table
-                    OffersScreen(mainViewModel = mainViewModel, myOffers = true, navController = navControllerMain)
+                    OffersScreen(mainViewModel = mainViewModel, myOffers = true, navController = navControllerMain, myLikes = false)
                 }
 
             }
