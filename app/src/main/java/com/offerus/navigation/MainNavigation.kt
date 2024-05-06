@@ -1,9 +1,6 @@
 package com.offerus.navigation
 
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -33,7 +30,7 @@ fun MainNavigation(
             MainScreen(navController, mainViewModel )
         }
         composable(AppScreens.UserScreen.route){
-            UserScreen(viewModel = mainViewModel)
+            UserScreen(viewModel = mainViewModel, navController = navController)
         }
         composable(AppScreens.LoginScreen.route){
             Login(

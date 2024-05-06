@@ -58,6 +58,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
+import androidx.navigation.NavHostController
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.gowtham.ratingbar.RatingBar
@@ -72,6 +73,7 @@ import com.offerus.components.ProfilePicture
 import com.offerus.components.ThemeSwitcher
 import com.offerus.components.languageSwitcher
 import com.offerus.components.mapa
+import com.offerus.navigation.AppScreens
 import com.offerus.ui.theme.OfferUSTheme
 import com.offerus.viewModels.MainViewModel
 import java.io.File
@@ -79,7 +81,8 @@ import java.io.File
 
 @Composable
 fun UserScreen(
-    viewModel: MainViewModel
+    viewModel: MainViewModel,
+    navController: NavHostController
 ){
     var sobreMiExpanded by rememberSaveable {
         mutableStateOf(false)
@@ -221,7 +224,9 @@ fun UserScreen(
                     }
                     OutlinedButton(
                         onClick = {
-                            /*TODO*/
+                            viewModel.logout()
+                            while (navController.popBackStack()){navController.popBackStack()}
+                            navController.navigate(AppScreens.LoginScreen.route)
                         },
                         modifier = Modifier
                             .weight(1f)
@@ -721,7 +726,9 @@ fun UserScreen(
             ) {
                 OutlinedButton(
                     onClick = {
-                        /*TODO*/
+                        viewModel.logout()
+                        while (navController.popBackStack()){navController.popBackStack()}
+                        navController.navigate(AppScreens.LoginScreen.route)
                     },
                     modifier = Modifier.weight(1f),
                 ) {
