@@ -1,20 +1,16 @@
 package com.offerus.viewModels
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import android.graphics.Bitmap
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.offerus.Idioma
 import com.offerus.MyPreferencesDataStore
-import com.offerus.data.Deal
-import com.offerus.data.ServicioPeticion
-import androidx.lifecycle.viewModelScope
 import com.offerus.data.BusquedaPeticionServicio
 import com.offerus.data.ContraseñaChange
 import com.offerus.data.Deal
@@ -32,14 +28,13 @@ import com.offerus.utils.AuthClient
 import com.offerus.utils.AuthenticationException
 import com.offerus.utils.CambioDeIdioma
 import com.offerus.utils.UserClient
-import com.offerus.utils.createDealListExample
 import com.offerus.utils.UserExistsException
+import com.offerus.utils.createDealListExample
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 interface LoginResultHandler {
