@@ -5,39 +5,39 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import com.offerus.model.database.entities.User
+import com.offerus.data.Usuario
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface UserDao {
 
     @Insert
-    suspend fun addUser(user: User)
+    suspend fun addUser(user: Usuario)
 
     @Update
-    suspend fun updateUser(user: User)
+    suspend fun updateUser(user: Usuario)
 
-    @Query("SELECT * FROM User where username = :username LIMIT 1")
-    fun getUserData(username: String): Flow<User>
+    @Query("SELECT * FROM Usuario where username = :username LIMIT 1")
+    fun getUserData(username: String): Flow<Usuario>
 
 
-    @Query("SELECT username FROM User where username = :username")
+    @Query("SELECT username FROM Usuario where username = :username")
     fun checkUsernameExists(username: String): String
 
-    @Query("SELECT password FROM User WHERE username = :username")
+    @Query("SELECT contraseña FROM Usuario WHERE username = :username")
     suspend fun getUserPassword(username: String): String
 
     //API
     @Transaction
-    @Query("DELETE FROM User")
+    @Query("DELETE FROM Usuario")
     suspend fun deleteUsers()
 
     @Transaction
-    suspend fun addUsers(users: Iterable<User>) {
+    suspend fun addUsers(users: Iterable<Usuario>) {
         users.forEach { addUser(it) }
     }
     @Transaction
-    suspend fun overwriteUsers(users: Iterable<User>) {
+    suspend fun overwriteUsers(users: Iterable<Usuario>) {
         deleteUsers()
         addUsers(users)
     }

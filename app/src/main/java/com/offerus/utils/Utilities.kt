@@ -6,7 +6,7 @@ import android.content.Intent
 import android.os.Handler
 import android.os.Looper
 import android.widget.Toast
-import com.offerus.model.database.entities.Deal
+import com.offerus.data.Deal
 
 fun showToastOnMainThread(context: Context, message: String) {
     Handler(Looper.getMainLooper()).post {
@@ -14,11 +14,22 @@ fun showToastOnMainThread(context: Context, message: String) {
     }
 }
 
-fun createDealList(): List<Deal> {
+fun createDealListExample(): List<Deal> {
     val dealList = mutableListOf<Deal>()
-    for (i in 0..10) {
-        dealList.add(Deal(i, i, "user$i", "jose", "", false))
+
+    repeat(20) {
+        val deal = Deal(
+            id = it + 1,
+            nota_cliente = "-1",
+            nota_host = "-1",
+            username_cliente = listOf("cuadron11").random(),
+            username_host = listOf("cuadron11").random(),
+            id_peticion = (1..100).random(),
+            estado = listOf("Aceptada", "Rechazada", "Pendiente").random()
+        )
+        dealList.add(deal)
     }
+
     return dealList
 }
 
