@@ -11,6 +11,7 @@ import com.offerus.screens.MainScreen
 import com.offerus.screens.OfferDetails
 import com.offerus.screens.UserScreen
 import com.offerus.screens.Login
+import com.offerus.screens.OffersScreen
 import com.offerus.viewModels.MainViewModel
 
 @Composable
@@ -36,16 +37,15 @@ fun MainNavigation(
         }
         composable(AppScreens.LoginScreen.route){
             Login(
-                onLogedIn = {
-                    navController.popBackStack()
-                    navController.navigate(AppScreens.MainScreen.route)
-                },
-                OnRegister = {
-                }
+                mainViewModel = mainViewModel,
+                navController = navController
             )
         }
         composable(AppScreens.OfferDetailsScreen.route){
             OfferDetails()
+        }
+        composable(AppScreens.Favorites.route){
+            OffersScreen(mainViewModel = mainViewModel, myOffers = false, navController = navController)
         }
     }
 }

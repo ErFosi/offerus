@@ -87,7 +87,8 @@ import com.offerus.viewModels.MainViewModel
 fun OffersScreen(
     navController: NavController,
     mainViewModel: MainViewModel,
-    myOffers: Boolean // Si es pagina MisOfertas true, si es pagina buscar false
+    myOffers: Boolean, // Si es pagina MisOfertas true, si es pagina buscar false
+    //myLikes: Boolean    // Si es pagina Favoritos true, si es pagina buscar false
 ) {
 
     val openCreateDialog = remember { mutableStateOf(false) }
@@ -152,16 +153,14 @@ fun OffersScreen(
             SubPageSearch(
                 onOpenFilterDialog = {  openFilterDialog.value = true },
                 myOffers = myOffers,
-                navController = navController
+                navController = navController,
+                onOpenCreateDialog = { openCreateDialog.value = true }
             )
             ListaOfertas(myOffers = myOffers, onItemClick = {navController.navigate(AppScreens.OfferDetailsScreen.route)} )
 
 
-            if ( myOffers ) {
-                CreateOferRequestFloatingButton (
-                    onOpenCreateDialog = { openCreateDialog.value = true }
-                )
-            }
+
+
         }
 
     }
@@ -172,9 +171,11 @@ fun OffersScreen(
 fun SubPageSearch(
     navController: NavController,
     onOpenFilterDialog: () -> Unit,
-    myOffers: Boolean
+    myOffers: Boolean,
+    onOpenCreateDialog: () -> Unit
 
 ){
+   
     Column {
 
         Row ( modifier = Modifier
@@ -237,6 +238,27 @@ fun SubPageSearch(
             }
 
 
+        }
+        ListaOfertas(myOffers = myOffers, onItemClick = {navController.navigate(AppScreens.OfferDetailsScreen.route)} )
+        if ( myOffers ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight()
+                    .wrapContentSize(Alignment.BottomEnd)
+                    .padding(16.dp)
+            ) {
+                FloatingActionButton(
+                    onClick = { onOpenCreateDialog() },
+
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .size(56.dp),
+                    shape = CircleShape
+                ) {
+                    Icon(Icons.Filled.Add, "Floating action button.")
+                }
+            }
         }
 
 

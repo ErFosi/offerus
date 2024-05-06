@@ -12,6 +12,7 @@ data class ServicioPeticion(
     val id: Int,
     val username: String,
     val titulo: String,
+    val peticion: Boolean,
     val descripcion: String,
     val precio: Double,
     val fecha: String,
@@ -75,6 +76,7 @@ data class ErrorResponse(
 data class ServicioPeticionCreate(
     val titulo: String,
     val descripcion: String,
+    val peticion: Boolean,
     val precio: Double,
     val fecha: String,
     val latitud: Double,
