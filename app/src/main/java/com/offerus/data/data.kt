@@ -36,8 +36,8 @@ data class Deal(
     val username_host: String,
     val id_peticion: Int,
     val estado: String,  // Modified to match the original schema using estado instead of aceptado
-    val nota_cliente: Int = -1,  // Defaults to -1 as per your SQLAlchemy model
-    val nota_host: Int = -1  // Defaults to -1 as per your SQLAlchemy model
+    var nota_cliente: Int = -1,  // Defaults to -1 as per your SQLAlchemy model
+    var nota_host: Int = -1  // Defaults to -1 as per your SQLAlchemy model
 )
 /************************************************************************
  * Clases para la gestion de los usuarios

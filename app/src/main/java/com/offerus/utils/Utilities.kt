@@ -20,8 +20,8 @@ fun createDealListExample(): List<Deal> {
     repeat(20) {
         val deal = Deal(
             id = it + 1,
-            nota_cliente = "-1",
-            nota_host = "-1",
+            nota_cliente = -1,
+            nota_host = -1,
             username_cliente = listOf("cuadron11").random(),
             username_host = listOf("cuadron11").random(),
             id_peticion = (1..100).random(),

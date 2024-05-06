@@ -144,9 +144,9 @@ fun ReviewDialog(
                         //actualizar la review dependiendo de si es cliente o host
                         if (deal != null) {
                             if (deal.username_host == "cuadron11") {
-                                deal.nota_host = valoracion.value.toString()
+                                deal.nota_host = valoracion.value.toInt()
                             } else {
-                                deal.nota_cliente = valoracion.value.toString()
+                                deal.nota_cliente = valoracion.value.toInt()
                             }
                         }
                         onConfirmation()

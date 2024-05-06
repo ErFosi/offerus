@@ -110,6 +110,7 @@ class MainViewModel @Inject constructor(
                 fecha = "12/12/2021",
                 latitud = 43.2628005,
                 longitud = -2.9479811,
+                peticion = true,
                 categorias = listOf("Deportes", "Gratis").toString()
             )
         }
