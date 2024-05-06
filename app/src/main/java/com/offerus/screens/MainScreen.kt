@@ -84,7 +84,10 @@ fun MainScreen(
         }
     }
     Scaffold(
-        topBar = { ToolBar(){navControllerMain.navigate(route = AppScreens.UserScreen.route)} },
+        topBar = { ToolBar(
+                onUserClick = {navControllerMain.navigate(route = AppScreens.UserScreen.route) },
+                onFavoritesClick =  {navControllerMain.navigate(route = AppScreens.Favorites.route) }
+                )  },
         bottomBar = { if (enableBottomNavigation){
             AppBottomBar(selectedDestination, onNavigateToSection)
         } }
@@ -105,12 +108,13 @@ fun MainScreen(
                 }
                 composable(BottomBarRoute.SEARCH) {
                     // Contenido de la pestaña Team
-                    OffersScreen(mainViewModel = mainViewModel, myOffers = false, navController = navControllerMain)
+                    OffersScreen(mainViewModel = mainViewModel, myOffers = false, navController = navControllerMain, myLikes = false)
                 }
                 composable(BottomBarRoute.MYOFFERS) {
                     // Contenido de la pestaña Table
-                    OffersScreen(navController = navControllerMain, mainViewModel = mainViewModel, myOffers = true)
+                    OffersScreen(mainViewModel = mainViewModel, myOffers = true, navController = navControllerMain, myLikes = false)
                 }
+
             }
         }
     }
@@ -149,7 +153,10 @@ fun AppBottomBar(currentRoute: String?, onNavigate: (String) -> Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ToolBar(onUserClick: () -> Unit) {
+fun ToolBar(
+    onUserClick: () -> Unit,
+    onFavoritesClick: () -> Unit
+) {
     var context = LocalContext.current
     //var username = viewModel.username.value
     var username = "cuadron11"
@@ -179,7 +186,7 @@ fun ToolBar(onUserClick: () -> Unit) {
                     Spacer(modifier = Modifier.weight(1f))
 
                     //BOTON LISTA DESEOS
-                    IconButton(onClick = { Log.d("boton", "lista deseos")}) {
+                    IconButton(onClick = { onFavoritesClick() }) {
                         Icon(
                             imageVector = ImageVector.vectorResource(id = R.drawable.favorite_filled),
                             contentDescription = null

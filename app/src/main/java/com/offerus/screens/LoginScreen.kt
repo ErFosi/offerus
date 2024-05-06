@@ -15,17 +15,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavController
 import com.offerus.components.AnimatedAppName
 import com.offerus.components.AnimatedLogo
 import com.offerus.components.LoginBox
 import com.offerus.ui.theme.OfferUSTheme
 import com.offerus.ui.theme.primaryLight
+import com.offerus.viewModels.MainViewModel
 
 
 @Composable
 fun Login(
-    onLogedIn: () -> Unit = {},
-    OnRegister: () -> Unit = {},
+    navController: NavController,
+    mainViewModel: MainViewModel
 ) {
     Box(
         contentAlignment = Alignment.Center,
@@ -49,8 +51,8 @@ fun Login(
 
             Card(modifier = Modifier.weight(0.7f)) {
                 LoginBox(
-                    onLogedIn = onLogedIn,
-                    OnRegister = OnRegister
+                    mainViewModel,
+                    navController,
                 )
             }
 
@@ -62,7 +64,7 @@ fun Login(
     }
 }
 
-
+/*
 @SuppressLint("CoroutineCreationDuringComposition")
 @Preview(showBackground = true)
 @Composable
@@ -71,4 +73,6 @@ fun PreviewLogInScreen() {
         Login()
     }
 }
+
+ */
 

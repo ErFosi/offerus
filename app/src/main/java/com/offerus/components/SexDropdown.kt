@@ -1,5 +1,6 @@
 package com.offerus.components
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.DropdownMenuItem
@@ -19,13 +20,16 @@ import com.offerus.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SexDropdown() {
+fun SexDropdown(
+    onSexChange: (Char) -> Unit,
+) {
     var sexExpanded by remember { mutableStateOf(false) }
     var selectedSex by remember { mutableStateOf("") }
     val sexOptions = listOf(
         stringResource(R.string.hombre), stringResource(R.string.mujer), stringResource(
             R.string.otros)
     )
+
     //val backgroundColor = MaterialTheme.colorScheme.secondary
 
     ExposedDropdownMenuBox(
@@ -57,6 +61,8 @@ fun SexDropdown() {
                     onClick = {
                         selectedSex = sexOption
                         sexExpanded = false
+                        Log.d("Sexo", sexOption)
+                        onSexChange(sexOption.first())
                     }
                 )
             }

@@ -62,6 +62,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -80,7 +82,8 @@ import com.offerus.viewModels.MainViewModel
 fun OffersScreen(
     navController: NavController,
     mainViewModel: MainViewModel,
-    myOffers: Boolean // Si es pagina MisOfertas true, si es pagina buscar false
+    myOffers: Boolean, // Si es pagina MisOfertas true, si es pagina buscar false
+    myLikes: Boolean    // Si es pagina Favoritos true, si es pagina buscar false
 ) {
 
     val openCreateDialog = remember { mutableStateOf(false) }
@@ -90,13 +93,29 @@ fun OffersScreen(
     var selectedTabIndex by remember { mutableIntStateOf(0) }
     val tabs = listOf("Ofertas", "Solicitudes")
 
+    //FILTRO
+    val titulo = remember { mutableStateOf("") }
+    val categoria = remember { mutableStateOf("") }
+    val distanciaMaxima = remember { mutableStateOf(0.0) }
+    val precioMinimo = remember { mutableStateOf(0.0) }
+    val precioMaxima = remember { mutableStateOf(0.0) }
+    val ordenarPor = remember { mutableStateOf("precio_asc") }
+
+
     when {
 
         openFilterDialog.value -> {
             SearchDialog(
                 onDismissRequest = { openFilterDialog.value = false },
-                onConfirmation = { openFilterDialog.value = false },
-                onRefresh = { }
+                onConfirmation = { openFilterDialog.value = false
+                                 mainViewModel.getRequests(titulo.value,categoria.value,distanciaMaxima.value,precioMinimo.value,precioMaxima.value,0.0,0.0,"")},
+                onRefresh = {  },
+                onTituloChange = { titulo.value = it },
+                onCategoriaChange = { categoria.value = it },
+                onDistanciaChange = { distanciaMaxima.value = it },
+                onPrecioMinChange = { precioMinimo.value = it },
+                onPrecioMaxChange = { precioMaxima.value = it }
+
             )
 
         }
@@ -145,16 +164,14 @@ fun OffersScreen(
             SubPageSearch(
                 onOpenFilterDialog = {  openFilterDialog.value = true },
                 myOffers = myOffers,
-                navController = navController
+                navController = navController,
+                onOpenCreateDialog = { openCreateDialog.value = true }
             )
             ListaOfertas(myOffers = myOffers, onItemClick = {navController.navigate(AppScreens.OfferDetailsScreen.route)} )
 
 
-            if ( myOffers ) {
-                CreateOferRequestFloatingButton (
-                    onOpenCreateDialog = { openCreateDialog.value = true }
-                )
-            }
+
+
         }
 
     }
@@ -165,9 +182,11 @@ fun OffersScreen(
 fun SubPageSearch(
     navController: NavController,
     onOpenFilterDialog: () -> Unit,
-    myOffers: Boolean
+    myOffers: Boolean,
+    onOpenCreateDialog: () -> Unit
 
 ){
+
     Column {
 
         Row ( modifier = Modifier
@@ -218,6 +237,7 @@ fun SubPageSearch(
                     )
                 }
             }
+            Spacer(modifier = Modifier.width(6.dp))
 
             OutlinedButton(
                 modifier = Modifier
@@ -232,6 +252,27 @@ fun SubPageSearch(
             }
 
 
+        }
+        ListaOfertas(myOffers = myOffers, onItemClick = {navController.navigate(AppScreens.OfferDetailsScreen.route)} )
+        if ( myOffers ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight()
+                    .wrapContentSize(Alignment.BottomEnd)
+                    .padding(16.dp)
+            ) {
+                FloatingActionButton(
+                    onClick = { onOpenCreateDialog() },
+
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .size(56.dp),
+                    shape = CircleShape
+                ) {
+                    Icon(Icons.Filled.Add, "Floating action button.")
+                }
+            }
         }
 
 
@@ -318,10 +359,19 @@ fun SelectableButtonRow(
 fun SearchDialog(
     onDismissRequest: () -> Unit,
     onConfirmation: () -> Unit,
-    onRefresh: () -> Unit
+    onRefresh: () -> Unit,
+    onTituloChange: (String) -> Unit,
+    onCategoriaChange: (String) -> Unit,
+    onDistanciaChange: (Double) -> Unit,
+    onPrecioMinChange: (Double) -> Unit,
+    onPrecioMaxChange: (Double) -> Unit
 
     ){
     var sliderValue by remember { mutableStateOf(0f) }
+    val titulo = remember { mutableStateOf("") }
+    val categoria = remember { mutableStateOf("") }
+    val precioMinimo = remember { mutableStateOf(0.0) }
+    val precioMaxima = remember { mutableStateOf(0.0) }
 
     Dialog(onDismissRequest = { onDismissRequest() }) {
         Card (
@@ -348,7 +398,12 @@ fun SearchDialog(
                             modifier = Modifier.padding(vertical = 5.dp),
                         ) {
                             OutlinedTextField(
-                                value = "", onValueChange = { }, modifier = Modifier.height(50.dp),
+                                value = titulo.value,
+                                onValueChange = {
+                                                titulo.value = it
+                                                onTituloChange(it)
+                                },
+                                modifier = Modifier.height(70.dp).padding(vertical = 10.dp),
                                 label = {Text(text = "Titulo")}
                             )
 
@@ -356,7 +411,7 @@ fun SearchDialog(
                         Row(
                             modifier = Modifier.padding(vertical = 5.dp),
                         ) {
-                            DropdownCategorias()
+                            DropdownCategorias(onCategoriaChange)
                         }
 
                         Row(
@@ -367,6 +422,7 @@ fun SearchDialog(
                                 value = sliderValue,
                                 onValueChange = { newValue ->
                                     sliderValue = newValue
+                                    onDistanciaChange(newValue.toDouble())
                                 },
                                 valueRange = 0f..100f,
                                 steps = 100,
@@ -381,7 +437,12 @@ fun SearchDialog(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             OutlinedTextField(
-                                value = "", onValueChange = { }, modifier = Modifier
+                                value = precioMinimo.value.toString(),
+                                onValueChange = {
+                                        precioMinimo.value = it.toDouble()
+                                    onPrecioMinChange(it.toDouble())
+                                },
+                                modifier = Modifier
                                     .height(50.dp)
                                     .width(65.dp),
                                 placeholder = {
@@ -390,7 +451,12 @@ fun SearchDialog(
                             )
                             Text(text = " - ")
                             OutlinedTextField(
-                                value = "", onValueChange = { }, modifier = Modifier
+                                value = precioMaxima.value.toString(),
+                                onValueChange = {
+                                    precioMaxima.value = it.toDouble()
+                                    onPrecioMaxChange(it.toDouble())
+                                },
+                                modifier = Modifier
                                     .height(50.dp)
                                     .width(65.dp),
                                 placeholder = {
@@ -662,10 +728,10 @@ fun EditDescriptionDialog(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DropdownCategorias(
-
+    onCategoriaChange: (String) -> Unit = {}
 ) {
     val context = LocalContext.current
-    val idiomas = arrayOf("Categoria1", "Categoria2")
+    val idiomas = arrayOf("gratis", "deporte", "hogar", "entrenamiento", "academico", "online", "otros")
     var expanded by remember { mutableStateOf(false) }
     var selectedText by remember {
         mutableStateOf("Categoria1")
@@ -683,7 +749,7 @@ fun DropdownCategorias(
         ) {
             OutlinedTextField(
                 value = selectedText,
-                onValueChange = {},
+                onValueChange = {onCategoriaChange(it)},
                 readOnly = true,
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                 modifier = Modifier.menuAnchor()

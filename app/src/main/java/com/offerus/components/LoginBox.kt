@@ -1,7 +1,6 @@
 package com.offerus.components
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.gestures.Orientation
@@ -49,21 +48,22 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
-import androidx.wear.compose.material.ExperimentalWearMaterialApi
-import androidx.wear.compose.material.FractionalThreshold
-import androidx.wear.compose.material.rememberSwipeableState
-import androidx.wear.compose.material.swipeable
+import androidx.navigation.NavController
 import com.offerus.R
+import com.offerus.navigation.AppScreens
+import com.offerus.viewModels.LoginResultHandler
+import com.offerus.viewModels.MainViewModel
 import kotlinx.coroutines.launch
 
 
 @Composable
 fun LoginBox(
-    onLogedIn: () -> Unit = {},
-    OnRegister: () -> Unit = {},
+    mainViewModel: MainViewModel,
+    navController: NavController
 ) {
     val screenWidth = LocalConfiguration.current.screenWidthDp
     val coroutineScope = rememberCoroutineScope()
@@ -77,6 +77,25 @@ fun LoginBox(
         offsetX.value += delta
         offsetX.value = offsetX.value.coerceIn(0f, screenWidthInPx)
     }
+
+
+
+    var loginSuccess by remember { mutableStateOf(false) }
+
+    if (loginSuccess) {
+        navController.navigate(route = AppScreens.MainScreen.route )
+    }
+
+
+    // VARIABLES
+
+    var username by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var fullName by remember { mutableStateOf("") }
+    var age by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var phone by remember { mutableStateOf("") }
+    var sex by remember { mutableStateOf("M") }
 
     Column(modifier = Modifier.fillMaxSize()) {
         // OptionSelector fijo en la parte superior
@@ -122,19 +141,40 @@ fun LoginBox(
                     enter = slideInHorizontally(initialOffsetX = { -1000 }),
                     exit = slideOutHorizontally(targetOffsetX = { -1000 })
                 ) {
-                    LoginFieldView()
+                    LoginFieldView(
+                        onUsernameChange = { newText -> username = newText},
+                        onPasswordChange = { newText -> password = newText}
+                    )
                 }
                 this@Column.AnimatedVisibility(
                     visible = offsetX.value <= screenWidthInPx / 2,
                     enter = slideInHorizontally(initialOffsetX = { 1000 }),
                     exit = slideOutHorizontally(targetOffsetX = { 1000 })
                 ) {
-                    RegisterFieldView()
+                    RegisterFieldView(
+                        onUsernameChange = { newText -> username = newText},
+                        onPasswordChange = { newText -> password = newText},
+                        onFullnameChange = { newText -> fullName = newText},
+                        onEmaiChange = { newText -> email = newText},
+                        onPhoneChange = { newText -> phone = newText},
+                        onAgeChange = { newText -> age = newText},
+                        onSexChange = { newText -> sex = newText.toString()},
+                    )
                 }
             }
 
             Button(
-                onClick = { onLogedIn() },
+                onClick = { if (offsetX.value > screenWidthInPx / 2) {
+                    mainViewModel.login(username, password,
+                        object : LoginResultHandler {
+                            override fun onLoginResult(success: Boolean) {
+                                loginSuccess = success
+                            }
+                        })
+                    }
+                        else {
+                            mainViewModel.register(username,password,fullName,age.toInt(),email,phone, sex)}
+                 },
                 modifier = Modifier
                     .height(70.dp)
                     .fillMaxWidth()
@@ -147,7 +187,7 @@ fun LoginBox(
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        "Log in",
+                        if (offsetX.value > screenWidthInPx / 2) "Log In" else "Register",
                         style = MaterialTheme.typography.titleLarge,
                         textAlign = TextAlign.Center
                     )
@@ -159,6 +199,9 @@ fun LoginBox(
                     )
                 }
             }
+
+
+
         }
     }
 }
@@ -196,8 +239,17 @@ fun OptionSelector(selectedOption: Int, onOptionSelected: (Int) -> Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegisterFieldView() {
+fun RegisterFieldView(
+    onUsernameChange: (String) -> Unit,
+    onPasswordChange: (String) -> Unit,
+    onFullnameChange: (String) -> Unit,
+    onAgeChange: (String) -> Unit,
+    onEmaiChange: (String) -> Unit,
+    onPhoneChange: (String) -> Unit,
+    onSexChange: (Char) -> Unit
+) {
     //val backgroundColor = MaterialTheme.colorScheme.secondary
+
     val scrollState = rememberScrollState()
     Column(
         modifier = Modifier
@@ -207,6 +259,7 @@ fun RegisterFieldView() {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         var username by remember { mutableStateOf("") }
+        var password by remember { mutableStateOf("") }
         var fullName by remember { mutableStateOf("") }
         var age by remember { mutableStateOf("") }
         var email by remember { mutableStateOf("") }
@@ -215,7 +268,8 @@ fun RegisterFieldView() {
 
         OutlinedTextField(
             value = username,
-            onValueChange = { username = it },
+            onValueChange = { username = it
+                            onUsernameChange(it)},
             label = { Text(stringResource(R.string.username)) },
             singleLine = true,
             leadingIcon = {
@@ -227,8 +281,24 @@ fun RegisterFieldView() {
         )
 
         OutlinedTextField(
+            value = password,
+            onValueChange = { password = it
+                onPasswordChange(it)},
+            label = { Text(stringResource(R.string.password)) },
+            singleLine = true,
+            leadingIcon = {
+                Icon(Icons.Filled.Person, contentDescription = stringResource(R.string.password))
+            },
+
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp)
+        )
+
+        OutlinedTextField(
             value = fullName,
-            onValueChange = { fullName = it },
+            onValueChange = { fullName = it
+                            onFullnameChange(it)},
             label = { Text(stringResource(R.string.full_name)) },
             singleLine = true,
             leadingIcon = {
@@ -240,7 +310,8 @@ fun RegisterFieldView() {
         )
         OutlinedTextField(
             value = age,
-            onValueChange = { age = it },
+            onValueChange = { age = it
+                            onAgeChange(it)},
             label = { Text(stringResource(R.string.age)) },
             singleLine = true,
             leadingIcon = {
@@ -256,7 +327,8 @@ fun RegisterFieldView() {
         // Email TextField
         OutlinedTextField(
             value = email,
-            onValueChange = { email = it },
+            onValueChange = { email = it
+                            onEmaiChange(it)},
             label = { Text(stringResource(R.string.email)) },
             singleLine = true,
             leadingIcon = {
@@ -273,7 +345,8 @@ fun RegisterFieldView() {
         // Phone TextField
         OutlinedTextField(
             value = phone,
-            onValueChange = { phone = it },
+            onValueChange = { phone = it
+                            onPhoneChange(it)},
             label = { Text(stringResource(R.string.phone)) },
             singleLine = true,
             leadingIcon = {
@@ -288,14 +361,21 @@ fun RegisterFieldView() {
         )
 
         // Sex dropdown
-        SexDropdown()
+        SexDropdown(
+            onSexChange
+        )
+
+
     }
 }
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginFieldView() {
+fun LoginFieldView(
+    onUsernameChange: (String) -> Unit,
+    onPasswordChange: (String) -> Unit
+) {
 
     //val backgroundColor = MaterialTheme.colorScheme.secondary
     Column(
@@ -309,7 +389,8 @@ fun LoginFieldView() {
 
         OutlinedTextField(
             value = username,
-            onValueChange = { username = it },
+            onValueChange = { username = it
+                            onUsernameChange(it)},
             label = { Text(stringResource(R.string.username)) },
             singleLine = true,
             leadingIcon = {
@@ -322,13 +403,14 @@ fun LoginFieldView() {
         )
         OutlinedTextField(
             value = password,
-            onValueChange = { password = it },
+            onValueChange = { password = it
+                            onPasswordChange(it)},
             label = { Text(stringResource(R.string.password)) },
             singleLine = true,
             leadingIcon = {
                 Icon(Icons.Filled.Lock, contentDescription = stringResource(R.string.password))
             },
-
+            visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.fillMaxWidth()
         )
     }
