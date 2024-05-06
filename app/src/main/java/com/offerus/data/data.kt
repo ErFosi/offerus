@@ -1,5 +1,8 @@
 package com.offerus.data
 
+import androidx.compose.runtime.Immutable
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import kotlinx.serialization.Serializable
 
 /************************************************************************
@@ -7,8 +10,11 @@ import kotlinx.serialization.Serializable
  *
  * Nota importante, las categorias deben ser una definida en el servidor y separadas por comas
  *************************************************************************/
+@Immutable
 @Serializable
+@Entity(tableName = "ServicioPeticion")
 data class ServicioPeticion(
+    @PrimaryKey
     val id: Int,
     val username: String,
     val titulo: String,
@@ -20,8 +26,11 @@ data class ServicioPeticion(
     val longitud: Double,
     val categorias: String
 )
+@Immutable
 @Serializable
+@Entity(tableName = "Deal")
 data class Deal(
+    @PrimaryKey
     val id: Int,
     val username_cliente: String,
     val username_host: String,
@@ -35,8 +44,11 @@ data class Deal(
  *
  * Nota importante, el sexo es un char, M, F ó O.
  *************************************************************************/
+@Immutable
 @Serializable
+@Entity(tableName = "Usuario")
 data class Usuario(
+    @PrimaryKey
     val username: String,
     val contraseña: String,
     val nombre_apellido: String,

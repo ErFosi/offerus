@@ -1,8 +1,8 @@
 package com.offerus.model.repositories
 
 import android.graphics.Bitmap
+import com.offerus.data.Usuario
 import com.offerus.model.database.daos.UserDao
-import com.offerus.model.database.entities.User
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -16,8 +16,8 @@ class UserDataRepository @Inject constructor(
 
     private lateinit var profileImage: Bitmap
 
-    suspend fun addUserData(user: User) = userDao.addUser(user)
-    suspend fun updateUser(user: User) {
+    suspend fun addUserData(user: Usuario) = userDao.addUser(user)
+    suspend fun updateUser(user: Usuario) {
         userDao.updateUser(user)
     }
 

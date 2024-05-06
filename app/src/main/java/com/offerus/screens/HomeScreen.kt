@@ -1,5 +1,6 @@
 package com.offerus.screens
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
@@ -22,12 +24,10 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
@@ -35,17 +35,21 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
+import com.gowtham.ratingbar.RatingBar
+import com.gowtham.ratingbar.RatingBarStyle
 import com.offerus.R
-import com.offerus.model.database.entities.Deal
+import com.offerus.data.Deal
 import com.offerus.navigation.AppScreens
-import com.offerus.utils.createDealList
 import com.offerus.utils.showToastOnMainThread
+import com.offerus.viewModels.MainViewModel
 
 @Composable
-fun HomeScreen(navController: NavController) {
+fun HomeScreen(navController: NavController, viewModel: MainViewModel) {
     // Estado para almacenar la pestaña seleccionada
-    var selectedTabIndex by remember { mutableIntStateOf(0) }
+    var selectedTabIndex = viewModel.selectedTabIndexHome
 
     // Lista de pestañas
     val tabs = listOf("Entrantes", "Salientes")
@@ -53,23 +57,34 @@ fun HomeScreen(navController: NavController) {
     // Superficie principal
     Surface {
         Column {
+
+            // dialogo para realizar la review
+            if (viewModel.dialogoReview.value) {
+                ReviewDialog(viewModel.dealReview,
+                    onDismissRequest = { viewModel.dialogoReview.value = false }) {
+                    //enviar la review
+                    viewModel.enviarReview()
+                    viewModel.dialogoReview.value = false
+                }
+            }
+
             // TabRow para mostrar las pestañas
-            TabRow(selectedTabIndex) {
+            TabRow(selectedTabIndex.value) {
                 // Crear una pestaña para cada elemento en la lista de pestañas
                 tabs.forEachIndexed { index, title ->
-                    Tab(selected = selectedTabIndex == index,
-                        onClick = { selectedTabIndex = index },
+                    Tab(selected = selectedTabIndex.value == index,
+                        onClick = { selectedTabIndex.value = index },
                         text = { Text(title) })
                 }
             }
 
             // Mostrar la subpantalla correspondiente a la pestaña seleccionada
-            when (selectedTabIndex) {
-                0 -> Entrantes() {
+            when (selectedTabIndex.value) {
+                0 -> Entrantes(viewModel) {
                     navController.navigate(AppScreens.OfferDetailsScreen.route)
                 }
 
-                1 -> Salientes() {
+                1 -> Salientes(viewModel, onMakeReview = { viewModel.dialogoReview.value = true }) {
                     navController.navigate(AppScreens.OfferDetailsScreen.route)
                 }
             }
@@ -77,10 +92,88 @@ fun HomeScreen(navController: NavController) {
     }
 }
 
+@SuppressLint("UnrememberedMutableState")
 @Composable
-fun Entrantes(onItemClick: () -> Unit) {
+fun ReviewDialog(
+    deal: Deal?,
+    onDismissRequest: () -> Unit,
+    onConfirmation: () -> Unit
+) {
+
+    var valoracion = mutableStateOf(0F)
+
+    Dialog(
+        onDismissRequest = { onDismissRequest() }
+    ) {
+        Card {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Valoración del servicio",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp,
+                    modifier = Modifier.padding(8.dp)
+                )
+
+                //info del deal
+                if (deal != null) {
+                    Text(text = "usuario: ${deal.username_host}", fontWeight = FontWeight.Bold)
+                    Text(text = "Id peticion: ${deal.id_peticion}")
+
+                    // valoracion en estrellas
+                    RatingBar(
+                        modifier = Modifier
+                            .padding(bottom = 20.dp, top = 15.dp, start = 5.dp, end = 5.dp)
+                            .scale(0.75F),
+                        value = valoracion.value,
+                        style = RatingBarStyle.Fill(
+                            MaterialTheme.colorScheme.primary,
+                            MaterialTheme.colorScheme.outline
+                        ),
+                        onValueChange = {
+                            valoracion.value = it
+                        },
+                        onRatingChanged = {
+                            Log.d("TAG", "onRatingChanged: $it")
+                        }
+                    )
+
+                    IconButton(onClick = {
+                        //actualizar la review dependiendo de si es cliente o host
+                        if (deal != null) {
+                            if (deal.username_host == "cuadron11") {
+                                deal.nota_host = valoracion.value.toString()
+                            } else {
+                                deal.nota_cliente = valoracion.value.toString()
+                            }
+                        }
+                        onConfirmation()
+                    }, modifier = Modifier
+                        .padding(8.dp)
+                        .size(32.dp)) {
+                        Icon(
+                            imageVector = Icons.Filled.CheckCircle,
+                            contentDescription = "Aceptar",
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(32.dp)
+                        )
+                    }
+                } else {
+                    Text(text = "Peticion no encontrada")
+                }
+
+            }
+        }
+    }
+}
+
+@Composable
+fun Entrantes(viewModel: MainViewModel, onItemClick: () -> Unit) {
     //obtenemos la lista del viemodel
-    var listaEntrantes = createDealList()
+    var listaEntrantes = viewModel.listaEntrantes
+    //var listaEntrantes = createDealList()
     //mostramos la lista
     Column(
         modifier = Modifier
@@ -90,6 +183,7 @@ fun Entrantes(onItemClick: () -> Unit) {
         LazyColumn {
             items(listaEntrantes.size) { index ->
                 EntrantesCard(deal = listaEntrantes[index]) {
+                    viewModel.cambiarServicioDetalle(listaEntrantes[index].id_peticion)
                     onItemClick()
                 }
             }
@@ -135,8 +229,9 @@ fun BotonesEntrantes() {
 }
 
 @Composable
-fun Salientes(onItemClick: () -> Unit) {
-    var listaSalientes = createDealList()
+fun Salientes(viewModel: MainViewModel, onMakeReview: () -> Unit, onItemClick: () -> Unit) {
+    val listaSalientes = viewModel.listaSalientes
+    Log.d("listaComposable", listaSalientes.toString())
     //mostramos la lista
     Column(
         modifier = Modifier
@@ -146,7 +241,14 @@ fun Salientes(onItemClick: () -> Unit) {
         LazyColumn {
             items(listaSalientes.size) { index ->
                 SalientesCard(deal = listaSalientes[index]) {
-                    onItemClick()
+                    if (listaSalientes[index].estado == "Aceptada") {
+                        viewModel.dealReview = listaSalientes[index]
+                        onMakeReview()
+                    } else {
+                        viewModel.cambiarServicioDetalle(listaSalientes[index].id_peticion)
+                        onItemClick()
+                    }
+
                 }
             }
         }
@@ -156,7 +258,6 @@ fun Salientes(onItemClick: () -> Unit) {
 @Composable
 fun SalientesCard(deal: Deal, onItemClick: () -> Unit) {
     var context = LocalContext.current
-    var estado = listOf("Pendiente", "Aceptada", "Rechazada").random()
     Card(
         modifier = Modifier
             .padding(8.dp)
@@ -166,14 +267,13 @@ fun SalientesCard(deal: Deal, onItemClick: () -> Unit) {
                         onItemClick()
                     },
                     onLongPress = {
-                        showToastOnMainThread(context, estado)
+                        showToastOnMainThread(context, deal.estado)
                     })
             }
     ) {
         OfferInfo(deal = deal) {
             //estado aleatorio entre pendiente, aceptada y rechazada
-
-            IconoEstado(estado = estado)
+            IconoEstado(estado = deal.estado)
         }
     }
 }
@@ -187,7 +287,9 @@ fun IconoEstado(estado: String) {
             Icon(
                 imageVector = ImageVector.vectorResource(R.drawable.pending),
                 contentDescription = "Pendiente",
-                modifier = Modifier.size(28.dp),
+                modifier = Modifier
+                    .padding(11.dp)
+                    .size(32.dp),
             )
         }
 
@@ -195,7 +297,9 @@ fun IconoEstado(estado: String) {
             Icon(
                 painter = painterResource(R.drawable.logorecortado),
                 contentDescription = null,
-                modifier = Modifier.size(28.dp),
+                modifier = Modifier
+                    .padding(12.dp)
+                    .size(28.dp),
                 tint = MaterialTheme.colorScheme.primary
             )
         }
@@ -204,7 +308,9 @@ fun IconoEstado(estado: String) {
             Icon(
                 painter = painterResource(R.drawable.logorecortado),
                 contentDescription = null,
-                modifier = Modifier.size(28.dp),
+                modifier = Modifier
+                    .padding(12.dp)
+                    .size(28.dp),
                 tint = MaterialTheme.colorScheme.error
             )
         }
@@ -227,7 +333,7 @@ fun OfferInfo(
             horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(4.dp)
         ) {
             UserAvatar(iniciales = "AC")
-            Text(text = deal.usernameOfrece)
+            Text(text = deal.username_host)
         }
 
         Column(modifier = Modifier.weight(1f)) {

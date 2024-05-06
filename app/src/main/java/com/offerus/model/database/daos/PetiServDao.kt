@@ -4,17 +4,17 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
-import com.offerus.model.database.entities.PeticionServicio
+import com.offerus.data.ServicioPeticion
 
 @Dao
 interface PetiServDao {
     @Insert
-    suspend fun addPetiServ(peti: PeticionServicio)
+    suspend fun addPetiServ(peti: ServicioPeticion)
 
     @Update
-    suspend fun updatePetiServ(peti: PeticionServicio)
+    suspend fun updatePetiServ(peti: ServicioPeticion)
 
-    @Query("SELECT * FROM PeticionServicio where id = :id LIMIT 1")
-    fun getPetiServData(id: Int): PeticionServicio
+    @Query("SELECT * FROM ServicioPeticion where id = :id LIMIT 1")
+    fun getPetiServData(id: Int): ServicioPeticion
 
 }
