@@ -31,4 +31,7 @@
     <string name="ubicacionMapa">Aukeratu kokapena mapan</string>
     <string name="seleccionarMiUbicacion">Aukeratu nire oraingo kokapena</string>
     <string name="mapaDosDedos">Erabili bi atzamar mapatik nabigatzeko</string>
+    <string name="error_login">Erabiltzaile izena edo pasahitza ez dira zuzenak, mesedez saiatu berriro.</string>
+    <string name="RegistroExitoso">Erregistroa zuzena izan da</string>
+    <string name="usuarioyaexiste">Erabiltzaile izena dagoeneko existitzen da, hasi saioa edo erabili beste bat</string>
 </resources>

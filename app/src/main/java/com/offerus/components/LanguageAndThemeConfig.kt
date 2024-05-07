@@ -5,10 +5,12 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -66,16 +68,25 @@ fun languageSwitcher(
                 Icon(
                     painter = painterResource(R.drawable.idioma),
                     contentDescription = stringResource(R.string.SeleccionarIdioma),
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = MaterialTheme.colorScheme.primary,
+
                 )
             }
 
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
             ) {
-                TextButton(onClick = { expanded = !expanded }) {
-                    Text(text = idiomaSeleccionado.name)
+                TextButton(
+                    onClick = { expanded = !expanded },
+                    modifier = Modifier.fillMaxSize().padding(0.dp),
+                    contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp)) {
+                    Text(
+                        if (size<70.dp) idiomaSeleccionado.codigo else idiomaSeleccionado.name,
+                        Modifier.fillMaxWidth().padding(start = 5.dp).align(Alignment.CenterVertically),
+                    )
                 }
                 DropdownMenu(
                     expanded = expanded,
@@ -184,8 +195,8 @@ fun ThemeSwitcher(
 @Composable
 @Preview
 fun ThemeSwitcherPreview() {
-    OfferUSTheme {
-        var darkTheme by remember { mutableStateOf(false) }
+    OfferUSTheme(darkTheme = true) {
+        var darkTheme by remember { mutableStateOf(true) }
         ThemeSwitcher(darkTheme = darkTheme, onClick = { darkTheme = !darkTheme })
     }
 
@@ -194,7 +205,11 @@ fun ThemeSwitcherPreview() {
 @Preview
 fun LanguageSwitcherPreview() {
     OfferUSTheme {
-        //languageSwitcher { it: com.offerus.Idioma -> viewModel.updateIdioma(it, context = context) }
+        languageSwitcher(
+            onLanguageSelected = {},
+            idiomaSeleccionado = Idioma.Castellano,
+            size = 40.dp
+        )
     }
 
 }

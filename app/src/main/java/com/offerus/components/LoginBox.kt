@@ -1,5 +1,6 @@
 package com.offerus.components
 
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
@@ -45,6 +46,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -55,16 +57,21 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.offerus.R
 import com.offerus.navigation.AppScreens
-import com.offerus.viewModels.LoginResultHandler
+import com.offerus.utils.AuthenticationException
+import com.offerus.utils.UserExistsException
 import com.offerus.viewModels.MainViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.net.ConnectException
 
 
 @Composable
 fun LoginBox(
     mainViewModel: MainViewModel,
-    navController: NavController
+    navController: NavController,
+    onTabChange: (Boolean) -> Unit
 ) {
+    val context = LocalContext.current
     val screenWidth = LocalConfiguration.current.screenWidthDp
     val coroutineScope = rememberCoroutineScope()
     val offsetX = remember { mutableStateOf(0f) } // Estado para almacenar el desplazamiento en X
@@ -78,15 +85,6 @@ fun LoginBox(
         offsetX.value = offsetX.value.coerceIn(0f, screenWidthInPx)
     }
 
-
-
-    var loginSuccess by remember { mutableStateOf(false) }
-
-    if (loginSuccess) {
-        navController.navigate(route = AppScreens.MainScreen.route )
-    }
-
-
     // VARIABLES
 
     var username by remember { mutableStateOf("") }
@@ -97,7 +95,112 @@ fun LoginBox(
     var phone by remember { mutableStateOf("") }
     var sex by remember { mutableStateOf("M") }
 
-    Column(modifier = Modifier.fillMaxSize()) {
+
+    ///////////////  METODOS PARA LOGIN Y REGISTRO ///////////////
+
+    var sesionIniciada by remember { mutableStateOf(false) }
+    var mostrarErrorLogin by remember { mutableStateOf(false) }  // VARIABLE QUE INDICA EL LOGIN INCORRECTO
+    var mostrarErrorConexion by remember { mutableStateOf(false) }
+
+    var registrado by remember { mutableStateOf(false) }
+    var mostrarErrorRegistro by remember { mutableStateOf(false) } // ERROR DE REGISTRO: USUARIO DUPLICADO O NO VALIDO
+
+    val onLogin: () -> Unit = {
+        coroutineScope.launch(Dispatchers.IO){
+            try {
+                mainViewModel.login(username, password)
+                sesionIniciada = true
+                mainViewModel.usuario = username // guardar el nombre de usuario en el viewmodel
+                mainViewModel.setUsuarioLogueado(username, password) // guardar el nombre de usuario y contraseña en el datastore
+                mostrarErrorLogin = false
+            } catch (e: AuthenticationException) {
+                mostrarErrorLogin = true
+                sesionIniciada = false
+            } catch (e: ConnectException) {
+                mostrarErrorLogin = true
+                sesionIniciada = false
+                mostrarErrorConexion = true
+            }
+        }
+    }
+    if (sesionIniciada) {
+        // TODO suscribeToFCM(context)
+        navController.popBackStack()
+        navController.navigate(AppScreens.MainScreen.route)
+    }
+    if (mostrarErrorLogin){
+        Toast.makeText(
+            context,
+            R.string.error_login,
+            Toast.LENGTH_SHORT
+        ).show()
+    }
+    if (mostrarErrorConexion){
+        Toast.makeText(
+            context,
+            R.string.no_internet,
+            Toast.LENGTH_SHORT
+        ).show()
+        mostrarErrorConexion = false
+    }
+
+    val onRegister: () -> Unit = {
+        coroutineScope.launch(Dispatchers.IO){
+            try {
+                mainViewModel.register(username, password, fullName, age.toInt(),  email, phone, sex)
+                registrado = true
+                mostrarErrorRegistro = false
+            } catch (e: UserExistsException) {
+                mostrarErrorRegistro = true
+                registrado = false
+            }catch (e: ConnectException) {
+                mostrarErrorRegistro = true
+                registrado = false
+                mostrarErrorConexion = true
+            }
+        }
+    }
+    if (registrado) {
+        registrado = false
+        // Show success message
+        Toast.makeText(
+            context,
+            R.string.RegistroExitoso,
+            Toast.LENGTH_SHORT
+        ).show()
+        // TODO QUE SE CAMBIE DE PANTALLA A LA DE LOGIN
+    }
+    if (mostrarErrorLogin){
+        // Show error message
+        Toast.makeText(
+            context,
+            R.string.usuarioyaexiste,
+            Toast.LENGTH_SHORT
+        ).show()
+    }
+    if (mostrarErrorConexion){
+        Toast.makeText(
+            context,
+            R.string.no_internet,
+            Toast.LENGTH_SHORT
+        ).show()
+        mostrarErrorConexion = false
+    }
+
+    /////////////////////////////////////////////////////////////
+
+
+
+    Column(
+        modifier = if (offsetX.value > screenWidthInPx / 2) {
+            Modifier
+                .height(300.dp)
+        } else {
+            Modifier
+                .fillMaxSize()
+        }
+            //.fillMaxSize()
+    ) {
         // OptionSelector fijo en la parte superior
         OptionSelector(
             selectedOption = if (offsetX.value > screenWidthInPx / 2) 1 else 2,
@@ -141,6 +244,7 @@ fun LoginBox(
                     enter = slideInHorizontally(initialOffsetX = { -1000 }),
                     exit = slideOutHorizontally(targetOffsetX = { -1000 })
                 ) {
+                    onTabChange(false)
                     LoginFieldView(
                         onUsernameChange = { newText -> username = newText},
                         onPasswordChange = { newText -> password = newText}
@@ -151,6 +255,7 @@ fun LoginBox(
                     enter = slideInHorizontally(initialOffsetX = { 1000 }),
                     exit = slideOutHorizontally(targetOffsetX = { 1000 })
                 ) {
+                    onTabChange(true)
                     RegisterFieldView(
                         onUsernameChange = { newText -> username = newText},
                         onPasswordChange = { newText -> password = newText},
@@ -164,16 +269,16 @@ fun LoginBox(
             }
 
             Button(
-                onClick = { if (offsetX.value > screenWidthInPx / 2) {
-                    mainViewModel.login(username, password,
-                        object : LoginResultHandler {
-                            override fun onLoginResult(success: Boolean) {
-                                loginSuccess = success
-                            }
-                        })
+                onClick = {
+                    if (offsetX.value > screenWidthInPx / 2) {
+                        //  LOGIN
+                        mostrarErrorLogin = false
+                        onLogin()
+                    } else {
+                        // REGISTER
+                        mostrarErrorRegistro = false
+                        onRegister()
                     }
-                        else {
-                            mainViewModel.register(username,password,fullName,age.toInt(),email,phone, sex)}
                  },
                 modifier = Modifier
                     .height(70.dp)

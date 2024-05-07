@@ -31,4 +31,7 @@
     <string name="ubicacionMapa">Choose a location in the map</string>
     <string name="seleccionarMiUbicacion">Select my current location</string>
     <string name="mapaDosDedos">Use two fingers to move the map</string>
+    <string name="error_login">The username or the password are not correct, try again.</string>
+    <string name="RegistroExitoso">Signed up successfully</string>
+    <string name="usuarioyaexiste">The username already exists, try other or log in</string>
 </resources>
