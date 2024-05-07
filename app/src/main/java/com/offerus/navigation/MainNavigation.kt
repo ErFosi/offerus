@@ -48,7 +48,7 @@ fun MainNavigation(
         }
         composable(AppScreens.MapScreen.route){
             // Contenido de la pestaña Map
-            MapaScreen()
+            MapaScreen(navController)
         }
         composable(AppScreens.Favorites.route){
             OffersScreen(mainViewModel = mainViewModel, myOffers = false, navController = navController, myLikes = true)

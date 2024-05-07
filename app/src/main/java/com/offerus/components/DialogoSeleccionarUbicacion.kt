@@ -150,6 +150,7 @@ fun DialogoSeleccionarUbicacion(
                             .fillMaxWidth()
                             .height(300.dp),
                     ) {
+                        Text(text = stringResource(id = R.string.mapaDosDedos), modifier = Modifier.padding(10.dp))
                         GoogleMap(
                             onMapClick = { ubicacion = it },
                             cameraPositionState = cameraPositionState

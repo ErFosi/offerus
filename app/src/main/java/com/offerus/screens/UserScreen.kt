@@ -1,11 +1,14 @@
 package com.offerus.screens
 
+import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.net.Uri
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -37,6 +40,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -71,6 +75,7 @@ import com.offerus.components.DialogoSobreMi
 import com.offerus.components.Marcador
 import com.offerus.components.ProfilePicture
 import com.offerus.components.ThemeSwitcher
+import com.offerus.components.TopBarSecundario
 import com.offerus.components.languageSwitcher
 import com.offerus.components.mapa
 import com.offerus.navigation.AppScreens
@@ -83,6 +88,24 @@ import java.io.File
 fun UserScreen(
     viewModel: MainViewModel,
     navController: NavHostController
+){
+    Scaffold(topBar = { TopBarSecundario(navController) }) {
+            innerPadding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
+            UserScreenContent(viewModel, navController)
+        }
+    }
+}
+
+
+@Composable
+fun UserScreenContent(
+    viewModel: MainViewModel,
+    navController: NavHostController,
 ){
     var sobreMiExpanded by rememberSaveable {
         mutableStateOf(false)
@@ -115,13 +138,15 @@ fun UserScreen(
             .verticalScroll(rememberScrollState())
             .fillMaxSize()
             .wrapContentSize(Alignment.Center)
-            .padding(vertical = 35.dp)
+            .padding(vertical = 20.dp)
         )
     {
         Row(
             modifier = Modifier
                 .padding(horizontal = 30.dp)
-                .height(120.dp)
+                .height(125.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column(
                 modifier = Modifier
@@ -230,7 +255,7 @@ fun UserScreen(
                         },
                         modifier = Modifier
                             .weight(1f)
-                            .padding(bottom = 5.dp),
+                            .padding(top = 10.dp, bottom = 5.dp),
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.baseline_logout_24),

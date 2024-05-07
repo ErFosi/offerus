@@ -37,10 +37,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
-interface LoginResultHandler {
-    fun onLoginResult(success: Boolean)
-}
-
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val userDataRepository: UserDataRepository,
@@ -67,6 +63,9 @@ class MainViewModel @Inject constructor(
     val idioma = myPreferencesDataStore.preferencesStatusFlow.map {
         it.idioma
     }
+
+    // selected language
+    val idiomaActual by cambioDeIdioma::idiomaActual
 
     /**
      * get and set the user and password on the datastore
@@ -103,6 +102,7 @@ class MainViewModel @Inject constructor(
             if (usuariog != "" && contrasena != ""){
                 try {
                     //authenticate(usuariog, contrasena)
+                    login(usuariog, contrasena)
                     Log.d("SeriesViewModel", "Usuario guardado autenticado")
                 } catch (e: AuthenticationException){
                     Log.e("SeriesViewModel", "Error al autenticar usuario guardado")
@@ -141,48 +141,51 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Update the selected language on the preferences data store and update the app language
+     * @param idioma new language
+     */
+    fun reloadLang(idioma: Idioma, context: Context) = cambioDeIdioma.cambiarIdioma(idioma, context, false)
+
+
 
 
     //--------------------------------------------------------------//
     //-------------------------- LOGIN -----------------------------//
     //--------------------------------------------------------------//
-    fun login(username: String, password: String, handler: LoginResultHandler) {
+    /**
+     * Login function. Throws an exception if the credentials are not correct
+     * @param username the username of the user
+     * @param password the password of the user
+     * @throws AuthenticationException if the credentials are not correct
+     * @throws Exception if there is a problem with the server
+     */
+    @Throws(AuthenticationException::class, Exception::class)
+    suspend fun login(username: String, password: String) {
 
         val userCred = UsuarioCred(usuario = username, contraseña = password)
-        viewModelScope.launch {
-            try {
-                Log.d("KTOR", "Registering...")
-                httpAuthClient.authenticate(userCred)
-                handler.onLoginResult(true)
-
-            } catch (e: UserExistsException){
-                Log.e("KTOR", "Usuario ya existente")
-                handler.onLoginResult(false)
-            } catch (e: Exception) {
-                Log.e("KTOR", "Error servidor")
-                handler.onLoginResult(false)
-            }
-        }
-
+        httpAuthClient.authenticate(userCred)
     }
 
     //--------------------------------------------------------------//
     //-------------------------- REGISTER --------------------------//
     //--------------------------------------------------------------//
-    fun register(username:String, password: String, fullName: String, age: Int, email: String, phone: String, sex: String) {
+    /**
+     * Register function. Throws an exception if the user already exists
+     * @param username the username of the user
+     * @param password the password of the user
+     * @param fullName the full name of the user
+     * @param age the age of the user
+     * @param email the email of the user
+     * @param phone the phone of the user
+     * @param sex users gender
+     * @throws UserExistsException if the user already exists
+     * @throws Exception if there is a problem with the server
+     */
+    @Throws(UserExistsException::class, Exception::class)
+    suspend fun register(username:String, password: String, fullName: String, age: Int, email: String, phone: String, sex: String) {
         val user = Usuario(username = username, nombre_apellido = fullName, edad = age, mail = email, telefono = phone, sexo = sex, contraseña = password, descripcion = "", latitud = 0.0, longitud = 0.0, suscripciones = "")
-
-        viewModelScope.launch {
-            try {
-                Log.d("KTOR", "Registering...")
-                httpAuthClient.register(user)
-
-            } catch (e: UserExistsException){
-                Log.e("KTOR", "Usuario ya existente")
-            } catch (e: Exception) {
-                Log.e("KTOR", "Error servidor" + e.toString())
-            }
-        }
+        httpAuthClient.register(user)
 
     }
 
