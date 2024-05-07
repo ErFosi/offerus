@@ -573,6 +573,28 @@ class UserClient @Inject constructor() {
         }
     }
 
+    /**
+     * @Description: Función que manda la petición de obtener los datos de cualquier usuario
+     * @Param username: String
+     * @Throws AuthenticationException
+     * @Throws Exception
+     * @Return UsuarioData
+     */
+    suspend fun getDatosCualquierUsuario(username:String): UsuarioData {
+        val response: HttpResponse = clienteHttp.get("https://offerus.zapto.org/usuario_details") {
+            parameter("username", username)
+            accept(ContentType.Application.Json)
+        }
+
+        if (response.status == HttpStatusCode.OK) {
+            return Json.decodeFromString<UsuarioData>(response.bodyAsText())
+        }else if (response.status == HttpStatusCode.Unauthorized) {
+            throw AuthenticationException()
+        } else {
+            throw Exception("Failed to fetch user data: HTTP ${response.status}")
+        }
+    }
+
     @Throws(AuthenticationException::class, UnprocessableEntityException::class, Exception::class)
     suspend fun obtenerPetFavoritasUsuario(): List<ServicioPeticion> {
         val token = bearerTokenStorage.last().accessToken
