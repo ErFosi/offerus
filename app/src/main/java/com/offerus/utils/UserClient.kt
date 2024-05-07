@@ -85,6 +85,7 @@ class UserClient @Inject constructor() {
                     exception is ClientRequestException && exception.response.status == HttpStatusCode.Unauthorized -> throw AuthenticationException()
                     exception is ClientRequestException && exception.response.status == HttpStatusCode.BadRequest -> throw UserExistsException()
                     exception is ClientRequestException && exception.response.status == HttpStatusCode.UnprocessableEntity -> throw UnprocessableEntityException()
+                    exception  is ClientRequestException && exception.response.status == HttpStatusCode.Conflict -> throw DealNoPendienteException()
                     else -> {
                         exception.printStackTrace()
                         throw exception

@@ -13,7 +13,7 @@ class AuthenticationException : Exception()
 class UserExistsException : Exception()
 class UnprocessableEntityException : Exception()
 
-
+class DealNoPendienteException : Exception()
 /************************************************************************
  * Json del token
  *************************************************************************/
