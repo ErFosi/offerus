@@ -20,7 +20,7 @@
     <string name="sobreMiEdit">Add a description</string>
     <string name="sobreMi">About me</string>
     <string name="datosPersonales">Personal information</string>
-    <string name="signout">Sign out</string>
+    <string name="signout">Log out</string>
     <string name="suscripciones">Topic subscription</string>
     <string name="changepasswd">Change password</string>
     <string name="currentpass">Current password</string>
@@ -30,4 +30,5 @@
     <string name="seleccionarUbicacion">Choose your location</string>
     <string name="ubicacionMapa">Choose a location in the map</string>
     <string name="seleccionarMiUbicacion">Select my current location</string>
+    <string name="mapaDosDedos">Use two fingers to move the map</string>
 </resources>
