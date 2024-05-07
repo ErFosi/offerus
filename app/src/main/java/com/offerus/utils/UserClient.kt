@@ -576,7 +576,6 @@ class UserClient @Inject constructor() {
     /**
      * @Description: Función que manda la petición de obtener los datos de cualquier usuario
      * @Param username: String
-     * @Throws AuthenticationException
      * @Throws Exception
      * @Return UsuarioData
      */
