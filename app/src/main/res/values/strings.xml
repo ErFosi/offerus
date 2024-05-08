@@ -34,4 +34,8 @@
     <string name="error_login">Usuario o contraseña incorrectos, inténtalo de nuevo.</string>
     <string name="RegistroExitoso">Usuario registrado correctamente</string>
     <string name="usuarioyaexiste">El nombre de usuario ya existe, inicie sesión o pruebe otro</string>
+    <string name="email_invalido">El email no es válido</string>
+    <string name="phone_invalido">El telefono no es válido</string>
+    <string name="password_invalido">La contraseña debe tener más de 6 caracteres.</string>
+    <string name="passwords_no_match">Las contraseñas no coinciden.</string>
 </resources>

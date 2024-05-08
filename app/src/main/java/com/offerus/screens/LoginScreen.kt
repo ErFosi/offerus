@@ -6,6 +6,7 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,6 +18,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -56,13 +59,14 @@ fun Login(
         Column(
             modifier = Modifier
                 .fillMaxHeight()
-                .fillMaxWidth(0.82f),  // Aplica el 75% del ancho aquí
+                .fillMaxWidth(0.82f)
+                .verticalScroll(rememberScrollState()),  // Aplica el 75% del ancho aquí
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             var height by rememberSaveable { mutableStateOf(false) }
             val heightdp by animateDpAsState(
-                if (height) 450.dp else 300.dp,
+                if (height) 450.dp else 320.dp,
                 animationSpec = spring(
                     dampingRatio = Spring.DampingRatioMediumBouncy,
                     stiffness = Spring.StiffnessLow
@@ -81,17 +85,20 @@ fun Login(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Card(modifier = Modifier.height(heightdp.coerceAtLeast(300.dp))) {
-                    LoginBox(
-                        mainViewModel,
-                        navController
-                    ) {
-                        height = it
+                    Box(modifier = Modifier.padding(vertical = 10.dp, horizontal = 5.dp)){
+                        LoginBox(
+                            mainViewModel,
+                            navController
+                        ) {
+                            height = it
+                        }
                     }
+
                 }
 
                 Row(
                     modifier = Modifier
-                        .padding(top = 30.dp)
+                        .padding(vertical = 30.dp)
                         .width(200.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically

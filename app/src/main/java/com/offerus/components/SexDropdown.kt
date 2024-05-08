@@ -25,9 +25,14 @@ fun SexDropdown(
 ) {
     var sexExpanded by remember { mutableStateOf(false) }
     var selectedSex by remember { mutableStateOf("") }
-    val sexOptions = listOf(
+    /*val sexOptions = listOf(
         stringResource(R.string.hombre), stringResource(R.string.mujer), stringResource(
             R.string.otros)
+    )*/
+    val sexOptions = listOf(
+        Pair(stringResource(R.string.hombre), 'M'),
+        Pair(stringResource(R.string.mujer), 'F'),
+        Pair(stringResource(R.string.otros), 'O')
     )
 
     //val backgroundColor = MaterialTheme.colorScheme.secondary
@@ -57,12 +62,11 @@ fun SexDropdown(
         ) {
             sexOptions.forEach { sexOption ->
                 DropdownMenuItem(
-                    text = { Text(sexOption) },
+                    text = { Text(sexOption.first) },
                     onClick = {
-                        selectedSex = sexOption
+                        selectedSex = sexOption.first
                         sexExpanded = false
-                        Log.d("Sexo", sexOption)
-                        onSexChange(sexOption.first())
+                        onSexChange(sexOption.second)
                     }
                 )
             }

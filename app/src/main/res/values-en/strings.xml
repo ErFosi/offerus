@@ -34,4 +34,8 @@
     <string name="error_login">The username or the password are not correct, try again.</string>
     <string name="RegistroExitoso">Signed up successfully</string>
     <string name="usuarioyaexiste">The username already exists, try other or log in</string>
+    <string name="email_invalido">The email is not valid</string>
+    <string name="phone_invalido">The phone number is not valid</string>
+    <string name="password_invalido">The password must have more than 6 characters</string>
+    <string name="passwords_no_match">The passwords do not match</string>
 </resources>

@@ -1,6 +1,5 @@
 package com.offerus.screens
 
-import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.net.Uri
 import androidx.compose.animation.AnimatedVisibility
@@ -8,8 +7,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -233,11 +232,13 @@ fun UserScreenContent(
                     Row(
                         modifier = Modifier
                             .padding(bottom = 5.dp),
-                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                        horizontalArrangement = Arrangement.spacedBy(30.dp)
                     ) {
                         languageSwitcher(
                             idiomaSeleccionado = viewModel.idioma.collectAsState(initial = Idioma.Castellano).value,
-                            onLanguageSelected =  { it: Idioma -> viewModel.updateIdioma(it, context = context) })
+                            onLanguageSelected =  { it: Idioma -> viewModel.updateIdioma(it, context = context) },
+                            size =  50.dp
+                        )
                         ThemeSwitcher(
                             darkTheme = booleanState,
                             onClick = {
@@ -245,7 +246,9 @@ fun UserScreenContent(
                                 viewModel.updateTheme(false)
                             }else{
                                 viewModel.updateTheme(true)
-                            } })
+                            } },
+                            size = 50.dp
+                        )
                     }
                     OutlinedButton(
                         onClick = {
@@ -728,11 +731,14 @@ fun UserScreenContent(
                 modifier = Modifier
                     .padding(horizontal = 40.dp, vertical = 20.dp)
                     .fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(30.dp)
+                horizontalArrangement = Arrangement.Center
             ) {
                 languageSwitcher(
                     idiomaSeleccionado = viewModel.idioma.collectAsState(initial = Idioma.Castellano).value,
-                    onLanguageSelected =  { it: Idioma -> viewModel.updateIdioma(it, context = context) })
+                    onLanguageSelected =  { it: Idioma -> viewModel.updateIdioma(it, context = context) },
+                    size = 50.dp
+                )
+                Spacer(modifier = Modifier.padding(30.dp))
                 ThemeSwitcher(
                     darkTheme = booleanState,
                     onClick = {
@@ -740,12 +746,14 @@ fun UserScreenContent(
                             viewModel.updateTheme(false)
                         }else{
                             viewModel.updateTheme(true)
-                        } })
+                        } },
+                    size = 50.dp
+                )
             }
 
             Row(
                 modifier = Modifier
-                    .padding(horizontal = 80.dp, vertical = 20.dp)
+                    .padding(start = 80.dp, end = 80.dp , bottom = 20.dp)
                     .width(350.dp),
                 horizontalArrangement = Arrangement.Center
             ) {

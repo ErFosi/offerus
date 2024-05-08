@@ -34,4 +34,8 @@
     <string name="error_login">Erabiltzaile izena edo pasahitza ez dira zuzenak, mesedez saiatu berriro.</string>
     <string name="RegistroExitoso">Erregistroa zuzena izan da</string>
     <string name="usuarioyaexiste">Erabiltzaile izena dagoeneko existitzen da, hasi saioa edo erabili beste bat</string>
+    <string name="email_invalido">E-maila ez da baliozkoa</string>
+    <string name="phone_invalido">Telefonoa ez da baliozkoa</string>
+    <string name="password_invalido">Pasahitzak 6 karaktere baino gehiago izan behar ditu</string>
+    <string name="passwords_no_match">Pasahitzak ez datoz bat</string>
 </resources>
