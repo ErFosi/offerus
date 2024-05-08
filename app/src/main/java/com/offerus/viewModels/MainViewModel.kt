@@ -153,6 +153,7 @@ class MainViewModel @Inject constructor(
                     //authenticate(usuariog, contrasena)
                     login(usuariog, contrasena)
                     Log.d("SeriesViewModel", "Usuario guardado autenticado")
+                    iniciarListas()
                 } catch (e: AuthenticationException) {
                     Log.e("SeriesViewModel", "Error al autenticar usuario guardado")
                 }
