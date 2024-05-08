@@ -7,6 +7,8 @@ import android.os.Handler
 import android.os.Looper
 import android.widget.Toast
 import com.offerus.data.Deal
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 fun showToastOnMainThread(context: Context, message: String) {
     Handler(Looper.getMainLooper()).post {
@@ -46,4 +48,22 @@ fun enviarEmail(context: Context, destinatario: String, asunto: String, cuerpo: 
     } catch (e: ActivityNotFoundException) {
         showToastOnMainThread(context, "No hay clientes de correo electrónico instalados.")
     }
+}
+
+fun obtenerFechaHoy(): String {
+    // Obtener la fecha de hoy
+    val fechaHoy = LocalDate.now()
+
+    // Formatear la fecha en el formato "yyyy-MM-dd"
+    val formato = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+    return fechaHoy.format(formato)
+}
+
+// sacar categorias de string
+fun obtenerCategorias(categorias: String): List<String> {
+    return categorias.split(",").map { it.trim() }
+}
+
+fun obtenerCategoriasString(categorias: List<String>): String {
+    return categorias.joinToString(",")
 }
