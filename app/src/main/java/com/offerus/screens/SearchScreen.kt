@@ -1,5 +1,6 @@
 package com.offerus.screens
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -62,8 +63,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -120,17 +119,6 @@ fun OffersScreen(
 
         }
 
-        openCreateDialog.value -> {
-            CreateDialog(
-                onDismissRequest = { openCreateDialog.value = false },
-                onConfirmation = { openCreateDialog.value = false },
-                onDescription = { openDescriptionDialog.value = true
-                                    openCreateDialog.value = false},
-                selectedTab = selectedTabIndex
-            )
-
-        }
-
         openDescriptionDialog.value -> {
             EditDescriptionDialog(
                 onDismissRequest = { openDescriptionDialog.value = false
@@ -139,8 +127,6 @@ fun OffersScreen(
                                      openCreateDialog.value = true},
             )
         }
-
-
 
 
     }
@@ -517,137 +503,6 @@ fun SearchDialog(
 
 
 @Composable
-fun CreateDialog(
-    onDismissRequest: () -> Unit,
-    onConfirmation: () -> Unit,
-    onDescription: () -> Unit,
-    selectedTab: Int
-
-    ){
-
-    Dialog(onDismissRequest = { onDismissRequest() }) {
-        Card (
-            modifier = Modifier
-              //  .background(Color.White, shape = RoundedCornerShape(8.dp))
-        ){
-            Column {
-
-                if ( selectedTab == 0 ) {
-                    Text(
-                        text = "Crear Oferta",
-                        style = MaterialTheme.typography.headlineMedium,
-                        modifier = Modifier
-                            .padding(horizontal = 30.dp, vertical = 10.dp)
-                    )
-                } else {
-                    Text(
-                        text = "Crear Solicitud",
-                        style = MaterialTheme.typography.headlineMedium,
-                        modifier = Modifier
-                            .padding(horizontal = 30.dp, vertical = 10.dp)
-                    )
-                }
-
-                Divider(color = Color.Gray, thickness = 1.dp, modifier = Modifier.fillMaxWidth())
-                Box(
-                    modifier = Modifier
-                        .padding(horizontal = 30.dp, vertical = 20.dp)
-                ) {
-                    Column {
-
-                        Row(
-                            modifier = Modifier.padding(vertical = 5.dp),
-                        ) {
-                            OutlinedTextField(
-                                value = "", onValueChange = { }, modifier = Modifier.height(50.dp),
-                                label = {Text(text = "Titulo")}
-                            )
-                        }
-                        Row(
-                            modifier = Modifier.padding(vertical = 5.dp),
-                        ) {
-                            DropdownCategorias()
-                        }
-
-                        if ( selectedTab == 0 ) {
-                            Row(
-                                modifier = Modifier.padding(vertical = 5.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(text = "Precio: ", fontSize = 25.sp)
-                                OutlinedTextField(
-                                    value = "", onValueChange = { }, modifier = Modifier
-                                        .height(50.dp)
-                                        .width(65.dp),
-                                )
-                                Text(text = " €", fontSize = 25.sp)
-                            }
-                        }
-
-                        Row(
-                            modifier = Modifier.padding(vertical = 5.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(text = "Descripción: ", fontSize = 25.sp)
-
-                            OutlinedButton(
-                                modifier = Modifier
-                                    .padding(horizontal = 5.dp),
-                                onClick = { onDescription() }
-
-                            ) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.baseline_edit_square_24),
-                                    null
-                                )
-
-                            }
-                        }
-
-
-
-                    }
-                }
-                Divider(color = Color.Gray, thickness = 1.dp, modifier = Modifier.fillMaxWidth())
-                Row (
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 5.dp),
-                    horizontalArrangement = Arrangement.Center
-                ){
-                    OutlinedButton(
-                        modifier = Modifier
-                            .padding(horizontal = 5.dp),
-                        onClick = { onDismissRequest() }
-
-                    ) {
-                        Icon(
-                            Icons.Default.Close,
-                            null
-                        )
-
-                    }
-                    OutlinedButton(
-                        modifier = Modifier
-                            .padding(horizontal = 5.dp),
-                        onClick = { onConfirmation() }
-
-                    ) {
-
-                        Icon(
-                            Icons.Default.Add,
-                            null
-                        )
-                        Text(text = "Crear")
-                    }
-
-                }
-            }
-        }
-    }
-}
-
-@Composable
 fun EditDescriptionDialog(
     onDismissRequest: () -> Unit,
     onConfirmation: () -> Unit,
@@ -770,29 +625,6 @@ fun DropdownCategorias(
                     )
                 }
             }
-        }
-    }
-}
-@Composable
-fun CreateOferRequestFloatingButton(
-    onOpenCreateDialog: () -> Unit
-){
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight()
-            .wrapContentSize(Alignment.BottomEnd)
-            .padding(16.dp)
-    ) {
-        FloatingActionButton(
-            onClick = { onOpenCreateDialog() },
-
-            modifier = Modifier
-                .padding(16.dp)
-                .size(56.dp),
-            shape = CircleShape
-        ) {
-            Icon(Icons.Filled.Add, "Floating action button.")
         }
     }
 }

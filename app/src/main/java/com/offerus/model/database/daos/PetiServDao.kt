@@ -17,4 +17,8 @@ interface PetiServDao {
     @Query("SELECT * FROM ServicioPeticion where id = :id LIMIT 1")
     fun getPetiServData(id: Int): ServicioPeticion
 
+    //delete table
+    @Query("DELETE FROM ServicioPeticion")
+    suspend fun deletePetiServ()
+
 }

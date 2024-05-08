@@ -379,7 +379,7 @@ class UserClient @Inject constructor() {
     suspend fun aceptarDeal(dealId: Int, accept : Boolean) {
         val token = bearerTokenStorage.last().accessToken
         val jsonContent = Json.encodeToString(DealPeticionAceptar(dealId,accept))
-        val response: HttpResponse = clienteHttp.post("https://offerus.zapto.org/deals/accept/accept_deny") {
+        val response: HttpResponse = clienteHttp.post("https://offerus.zapto.org/deals/accept_deny") {
             header("Authorization", "Bearer $token")
             contentType(ContentType.Application.Json)
             accept(ContentType.Application.Json)
@@ -408,6 +408,7 @@ class UserClient @Inject constructor() {
         }
 
         if (response.status == HttpStatusCode.OK) {
+            Log.d("lista deals", "enviado")
             return Json.decodeFromString(response.bodyAsText())
         } else if (response.status == HttpStatusCode.UnprocessableEntity) {
             throw UnprocessableEntityException()

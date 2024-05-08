@@ -224,7 +224,7 @@ fun OfferDetailsContent(paddingValues: PaddingValues, viewModel: MainViewModel) 
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
                                     UserAvatar(iniciales = "AC")
-                                    Text(text = "cuadron11", textAlign = TextAlign.Center)
+                                    Text(text = servicioPeticion.username, textAlign = TextAlign.Center)
                                     RatingBar(
                                         modifier = Modifier
                                             .padding(
@@ -321,7 +321,7 @@ fun BotonesDetalles(viewModel: MainViewModel, servicioPeticion: ServicioPeticion
         Spacer(modifier = Modifier.width(16.dp))
 
         ElevatedButton(onClick = {
-            viewModel.crearDeal(servicioPeticion.id, servicioPeticion.username, "cuadron11")
+            viewModel.createDeal(servicioPeticion.id)
             showToastOnMainThread(context, "Solicitud enviada")
 
         }) {

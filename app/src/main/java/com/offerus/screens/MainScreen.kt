@@ -2,7 +2,6 @@ package com.offerus.screens
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -11,10 +10,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -25,7 +22,6 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -85,9 +81,10 @@ fun MainScreen(
     }
     Scaffold(
         topBar = { ToolBar(
-                onUserClick = {navControllerMain.navigate(route = AppScreens.UserScreen.route) },
-                onFavoritesClick =  {navControllerMain.navigate(route = AppScreens.Favorites.route) }
-                )  },
+                mainViewModel.usuario,
+                onUserClick = {navControllerMain.navigate(route = AppScreens.UserScreen.route) }
+        ) { navControllerMain.navigate(route = AppScreens.Favorites.route) }
+        },
         bottomBar = { if (enableBottomNavigation){
             AppBottomBar(selectedDestination, onNavigateToSection)
         } }
@@ -112,7 +109,7 @@ fun MainScreen(
                 }
                 composable(BottomBarRoute.MYOFFERS) {
                     // Contenido de la pestaña Table
-                    OffersScreen(mainViewModel = mainViewModel, myOffers = true, navController = navControllerMain, myLikes = false)
+                    MyOffersScreen(navControllerMain, mainViewModel)
                 }
 
             }
@@ -154,12 +151,11 @@ fun AppBottomBar(currentRoute: String?, onNavigate: (String) -> Unit) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ToolBar(
+    username: String,
     onUserClick: () -> Unit,
     onFavoritesClick: () -> Unit
 ) {
     var context = LocalContext.current
-    //var username = viewModel.username.value
-    var username = "cuadron11"
     if(username!=null) {
         TopAppBar(
             colors = TopAppBarDefaults.topAppBarColors(
@@ -202,17 +198,6 @@ fun ToolBar(
                         UserAvatar("AC")
                         Text(text = username, fontSize = 12.sp, lineHeight = 12.sp)
                     }
-                    Spacer(
-                        modifier = Modifier
-
-                            .height(32.dp)
-
-                            .width(2.dp)
-                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.25f))
-                    )
-
-
-
                 }
             }
 
@@ -234,13 +219,6 @@ fun UserAvatar(iniciales: String) {
             modifier = Modifier.align(Alignment.Center),
             fontWeight = FontWeight.Bold
         )
-    }
-}
-
-@Composable
-fun MyOffersScreen() {
-    Surface() {
-        Text(text = "MY OFFERS SCREEN")
     }
 }
 

@@ -172,8 +172,7 @@ fun ReviewDialog(
 @Composable
 fun Entrantes(viewModel: MainViewModel, onItemClick: () -> Unit) {
     //obtenemos la lista del viemodel
-    var listaEntrantes = viewModel.listaEntrantes
-    //var listaEntrantes = createDealList()
+    var listaEntrantes = viewModel.listaEntrantes.value
     //mostramos la lista
     Column(
         modifier = Modifier
@@ -182,7 +181,7 @@ fun Entrantes(viewModel: MainViewModel, onItemClick: () -> Unit) {
     ) {
         LazyColumn {
             items(listaEntrantes.size) { index ->
-                EntrantesCard(deal = listaEntrantes[index]) {
+                EntrantesCard(deal = listaEntrantes[index], viewModel) {
                     viewModel.cambiarServicioDetalle(listaEntrantes[index].id_peticion)
                     onItemClick()
                 }
@@ -192,22 +191,23 @@ fun Entrantes(viewModel: MainViewModel, onItemClick: () -> Unit) {
 }
 
 @Composable
-fun EntrantesCard(deal: Deal, onItemClick: () -> Unit) {
+fun EntrantesCard(deal: Deal, viewModel: MainViewModel, onItemClick: () -> Unit) {
     var context = LocalContext.current
     Card(
         modifier = Modifier
             .padding(8.dp)
             .clickable(onClick = onItemClick)
     ) {
-        OfferInfo(deal = deal) { BotonesEntrantes() }
+        OfferInfo(deal = deal) { BotonesEntrantes(onAccept = {viewModel.dealAcceptDeny(deal.id, true)}) {viewModel.dealAcceptDeny(deal.id, false)} }
     }
 }
 
 @Composable
-fun BotonesEntrantes() {
+fun BotonesEntrantes(onAccept: () -> Unit, onDeny: () -> Unit) {
     var context = LocalContext.current
     Column {
         IconButton(onClick = {
+            onAccept()
             showToastOnMainThread(context, "Petición aceptada")
         }) {
             Icon(
@@ -217,6 +217,7 @@ fun BotonesEntrantes() {
             )
         }
         IconButton(onClick = {
+            onDeny()
             showToastOnMainThread(context, "Petición rechazada")
         }) {
             Icon(
@@ -230,7 +231,7 @@ fun BotonesEntrantes() {
 
 @Composable
 fun Salientes(viewModel: MainViewModel, onMakeReview: () -> Unit, onItemClick: () -> Unit) {
-    val listaSalientes = viewModel.listaSalientes
+    val listaSalientes = viewModel.listaSalientes.value
     Log.d("listaComposable", listaSalientes.toString())
     //mostramos la lista
     Column(
@@ -282,18 +283,18 @@ fun SalientesCard(deal: Deal, onItemClick: () -> Unit) {
 @Composable
 fun IconoEstado(estado: String) {
     when (estado) {
-        "Pendiente" -> {
+        "pendiente" -> {
 
             Icon(
                 imageVector = ImageVector.vectorResource(R.drawable.pending),
-                contentDescription = "Pendiente",
+                contentDescription = "pendiente",
                 modifier = Modifier
                     .padding(11.dp)
                     .size(32.dp),
             )
         }
 
-        "Aceptada" -> {
+        "aceptada" -> {
             Icon(
                 painter = painterResource(R.drawable.logorecortado),
                 contentDescription = null,
@@ -304,7 +305,7 @@ fun IconoEstado(estado: String) {
             )
         }
 
-        "Rechazada" -> {
+        "rechazada" -> {
             Icon(
                 painter = painterResource(R.drawable.logorecortado),
                 contentDescription = null,
