@@ -203,6 +203,7 @@ fun LoginBox(
         // TODO suscribeToFCM(context)
         navController.popBackStack()
         navController.navigate(AppScreens.MainScreen.route)
+        mainViewModel.iniciarListas()
     }
     if (mostrarErrorLogin){
         Toast.makeText(
