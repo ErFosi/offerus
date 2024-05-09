@@ -51,7 +51,7 @@ fun MainNavigation(
             MapaScreen(navController)
         }
         composable(AppScreens.Favorites.route){
-            OffersScreen(mainViewModel = mainViewModel, myOffers = false, navController = navController, myLikes = true)
+            OffersScreen(mainViewModel = mainViewModel, navController = navController, myLikes = true)
         }
     }
 }

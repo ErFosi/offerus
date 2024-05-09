@@ -1,5 +1,6 @@
 package com.offerus.screens
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -71,35 +72,43 @@ import androidx.navigation.NavController
 import androidx.wear.compose.material.ExperimentalWearMaterialApi
 import com.offerus.R
 import com.offerus.data.Deal
+import com.offerus.data.ServicioPeticion
 import com.offerus.navigation.AppScreens
 import com.offerus.utils.createDealListExample
 import com.offerus.utils.showToastOnMainThread
 import com.offerus.viewModels.MainViewModel
-
 
 @OptIn(ExperimentalWearMaterialApi::class)
 @Composable
 fun OffersScreen(
     navController: NavController,
     mainViewModel: MainViewModel,
-    myOffers: Boolean, // Si es pagina MisOfertas true, si es pagina buscar false
+    //myOffers: Boolean, // Si es pagina MisOfertas true, si es pagina buscar false
     myLikes: Boolean    // Si es pagina Favoritos true, si es pagina buscar false
 ) {
 
-    val openCreateDialog = remember { mutableStateOf(false) }
+    // DIALOGAS
+    //val openCreateDialog = remember { mutableStateOf(false) }
     val openFilterDialog = remember { mutableStateOf(false) }
-    val openDescriptionDialog = remember { mutableStateOf(false) }
+    //val openDescriptionDialog = remember { mutableStateOf(false) }
 
+    // PANTALLAS
     var selectedTabIndex by remember { mutableIntStateOf(0) }
     val tabs = listOf("Ofertas", "Solicitudes")
 
-    //FILTRO
+    // FILTRO
     val titulo = remember { mutableStateOf("") }
-    val categoria = remember { mutableStateOf("") }
+    val categoria = remember { mutableStateOf("gratis,deporte,hogar,otros,entretenimiento,academico,online") }
     val distanciaMaxima = remember { mutableStateOf(0.0) }
     val precioMinimo = remember { mutableStateOf(0.0) }
     val precioMaxima = remember { mutableStateOf(0.0) }
     val ordenarPor = remember { mutableStateOf("precio_asc") }
+
+    // LISTAS
+    val listaOfertas = mainViewModel.listaOfertas
+
+    val listaSolicitudes =  mainViewModel.listaSolicitudes
+
 
 
     when {
@@ -120,32 +129,8 @@ fun OffersScreen(
 
         }
 
-        openCreateDialog.value -> {
-            CreateDialog(
-                onDismissRequest = { openCreateDialog.value = false },
-                onConfirmation = { openCreateDialog.value = false },
-                onDescription = { openDescriptionDialog.value = true
-                                    openCreateDialog.value = false},
-                selectedTab = selectedTabIndex
-            )
-
-        }
-
-        openDescriptionDialog.value -> {
-            EditDescriptionDialog(
-                onDismissRequest = { openDescriptionDialog.value = false
-                                        openCreateDialog.value = true},
-                onConfirmation = { openDescriptionDialog.value = false
-                                     openCreateDialog.value = true},
-            )
-        }
-
-
-
 
     }
-
-
 
     Surface {
 
@@ -163,11 +148,15 @@ fun OffersScreen(
             Spacer(modifier = Modifier.height(20.dp))
             SubPageSearch(
                 onOpenFilterDialog = {  openFilterDialog.value = true },
-                myOffers = myOffers,
-                navController = navController,
-                onOpenCreateDialog = { openCreateDialog.value = true }
+                //myOffers = myOffers,
+                navController = navController
             )
-            ListaOfertas(myOffers = myOffers, onItemClick = {navController.navigate(AppScreens.OfferDetailsScreen.route)} )
+
+            if (selectedTabIndex == 0) {
+                ListaOfertas(onItemClick = {navController.navigate(AppScreens.OfferDetailsScreen.route)} ,listaOfertas.value)
+            } else {
+                ListaOfertas(onItemClick = {navController.navigate(AppScreens.OfferDetailsScreen.route)} ,listaSolicitudes.value)
+            }
 
 
 
@@ -182,8 +171,6 @@ fun OffersScreen(
 fun SubPageSearch(
     navController: NavController,
     onOpenFilterDialog: () -> Unit,
-    myOffers: Boolean,
-    onOpenCreateDialog: () -> Unit
 
 ){
 
@@ -221,7 +208,7 @@ fun SubPageSearch(
 
             ){
 
-            if ( !myOffers ){
+
                 OutlinedButton(
                     modifier = Modifier
 
@@ -236,7 +223,7 @@ fun SubPageSearch(
                         null
                     )
                 }
-            }
+
             Spacer(modifier = Modifier.width(6.dp))
 
             OutlinedButton(
@@ -251,105 +238,7 @@ fun SubPageSearch(
                 )
             }
 
-
         }
-        ListaOfertas(myOffers = myOffers, onItemClick = {navController.navigate(AppScreens.OfferDetailsScreen.route)} )
-        if ( myOffers ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight()
-                    .wrapContentSize(Alignment.BottomEnd)
-                    .padding(16.dp)
-            ) {
-                FloatingActionButton(
-                    onClick = { onOpenCreateDialog() },
-
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .size(56.dp),
-                    shape = CircleShape
-                ) {
-                    Icon(Icons.Filled.Add, "Floating action button.")
-                }
-            }
-        }
-
-
-    }
-}
-
-@Composable
-fun OfferList(){
-
-}
-
-@Composable
-fun SelectableButtonRow(
-    modifier: Modifier = Modifier,
-    button1Text: String,
-    button2Text: String,
-    onButton1Selected: () -> Unit,
-    onButton2Selected: () -> Unit,
-    subPaginaOfertasSelected: Boolean
-    ) {
-
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceEvenly,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        TextButton(
-            onClick = { onButton1Selected() },
-
-
-            ) {
-            if (subPaginaOfertasSelected) {
-                Text(
-                    text = button1Text,
-                    fontSize = 23.sp,
-                    modifier = Modifier.drawBehind {
-                        val strokeWidthPx = 3.dp.toPx()
-                        val verticalOffset = size.height + 5.sp.toPx()
-                        drawLine(
-                            color = Color.Gray,
-                            strokeWidth = strokeWidthPx,
-                            start = Offset(0f, verticalOffset),
-                            end = Offset(size.width, verticalOffset)
-                        )
-                    }
-                )
-            } else {
-                Text(button1Text, fontSize = 23.sp)
-            }
-        }
-        TextButton(
-            onClick = { onButton2Selected() },
-
-
-            ) {
-            if (!subPaginaOfertasSelected) {
-                Text(
-                    text = button2Text,
-                    fontSize = 23.sp,
-                    modifier = Modifier.drawBehind {
-                        val strokeWidthPx = 3.dp.toPx()
-                        val verticalOffset = size.height + 5.sp.toPx()
-                        drawLine(
-                            color = Color.Gray,
-                            strokeWidth = strokeWidthPx,
-                            start = Offset(0f, verticalOffset),
-                            end = Offset(size.width, verticalOffset)
-                        )
-                    }
-                )
-            } else {
-                Text(button2Text, fontSize = 23.sp)
-            }
-
-
-        }
-
 
     }
 
@@ -369,9 +258,11 @@ fun SearchDialog(
     ){
     var sliderValue by remember { mutableStateOf(0f) }
     val titulo = remember { mutableStateOf("") }
-    val categoria = remember { mutableStateOf("") }
-    val precioMinimo = remember { mutableStateOf(0.0) }
-    val precioMaxima = remember { mutableStateOf(0.0) }
+    var categoria = remember { mutableStateOf("") }
+    val precioMinimo = remember { mutableStateOf("") }
+    val precioMaxima = remember { mutableStateOf("") }
+
+    var errorState by remember { mutableStateOf(false) }
 
     Dialog(onDismissRequest = { onDismissRequest() }) {
         Card (
@@ -403,7 +294,9 @@ fun SearchDialog(
                                                 titulo.value = it
                                                 onTituloChange(it)
                                 },
-                                modifier = Modifier.height(70.dp).padding(vertical = 10.dp),
+                                modifier = Modifier
+                                    .height(70.dp)
+                                    .padding(vertical = 10.dp),
                                 label = {Text(text = "Titulo")}
                             )
 
@@ -411,7 +304,7 @@ fun SearchDialog(
                         Row(
                             modifier = Modifier.padding(vertical = 5.dp),
                         ) {
-                            DropdownCategorias(onCategoriaChange)
+                            DropdownCategorias({categoria.value = it})
                         }
 
                         Row(
@@ -437,31 +330,49 @@ fun SearchDialog(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             OutlinedTextField(
+
                                 value = precioMinimo.value.toString(),
                                 onValueChange = {
-                                        precioMinimo.value = it.toDouble()
-                                    onPrecioMinChange(it.toDouble())
+
+                                    if ( it.isEmpty() || it.toDoubleOrNull() != null) {
+                                        precioMinimo.value = it
+                                        errorState = false
+                                        if (!it.isEmpty()){
+                                            onPrecioMinChange(it.toDouble())
+                                        }
+
+
+                                    } else {
+                                        errorState = true
+                                    }
                                 },
                                 modifier = Modifier
-                                    .height(50.dp)
+                                    .height(70.dp)
                                     .width(65.dp),
-                                placeholder = {
-                                    Text("Min")
-                                },
+                                label = {Text(text = "Min")},
+                                singleLine = true,
+                                isError = errorState
                             )
                             Text(text = " - ")
                             OutlinedTextField(
                                 value = precioMaxima.value.toString(),
                                 onValueChange = {
-                                    precioMaxima.value = it.toDouble()
-                                    onPrecioMaxChange(it.toDouble())
+                                    if ( it.isEmpty() || it.toDoubleOrNull() != null) {
+                                        precioMaxima.value = it
+                                        errorState = false
+                                        if (!it.isEmpty()){
+                                            onPrecioMaxChange(it.toDouble())
+                                        }
+
+
+                                    } else {
+                                        errorState = true
+                                    }
                                 },
                                 modifier = Modifier
-                                    .height(50.dp)
+                                    .height(70.dp)
                                     .width(65.dp),
-                                placeholder = {
-                                    Text("Max")
-                                },
+                                label = {Text(text = "Max")}
                             )
                             Text(text = " €")
                         }
@@ -516,6 +427,149 @@ fun SearchDialog(
 }
 
 
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DropdownCategorias(
+    onCategoriaChange: (String) -> Unit
+) {
+    val context = LocalContext.current
+    val idiomas = arrayOf("gratis", "deporte", "hogar", "entrenamiento", "academico", "online", "otros")
+    var expanded by remember { mutableStateOf(false) }
+    var selectedText by remember {
+        mutableStateOf("Categoria1")
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+    ) {
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = {
+                expanded = !expanded
+            }
+        ) {
+            OutlinedTextField(
+                value = selectedText,
+                onValueChange = {onCategoriaChange(it)},
+                readOnly = true,
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                modifier = Modifier.menuAnchor()
+            )
+
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                idiomas.forEach { item ->
+                    DropdownMenuItem(
+                        text = { Text(text = item) },
+                        onClick = {
+                            // selectedText = item
+                            expanded = false
+                            selectedText = item
+                        }
+                    )
+                }
+            }
+        }
+    }
+}
+
+
+@Composable
+fun ListaOfertas(onItemClick: () -> Unit, listaPeticiones: List<ServicioPeticion>) {
+    //obtenemos la lista del viemodel
+    var listaEntrantes = createDealListExample()
+    //mostramos la lista
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(8.dp)
+    ) {
+        LazyColumn {
+            items(listaPeticiones.size) { index ->
+                OfertasCard(peticion = listaPeticiones[index], onItemClick = onItemClick)
+            }
+        }
+    }
+}
+
+@Composable
+fun OfertasCard(peticion: ServicioPeticion, onItemClick: () -> Unit) {
+    var context = LocalContext.current
+    Card(
+        modifier = Modifier
+            .padding(8.dp)
+            .clickable(onClick = onItemClick)
+    ) {
+
+        PeticionInfo(peticion = peticion)
+
+
+
+    }
+}
+@Composable
+fun PeticionInfo(
+    peticion: ServicioPeticion
+) {
+    Row(
+        modifier = Modifier
+            .padding(8.dp)
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+
+        // foto de perfil del usuario
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(4.dp)
+        ) {
+            UserAvatar(iniciales = "AC")
+            Text(text = peticion.username)
+        }
+
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = peticion.titulo,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
+            )
+            Text(text = peticion.precio.toString()+" €", modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp))
+        }
+
+    }
+}
+
+
+
+// BASURERO TEMPORAL
+
+/*
+@Composable
+fun CreateOferRequestFloatingButton(
+    onOpenCreateDialog: () -> Unit
+){
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight()
+            .wrapContentSize(Alignment.BottomEnd)
+            .padding(16.dp)
+    ) {
+        FloatingActionButton(
+            onClick = { onOpenCreateDialog() },
+
+            modifier = Modifier
+                .padding(16.dp)
+                .size(56.dp),
+            shape = CircleShape
+        ) {
+            Icon(Icons.Filled.Add, "Floating action button.")
+        }
+    }
+}
 @Composable
 fun CreateDialog(
     onDismissRequest: () -> Unit,
@@ -523,12 +577,12 @@ fun CreateDialog(
     onDescription: () -> Unit,
     selectedTab: Int
 
-    ){
+){
 
     Dialog(onDismissRequest = { onDismissRequest() }) {
         Card (
             modifier = Modifier
-              //  .background(Color.White, shape = RoundedCornerShape(8.dp))
+            //  .background(Color.White, shape = RoundedCornerShape(8.dp))
         ){
             Column {
 
@@ -660,7 +714,7 @@ fun EditDescriptionDialog(
     Dialog(onDismissRequest = { onDismissRequest() }) {
         Card(
             modifier = Modifier
-                //.background(Color.White, shape = RoundedCornerShape(8.dp))
+            //.background(Color.White, shape = RoundedCornerShape(8.dp))
         ) {
 
             Column {
@@ -724,162 +778,8 @@ fun EditDescriptionDialog(
     }
 }
 
+*/
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun DropdownCategorias(
-    onCategoriaChange: (String) -> Unit = {}
-) {
-    val context = LocalContext.current
-    val idiomas = arrayOf("gratis", "deporte", "hogar", "entrenamiento", "academico", "online", "otros")
-    var expanded by remember { mutableStateOf(false) }
-    var selectedText by remember {
-        mutableStateOf("Categoria1")
-    }
-
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-    ) {
-        ExposedDropdownMenuBox(
-            expanded = expanded,
-            onExpandedChange = {
-                expanded = !expanded
-            }
-        ) {
-            OutlinedTextField(
-                value = selectedText,
-                onValueChange = {onCategoriaChange(it)},
-                readOnly = true,
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                modifier = Modifier.menuAnchor()
-            )
-
-            ExposedDropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false }
-            ) {
-                idiomas.forEach { item ->
-                    DropdownMenuItem(
-                        text = { Text(text = item) },
-                        onClick = {
-                            // selectedText = item
-                            expanded = false
-                            selectedText = item
-                        }
-                    )
-                }
-            }
-        }
-    }
-}
-@Composable
-fun CreateOferRequestFloatingButton(
-    onOpenCreateDialog: () -> Unit
-){
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight()
-            .wrapContentSize(Alignment.BottomEnd)
-            .padding(16.dp)
-    ) {
-        FloatingActionButton(
-            onClick = { onOpenCreateDialog() },
-
-            modifier = Modifier
-                .padding(16.dp)
-                .size(56.dp),
-            shape = CircleShape
-        ) {
-            Icon(Icons.Filled.Add, "Floating action button.")
-        }
-    }
-}
-
-@Composable
-fun ListaOfertas(onItemClick: () -> Unit, myOffers: Boolean) {
-    //obtenemos la lista del viemodel
-    var listaEntrantes = createDealListExample()
-    //mostramos la lista
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(8.dp)
-    ) {
-        LazyColumn {
-            items(listaEntrantes.size) { index ->
-                OfertasCard(deal = listaEntrantes[index], myOffers = myOffers, onItemClick = onItemClick)
-            }
-        }
-    }
-}
-
-@Composable
-fun OfertasCard(deal: Deal, onItemClick: () -> Unit, myOffers: Boolean) {
-    var context = LocalContext.current
-    Card(
-        modifier = Modifier
-            .padding(8.dp)
-            .clickable(onClick = onItemClick)
-    ) {
-
-        OfferInfo(deal = deal) {
-            if ( myOffers ) {
-                BotonesMisOfertas()
-            } else {
-                BotonesOfertas()
-            }
-
-        }
-    }
-}
-
-@Composable
-fun BotonesOfertas() {
-    var context = LocalContext.current
-    Column {
-        IconButton(onClick = {  }) {
-            Icon(
-                imageVector = Icons.Filled.LocationOn,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary
-            )
-        }
-        IconButton(onClick = {
-            showToastOnMainThread(context, "Petición rechazada")
-        }) {
-            Icon(
-                imageVector = Icons.Filled.Close,
-                contentDescription = "Rechazar",
-                tint = MaterialTheme.colorScheme.error
-            )
-        }
-    }
-}
-
-@Composable
-fun BotonesMisOfertas() {
-    var context = LocalContext.current
-    Column {
-        IconButton(onClick = {  }) {
-            Icon(
-                imageVector = Icons.Filled.Edit,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary
-            )
-        }
-        IconButton(onClick = {
-
-        }) {
-            Icon(
-                imageVector = Icons.Filled.Delete,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.error
-            )
-        }
-    }
-}
 
 
 

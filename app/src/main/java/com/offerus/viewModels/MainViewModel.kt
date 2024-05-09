@@ -7,6 +7,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.offerus.Idioma
@@ -49,6 +50,11 @@ class MainViewModel @Inject constructor(
     var listaDeals = mutableListOf<Deal>()
     var listaEntrantes = mutableListOf<Deal>()
     var listaSalientes = mutableListOf<Deal>()
+
+    var listaSolicitudes = mutableStateOf(emptyList<ServicioPeticion>())
+    var listaOfertas = mutableStateOf(emptyList<ServicioPeticion>())
+
+
 
     init {
         actualizarListaDeals()
@@ -277,20 +283,25 @@ class MainViewModel @Inject constructor(
         return respuesta
     }
 
-    fun getRequests(searchText: String, categories: String, maxDistance: Double, minPrice: Double, maxPrice: Double, lat: Double, lon: Double, asc: String): List<ServicioPeticion> {
-        val filter = BusquedaPeticionServicio(searchText, categories, maxDistance, minPrice, maxPrice, lat, lon, asc)
-        Log.e("KTOR", searchText + categories + maxDistance.toString())
-        var respuesta: List<ServicioPeticion> = emptyList()
+    fun getRequests(searchText: String, categories: String, maxDistance: Double, minPrice: Double, maxPrice: Double, lat: Double =43.233364152762064, lon: Double=-2.8532775378750097, asc: String) {
+        val filter = BusquedaPeticionServicio(searchText, categories, maxDistance, minPrice, maxPrice, 0.0, 0.0, "precio_asc")
+        Log.e("KTOR", "$searchText, $categories, $maxDistance, $minPrice, $maxPrice, $lat, $lon, $asc")
+        var respuesta: List<ServicioPeticion>
         try {
             viewModelScope.launch {
-                respuesta = httpUserClient.buscarPeticionesServicio(filter)
+                respuesta = httpUserClient.buscarPeticionesServicio(filter).toMutableList()
+                listaSolicitudes.value = respuesta.filter { it.peticion }
+                listaOfertas.value = respuesta.filter { !it.peticion }
+
                 Log.e("KTOR", "Peticiones recogidas con exito")
+                Log.e("KTOR", listaOfertas.value.size.toString())
+                Log.e("KTOR", listaSolicitudes.value.size.toString())
+
             }
         } catch (e: Exception) {
             Log.e("KTOR", e.toString())
 
         }
-        return respuesta
     }
 
     //--------------------------------------------------------------//
