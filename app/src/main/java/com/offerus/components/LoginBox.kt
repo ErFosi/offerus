@@ -37,6 +37,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -199,11 +200,15 @@ fun LoginBox(
             }
         }
     }
-    if (sesionIniciada) {
-        // TODO suscribeToFCM(context)
-        navController.popBackStack()
-        navController.navigate(AppScreens.MainScreen.route)
-        mainViewModel.iniciarListas()
+    LaunchedEffect (sesionIniciada) {
+        if (sesionIniciada){
+            // TODO suscribeToFCM(context)
+
+            mainViewModel.iniciarListas()
+            navController.popBackStack()
+            navController.navigate(AppScreens.MainScreen.route)
+        }
+
     }
     if (mostrarErrorLogin){
         Toast.makeText(
