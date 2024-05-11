@@ -38,4 +38,9 @@
     <string name="phone_invalido">Telefonoa ez da baliozkoa</string>
     <string name="password_invalido">Pasahitzak 6 karaktere baino gehiago izan behar ditu</string>
     <string name="passwords_no_match">Pasahitzak ez datoz bat</string>
+    <string name="no_internet_pic">Ezin izan da erabiltzailearen irudia berreskuratu</string>
+    <string name="contrasena_incorrecta">Pasahitza ez da zuzena, saiatu berriro</string>
+    <string name="invalid_fields">Pasahitzak 6 digitu izan behar ditu gutxienez, eta pasahitz berriak bat etorri behar dira</string>
+    <string name="ubicacion_actualizada">Kokapena aldatu egin da</string>
+    <string name="datos_actualizados" >Aldaketa zuzenki gorde da</string>
 </resources>

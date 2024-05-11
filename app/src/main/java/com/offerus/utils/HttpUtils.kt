@@ -14,6 +14,8 @@ class UserExistsException : Exception()
 class UnprocessableEntityException : Exception()
 
 class DealNoPendienteException : Exception()
+
+class ContraseñaNoCoincideException : Exception()
 /************************************************************************
  * Json del token
  *************************************************************************/

@@ -1,7 +1,11 @@
 package com.offerus.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
@@ -24,6 +28,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -36,12 +41,13 @@ import com.offerus.ui.theme.OfferUSTheme
 
 @Composable
 fun DialogoSobreMi(
+    sobreMiOld: String,
     onDismissRequest: () -> Unit,
-    onConfirmation: () -> Unit
+    onConfirmation: (String) -> Unit
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    var sobreMi by rememberSaveable { mutableStateOf("") }
+    var sobreMi by rememberSaveable { mutableStateOf(sobreMiOld) }
 
     Dialog(
         onDismissRequest = { onDismissRequest() },
@@ -55,18 +61,39 @@ fun DialogoSobreMi(
         ) {
             Text(
                 text = stringResource(R.string.sobreMi),
-                modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 40.dp),
+                modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 20.dp, bottom = 10.dp),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.titleLarge
             )
+            Spacer(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
+                    .height(2.dp)
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.25f))
+            )
 
             OutlinedTextField(
-                modifier = Modifier.padding(20.dp),
+                modifier = Modifier.padding(top = 20.dp, start = 20.dp, end = 20.dp),
                 value = sobreMi,
-                onValueChange = { sobreMi = it},
+                onValueChange = {
+                                    if (it.length <= 400) sobreMi = it
+                                },
                 label = { Text(stringResource(R.string.sobreMiEdit)) },
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() })
+            )
+            Text(
+                text = "${400 - sobreMi.length}/400",
+                color = if (400 - sobreMi.length < 0) Color.Red else Color.Gray,
+                modifier = Modifier.padding(bottom = 20.dp, start = 20.dp)
+            )
+            Spacer(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
+                    .height(2.dp)
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.25f))
             )
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -86,7 +113,7 @@ fun DialogoSobreMi(
                 }
 
                 Button(onClick = {
-                    onConfirmation()
+                    onConfirmation(sobreMi)
                 }) {
                     Text(text = "")
                     Icon(
@@ -104,8 +131,8 @@ fun DialogoSobreMi(
 @Composable
 fun previewDialogoSobreMi() {
     OfferUSTheme(content = {
-        DialogoSobreMi(onDismissRequest = {  }) {
+        //DialogoSobreMi(onDismissRequest = {  }) {
 
-        }
+        //}
     })
 }

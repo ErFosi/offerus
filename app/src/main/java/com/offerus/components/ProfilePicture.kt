@@ -320,13 +320,26 @@ fun Context.createImageFileFromBitMap(bitmap: Bitmap): Uri {
     return imageFile.toUri()
 }
 
-fun Context.getBipMapFromUri(uri: Uri): Bitmap {
-    return uri.let {
-        val parcelFileDescriptor = contentResolver.openFileDescriptor(it, "r", null)
-        val fileDescriptor = parcelFileDescriptor?.fileDescriptor
-        val image = BitmapFactory.decodeFileDescriptor(fileDescriptor)
-        parcelFileDescriptor?.close()
-        image
+fun Context.getBipMapFromUri(uri: Uri): Bitmap? {
+    return uri.let { uri ->
+
+        val inputStream = contentResolver.openInputStream(uri)
+        val bitmap = BitmapFactory.decodeStream(inputStream)
+        val outputStream = ByteArrayOutputStream()
+        
+        try {
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 50, outputStream)
+            val compressedByteArray = outputStream.toByteArray()
+            BitmapFactory.decodeByteArray(compressedByteArray, 0, compressedByteArray.size)
+
+        } catch (e: IOException) {
+            Log.e("CompressImage", "Error al escribir el archivo comprimido: ${e.message}")
+            null
+        } catch (e: Exception) {
+            Log.e("CompressImage", "Error al escribir el archivo comprimido: ${e.message}")
+            null
+        }
+
     }
 }
 

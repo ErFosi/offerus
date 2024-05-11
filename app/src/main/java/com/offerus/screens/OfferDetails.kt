@@ -196,10 +196,10 @@ fun OfferDetailsContent(paddingValues: PaddingValues, viewModel: MainViewModel) 
                                 permisoUbicacion = false,
                                 marcadores = listOf(marcador),
                                 sePuedeDesplazar = false,
-                                cameraPosition = CameraPosition.fromLatLngZoom(
+                                /*cameraPosition = CameraPosition.fromLatLngZoom(
                                     LatLng(servicioPeticion.latitud, servicioPeticion.longitud),
                                     15f
-                                ),
+                                ),*/
 
                                 )
                         }

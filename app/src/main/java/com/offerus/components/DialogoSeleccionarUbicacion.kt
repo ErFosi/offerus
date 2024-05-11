@@ -5,9 +5,11 @@ import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -19,6 +21,7 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -52,12 +56,14 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun DialogoSeleccionarUbicacion(
+    lat: Double,
+    lon: Double,
     onDismissRequest: () -> Unit,
-    onConfirmation: () -> Unit
+    onConfirmation: (LatLng) -> Unit
 ) {
     var abrirMapa by rememberSaveable { mutableStateOf(false) }
     var ubicacion by rememberSaveable {
-        mutableStateOf(LatLng(0.0, 0.0))
+        mutableStateOf(LatLng(lat, lon))
     }
     val locationUtils = locationUtils()
     val context = LocalContext.current
@@ -114,15 +120,24 @@ fun DialogoSeleccionarUbicacion(
         Card(modifier = Modifier.fillMaxWidth()) {
             Column(
                 modifier = Modifier
-                    .padding(16.dp)
+                    .padding(20.dp)
                     .fillMaxWidth()
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(
                     text = stringResource(id = R.string.seleccionarUbicacion),
-
+                    modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 20.dp, bottom = 10.dp),
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.titleLarge
                     )
+                Spacer(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp, bottom = 20.dp, start = 8.dp, end = 8.dp)
+                        .height(2.dp)
+                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.25f))
+                )
                 if (permisoUbicacion) {
                     Button(
                         onClick = {
@@ -132,14 +147,16 @@ fun DialogoSeleccionarUbicacion(
                                     ubicacion = LatLng(ubi.latitude, ubi.longitude)
                                 }
                             }
-                        }
+                        },
+                        modifier = Modifier.padding(horizontal = 20.dp).fillMaxWidth()
                     ) {
                         Text(text = stringResource(id = R.string.seleccionarMiUbicacion))
                     }
                 }
 
                 Button(
-                    onClick = { abrirMapa = !abrirMapa }
+                    onClick = { abrirMapa = !abrirMapa },
+                    modifier = Modifier.padding(horizontal = 20.dp).fillMaxWidth()
                 ) {
                     Text(text = stringResource(id = R.string.ubicacionMapa))
                 }
@@ -163,7 +180,15 @@ fun DialogoSeleccionarUbicacion(
                     }
 
                 }
-                Text(text = "Ubicación seleccionada DEBUG: ${ubicacion.latitude}, ${ubicacion.longitude}")
+                //Text(text = "Ubicación seleccionada DEBUG: ${ubicacion.latitude}, ${ubicacion.longitude}")
+
+                Spacer(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 20.dp, bottom = 8.dp, start = 8.dp, end = 8.dp)
+                        .height(2.dp)
+                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.25f))
+                )
 
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -183,7 +208,9 @@ fun DialogoSeleccionarUbicacion(
                     }
 
                     Button(onClick = {
-                        onConfirmation()
+                        onConfirmation(
+                            ubicacion
+                        )
                     }) {
                         Text(text = "")
                         Icon(
@@ -206,8 +233,8 @@ fun DialogoSeleccionarUbicacion(
 @Composable
 fun previewDialogoSeleccionarUbicacion() {
     OfferUSTheme(content = {
-        DialogoSeleccionarUbicacion(onDismissRequest = {  }, {
+       // DialogoSeleccionarUbicacion(onDismissRequest = {  }, {
 
-        })
+        //})
     })
 }

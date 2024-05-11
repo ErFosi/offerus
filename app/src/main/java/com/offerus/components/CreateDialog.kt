@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
@@ -80,8 +81,8 @@ fun CreateDialog(
                     Text(
                         text = "Nuevo Servicio",
                         modifier = Modifier
-                            .padding(10.dp),
-                        fontWeight = FontWeight.Bold,
+                            .padding(20.dp),
+                        style = MaterialTheme.typography.titleLarge,
                         textAlign = TextAlign.Center,
                     )
 
@@ -275,7 +276,7 @@ fun CreateDialog(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 5.dp),
+                            .padding(top = 5.dp, bottom = 20.dp),
                         horizontalArrangement = Arrangement.Center
                     ) {
                         OutlinedButton(
@@ -290,7 +291,7 @@ fun CreateDialog(
                             )
 
                         }
-                        OutlinedButton(
+                        Button(
                             modifier = Modifier
                                 .padding(horizontal = 5.dp),
                             onClick = {

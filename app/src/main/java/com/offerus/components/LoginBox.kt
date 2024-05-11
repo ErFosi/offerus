@@ -194,7 +194,7 @@ fun LoginBox(
                 mostrarErrorLogin = true
                 sesionIniciada = false
             } catch (e: Exception) {
-                mostrarErrorLogin = true
+                mostrarErrorLogin = false
                 sesionIniciada = false
                 mostrarErrorConexion = true
             }
@@ -205,6 +205,7 @@ fun LoginBox(
             // TODO suscribeToFCM(context)
 
             mainViewModel.iniciarListas()
+            mainViewModel.actualizarInfoUsuario()
             navController.popBackStack()
             navController.navigate(AppScreens.MainScreen.route)
         }

@@ -28,6 +28,7 @@ import com.offerus.model.repositories.UserDataRepository
 import com.offerus.utils.AuthClient
 import com.offerus.utils.AuthenticationException
 import com.offerus.utils.CambioDeIdioma
+import com.offerus.utils.ContraseñaNoCoincideException
 import com.offerus.utils.UserClient
 import com.offerus.utils.UserExistsException
 import com.offerus.utils.showToastOnMainThread
@@ -99,7 +100,7 @@ class MainViewModel @Inject constructor(
 
     // variable to store the current user name
     var usuario by mutableStateOf("")
-
+    var infoUsuario = mutableStateOf(UsuarioData("", "", 0, 0.0, 0.0, "", "", "", "", ""))
     // get the theme and language from the data store
     val tema = myPreferencesDataStore.preferencesStatusFlow.map {
         it.temaClaro
@@ -153,6 +154,7 @@ class MainViewModel @Inject constructor(
                     //authenticate(usuariog, contrasena)
                     login(usuariog, contrasena)
                     Log.d("SeriesViewModel", "Usuario guardado autenticado")
+                    actualizarInfoUsuario()
                     iniciarListas()
                 } catch (e: AuthenticationException) {
                     Log.e("SeriesViewModel", "Error al autenticar usuario guardado")
@@ -257,17 +259,26 @@ class MainViewModel @Inject constructor(
         }
         return respuesta
     }
-    fun modifyPassword(password: String, newPassword: String) {
-        val passwordChange = ContraseñaChange(password, newPassword)
+
+    fun actualizarInfoUsuario(){
         try {
             viewModelScope.launch {
-                httpUserClient.changePassword(passwordChange)
-                Log.e("KTOR", "Cambio de contrasena completado")
+                infoUsuario.value = httpUserClient.getDatosUsuario()
+                Log.e("KTOR", "Datos usuario conseguidos")
             }
         } catch (e: Exception) {
             Log.e("KTOR", e.toString())
 
         }
+    }
+
+    @Throws(ContraseñaNoCoincideException::class, Exception::class)
+    suspend fun modifyPassword(password: String, newPassword: String) {
+        val passwordChange = ContraseñaChange(password, newPassword)
+
+        httpUserClient.changePassword(passwordChange)
+        Log.e("KTOR", "Cambio de contrasena completado")
+
     }
     fun updateUserData(fullName: String, age: Int, email: String, phone: String, sex: String,lat: Double, lon: Double, descr: String, suscriptions: String) {
         val update = UsuarioUpdate(fullName, age, lat, lon, email, phone, sex, descr, suscriptions)
@@ -275,6 +286,7 @@ class MainViewModel @Inject constructor(
             viewModelScope.launch {
                 httpUserClient.modifyUser(update)
                 Log.e("KTOR", "Datos de usuario actualizados")
+                actualizarInfoUsuario()
             }
         } catch (e: Exception) {
             Log.e("KTOR", e.toString())

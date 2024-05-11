@@ -38,4 +38,9 @@
     <string name="phone_invalido">The phone number is not valid</string>
     <string name="password_invalido">The password must have more than 6 characters</string>
     <string name="passwords_no_match">The passwords do not match</string>
+    <string name="no_internet_pic">There has been an error while recovering the user\'s profile pic.</string>
+    <string name="contrasena_incorrecta">Incorrect password, please try again</string>
+    <string name="invalid_fields">The password must have at least 6 characters and the new password must match</string>
+    <string name="ubicacion_actualizada">The location was updated successfully</string>
+    <string name="datos_actualizados" >The data was updated successfully</string>
 </resources>
