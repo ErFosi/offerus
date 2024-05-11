@@ -59,7 +59,6 @@ fun MainScreen(
     navControllerMain: NavHostController,
     mainViewModel: MainViewModel
 ){
-    mainViewModel.iniciarListas()
 
     //navControler para el BOTTOM BAR
     val navController = rememberNavController()

@@ -1,12 +1,10 @@
 package com.offerus.data
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.offerus.R
 import kotlinx.serialization.Serializable
 
 /************************************************************************
@@ -193,14 +191,14 @@ data class Favoritos(
 )
 
 
-data class Categoria(val nombre: String, val icono: ImageVector, val color: Color)
+data class Categoria(val nombre: String, val icono: Int, val color: Color)
 
 val CATEGORIAS = listOf(
-    Categoria("gratis", Icons.Filled.Home, Color.Blue),
-    Categoria("deporte", Icons.Filled.Home, Color.Green),
-    Categoria("hogar", Icons.Filled.Home, Color.Red),
-    Categoria("academico", Icons.Filled.Home, Color.Magenta),
-    Categoria("online", Icons.Filled.Home, Color.Cyan),
-    Categoria("otros", Icons.Filled.Home, Color.Gray),
-    Categoria("entretenimiento", Icons.Filled.Home, Color.Yellow),
+    Categoria("gratis", R.drawable.gratis, Color.Green),
+    Categoria("deporte", R.drawable.deporte, Color.Yellow),
+    Categoria("hogar", R.drawable.hogar, Color.Magenta),
+    Categoria("academico", R.drawable.academico, Color.Blue),
+    Categoria("online", R.drawable.online, Color.Cyan),
+    Categoria("otros", R.drawable.otros, Color.Gray),
+    Categoria("entretenimiento", R.drawable.ocio, Color.Red),
 )

@@ -11,12 +11,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -42,6 +43,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.offerus.components.CategoriasCirculos
 import com.offerus.components.CreateDialog
 import com.offerus.components.EditDialog
 import com.offerus.data.ServicioPeticion
@@ -124,13 +126,14 @@ fun MisOfertas(viewModel: MainViewModel, onItemClick: () -> Unit) {
             .fillMaxSize()
             .padding(8.dp)
     ) {
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
+        LazyVerticalStaggeredGrid(
+            columns = StaggeredGridCells.Fixed(2),
+            //columns = GridCells.Fixed(2),
             modifier = Modifier.fillMaxSize()
         ) {
             items(listaMisOfertas.size) { index ->
                 MisOfertasCard(listaMisOfertas[index], viewModel) {
-                    viewModel.cambiarServicioDetalle(listaMisOfertas[index].id)
+                    viewModel.servicioDetalle.value = listaMisOfertas[index]
                     onItemClick()
                 }
             }
@@ -144,7 +147,7 @@ fun MisOfertasCard(servicioPeticion: ServicioPeticion, viewModel: MainViewModel,
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Card(
             modifier = Modifier
-                .padding(8.dp)
+                .padding(vertical = 8.dp, horizontal = 4.dp)
                 .clickable(onClick = onItemClick),
 
             ) {
@@ -161,8 +164,8 @@ fun BotonesMyOffers(onEditClick: () -> Unit, onDeleteClick: () -> Unit) {
     var context = LocalContext.current
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center,
-        modifier = Modifier.fillMaxWidth()
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier.padding(4.dp)
     ) {
         // Botón de aceptar
         OutlinedButton(
@@ -178,7 +181,7 @@ fun BotonesMyOffers(onEditClick: () -> Unit, onDeleteClick: () -> Unit) {
             Icon(
                 imageVector = Icons.Filled.Create,
                 contentDescription = "Editar",
-                modifier = Modifier.padding(4.dp)
+                //modifier = Modifier.padding(4.dp)
             )
         }
 
@@ -194,7 +197,7 @@ fun BotonesMyOffers(onEditClick: () -> Unit, onDeleteClick: () -> Unit) {
             Icon(
                 imageVector = Icons.Filled.Delete,
                 contentDescription = "Rechazar",
-                modifier = Modifier.padding(4.dp)
+                //modifier = Modifier.padding(4.dp)
             )
         }
     }
@@ -216,7 +219,7 @@ fun MisPeticiones(viewModel: MainViewModel, onItemClick: () -> Unit) {
         ) {
             items(listaMisPeticiones.size) { index ->
                 MisOfertasCard(listaMisPeticiones[index], viewModel) {
-                    viewModel.cambiarServicioDetalle(listaMisPeticiones[index].id)
+                    viewModel.servicioDetalle.value = listaMisPeticiones[index]
                     onItemClick()
                 }
             }
@@ -231,20 +234,27 @@ fun MyOfferInfo(
 ) {
     Column(
         modifier = Modifier
-            .padding(8.dp)
+            .padding(4.dp)
             .fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             text = servicioPeticion.titulo,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
+            modifier = Modifier
+                .padding(vertical = 4.dp, horizontal = 8.dp)
+                .fillMaxWidth()
         )
-        Text(text = servicioPeticion.precio.toString() + "€", modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp))
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
+            Column {
+                Text(text = servicioPeticion.precio.toString() + "€", modifier = Modifier
+                    .padding(vertical = 4.dp, horizontal = 4.dp))
+                CategoriasCirculos(nombresCategorias = servicioPeticion.categorias)
+            }
 
-        buttons()
+            buttons()
+        }
     }
 }
 

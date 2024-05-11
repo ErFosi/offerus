@@ -33,6 +33,7 @@ import com.offerus.utils.UserExistsException
 import com.offerus.utils.showToastOnMainThread
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -49,6 +50,9 @@ class MainViewModel @Inject constructor(
     private val cambioDeIdioma: CambioDeIdioma,
     private val servicioRepository: ServicioRepository,
 ) : ViewModel() {
+
+    // pull refresh states
+    val isRefreshingHome = mutableStateOf(false)
 
     // Recordar subpestañas
     var selectedTabIndexHome =
@@ -361,12 +365,15 @@ class MainViewModel @Inject constructor(
 
     // servicio para mostrar detalles
     var servicioDetalle = mutableStateOf<ServicioPeticion?>(null)
-
+    var listaServiciosApi = mutableStateOf(emptyList<ServicioPeticion>())
     // gestor del dialogo para hacer la review
     var dialogoReview = mutableStateOf(false)
     var dealReview: Deal? = null
     fun actualizarListaDeals() {
+
         viewModelScope.launch {
+            isRefreshingHome.value = true
+            delay(500)
             try {
                 // Actualizar listaDeals
                 val nuevasDeals = httpUserClient.obtenerDealsUsuario().toMutableList()
@@ -375,15 +382,7 @@ class MainViewModel @Inject constructor(
                 val listaIdPeticiones = nuevasDeals.map { it.id_peticion }
                 Log.d("lista petis", listaIdPeticiones.toString())
 
-                if (listaIdPeticiones.isNotEmpty()) {
-                    withContext(Dispatchers.IO) {
-                        servicioRepository.deleteServicio()
-                        httpUserClient.obtenerPeticiones(listaIdPeticiones).forEach { peticion ->
-                            Log.d("peticion add", peticion.toString())
-                            servicioRepository.addServicio(peticion)
-                        }
-                    }
-                }
+
 
                 // Filtrar deals entrantes y actualizar listaEntrantes
                 val nuevasEntrantes = nuevasDeals.filter { it.username_host == usuario && it.estado == "pendiente" }.toMutableList()
@@ -398,14 +397,32 @@ class MainViewModel @Inject constructor(
                 listaEntrantes.value = nuevasEntrantes
                 listaSalientes.value = nuevasSalientes
 
+                if (listaIdPeticiones.isNotEmpty()) {
+                    withContext(Dispatchers.IO) {
+                        servicioRepository.deleteServicio()
+                        listaServiciosApi.value = httpUserClient.obtenerPeticiones(listaIdPeticiones)
+                        listaServiciosApi.value.forEach { peticion ->
+                            Log.d("peticion add", peticion.toString())
+                            servicioRepository.addServicio(peticion)
+                        }
+                        isRefreshingHome.value = false
+                    }
+                }
+                else{
+                    isRefreshingHome.value = false
+                }
+
             } catch (e: Exception) {
                 // Manejar cualquier excepción
                 Log.e("actualizarListaDeals", "Error al actualizar las ofertas: $e")
+                isRefreshingHome.value = false
             }
+
         }
+
     }
 
-
+    var listaPeticiones = servicioRepository.getListaServicios()
 
     //metodo para actualizar (update) el deal cuando se hace una review
     fun enviarReview() {

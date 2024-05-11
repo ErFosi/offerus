@@ -50,6 +50,7 @@ import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.gowtham.ratingbar.RatingBar
 import com.gowtham.ratingbar.RatingBarStyle
+import com.offerus.components.CategoriasCard
 import com.offerus.components.Marcador
 import com.offerus.components.TopBarSecundario
 import com.offerus.components.mapa
@@ -74,6 +75,11 @@ fun OfferDetailsContent(paddingValues: PaddingValues, viewModel: MainViewModel) 
 
     var servicioPeticion = viewModel.servicioDetalle.value ?: return
 
+    //comprar si la tenemos pendiente
+    var listaSalientes = viewModel.listaSalientes.value
+    Log.d("listaSalientes", listaSalientes.toString())
+    var pendiente = listaSalientes.filter { it.id_peticion == servicioPeticion.id }.any{ it.estado == "pendiente" }
+    Log.d("pendiente", pendiente.toString())
     // lista de categorias
     val categorias =
         servicioPeticion.categorias.replace("[", "").replace("]", "").split(", ").map { it.trim() }
@@ -140,21 +146,10 @@ fun OfferDetailsContent(paddingValues: PaddingValues, viewModel: MainViewModel) 
 
                         }
 
+                        //CATEGORIAS
                         Row {
                             //recorrer la lista de categorias
-                            for (category in categorias) {
-                                Card(modifier = Modifier.padding(4.dp)) {
-                                    Text(
-                                        text = category,
-                                        modifier = Modifier.padding(
-                                            top = 4.dp,
-                                            start = 8.dp,
-                                            end = 8.dp,
-                                            bottom = 4.dp
-                                        )
-                                    )
-                                }
-                            }
+                            CategoriasCard(nombresCategorias = servicioPeticion.categorias)
                         }
 
                         //descripcion de la oferta
@@ -217,7 +212,9 @@ fun OfferDetailsContent(paddingValues: PaddingValues, viewModel: MainViewModel) 
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             //info contacto
-                            Row(modifier = Modifier.fillMaxWidth().padding(8.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceAround){
+                            Row(modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceAround){
 
                                 Column(
                                     verticalArrangement = Arrangement.Center,
@@ -278,8 +275,23 @@ fun OfferDetailsContent(paddingValues: PaddingValues, viewModel: MainViewModel) 
                     }
                 }
             }
+            if (servicioPeticion.username != viewModel.usuario) {
+                if (pendiente) {
+                    Row(
+                        modifier = Modifier
+                            .padding(12.dp)
+                            .fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Text(text = "Solicitud pendiente", modifier = Modifier.padding(8.dp))
+                    }
+                }
+                else {
+                    BotonesDetalles(viewModel, servicioPeticion)
+                }
+            }
 
-            BotonesDetalles(viewModel, servicioPeticion)
         }
     }
 }

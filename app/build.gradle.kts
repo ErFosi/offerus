@@ -142,4 +142,6 @@ dependencies {
     //PERMISSIONS
     implementation("com.google.accompanist:accompanist-permissions:0.24.13-rc")
 
+    implementation("androidx.compose.material:material-android:1.6.7")
+
 }

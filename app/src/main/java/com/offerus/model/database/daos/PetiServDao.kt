@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
 import com.offerus.data.ServicioPeticion
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface PetiServDao {
@@ -20,5 +21,9 @@ interface PetiServDao {
     //delete table
     @Query("DELETE FROM ServicioPeticion")
     suspend fun deletePetiServ()
+
+    // get all services
+    @Query("SELECT * FROM ServicioPeticion")
+    fun getListaServicios(): Flow<List<ServicioPeticion>>
 
 }

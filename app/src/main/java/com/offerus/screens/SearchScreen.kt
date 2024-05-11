@@ -1,6 +1,5 @@
 package com.offerus.screens
 
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -51,6 +50,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -151,9 +151,10 @@ fun OffersScreen(
                 onOpenFilterDialog = {  openFilterDialog.value = true },
                 myOffers = myOffers,
                 navController = navController,
+                viewModel = mainViewModel,
                 onOpenCreateDialog = { openCreateDialog.value = true }
             )
-            ListaOfertas(myOffers = myOffers, onItemClick = {navController.navigate(AppScreens.OfferDetailsScreen.route)} )
+            ListaOfertas(myOffers = myOffers, viewModel = mainViewModel, onItemClick = {navController.navigate(AppScreens.OfferDetailsScreen.route)} )
 
 
 
@@ -169,7 +170,8 @@ fun SubPageSearch(
     navController: NavController,
     onOpenFilterDialog: () -> Unit,
     myOffers: Boolean,
-    onOpenCreateDialog: () -> Unit
+    onOpenCreateDialog: () -> Unit,
+    viewModel: MainViewModel
 
 ){
 
@@ -239,7 +241,11 @@ fun SubPageSearch(
 
 
         }
-        ListaOfertas(myOffers = myOffers, onItemClick = {navController.navigate(AppScreens.OfferDetailsScreen.route)} )
+        ListaOfertas(
+            onItemClick = {navController.navigate(AppScreens.OfferDetailsScreen.route)},
+            myOffers = myOffers,
+            viewModel = viewModel
+        )
         if ( myOffers ) {
             Box(
                 modifier = Modifier
@@ -630,7 +636,7 @@ fun DropdownCategorias(
 }
 
 @Composable
-fun ListaOfertas(onItemClick: () -> Unit, myOffers: Boolean) {
+fun ListaOfertas(onItemClick: () -> Unit, myOffers: Boolean, viewModel: MainViewModel) {
     //obtenemos la lista del viemodel
     var listaEntrantes = createDealListExample()
     //mostramos la lista
@@ -641,28 +647,31 @@ fun ListaOfertas(onItemClick: () -> Unit, myOffers: Boolean) {
     ) {
         LazyColumn {
             items(listaEntrantes.size) { index ->
-                OfertasCard(deal = listaEntrantes[index], myOffers = myOffers, onItemClick = onItemClick)
+                OfertasCard(deal = listaEntrantes[index], viewModel = viewModel, myOffers = myOffers, onItemClick = onItemClick)
             }
         }
     }
 }
 
 @Composable
-fun OfertasCard(deal: Deal, onItemClick: () -> Unit, myOffers: Boolean) {
+fun OfertasCard(deal: Deal, onItemClick: () -> Unit, myOffers: Boolean, viewModel: MainViewModel) {
     var context = LocalContext.current
-    Card(
-        modifier = Modifier
-            .padding(8.dp)
-            .clickable(onClick = onItemClick)
-    ) {
+    val servicioPeticion = viewModel.listaPeticiones.collectAsState(listOf()).value.find { it.id == deal.id_peticion }
+    if (servicioPeticion != null) {
+        Card(
+            modifier = Modifier
+                .padding(8.dp)
+                .clickable(onClick = onItemClick)
+        ) {
 
-        OfferInfo(deal = deal) {
-            if ( myOffers ) {
-                BotonesMisOfertas()
-            } else {
-                BotonesOfertas()
+            OfferInfo(deal = deal, servicioPeticion) {
+                if (myOffers) {
+                    BotonesMisOfertas()
+                } else {
+                    BotonesOfertas()
+                }
+
             }
-
         }
     }
 }

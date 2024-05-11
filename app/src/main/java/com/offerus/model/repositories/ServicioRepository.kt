@@ -21,4 +21,7 @@ class ServicioRepository @Inject constructor(
     suspend fun deleteServicio() {
         petiServDao.deletePetiServ()
     }
+
+    fun getListaServicios()= petiServDao.getListaServicios()
+
 }

@@ -2,6 +2,7 @@ package com.offerus.components
 
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,6 +17,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
@@ -35,7 +37,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -74,7 +78,7 @@ fun CreateDialog(
     var desc by remember { mutableStateOf("") }
 
     Dialog(onDismissRequest = { onDismissRequest() }) {
-        Card(modifier = Modifier.padding(10.dp)) {
+        Card(modifier = Modifier.padding(vertical = 64.dp)) {
             LazyColumn(horizontalAlignment = Alignment.CenterHorizontally) {
                 item {
                     Text(
@@ -83,14 +87,15 @@ fun CreateDialog(
                             .padding(10.dp),
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
+                        fontSize = 20.sp
                     )
 
                     Spacer(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(8.dp)
-                            .height(2.dp)
-                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.25f))
+                            .padding(horizontal = 8.dp)
+                            .height(1.dp)
+                            .background(MaterialTheme.colorScheme.outline.copy(alpha = 0.25f))
                     )
 
                     // Contenido del dialogo
@@ -101,32 +106,40 @@ fun CreateDialog(
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
                             // TIPO DE SERVICIO con switch
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier.padding(bottom = 8.dp)
-                            ) {
+                            Box(
+                                modifier = Modifier
+                                    .border(width = 1.dp, color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.25f), shape = MaterialTheme.shapes.medium)
+                                    .padding(4.dp)
 
-                                Switch(
-                                    checked = esPeticion,
-                                    onCheckedChange = { esPeticion = it },
-                                    colors = SwitchDefaults.colors(
-                                        checkedThumbColor = MaterialTheme.colorScheme.primary,
-                                        checkedTrackColor = MaterialTheme.colorScheme.primaryContainer,
-                                        uncheckedThumbColor = MaterialTheme.colorScheme.secondary,
-                                        uncheckedTrackColor = MaterialTheme.colorScheme.secondaryContainer,
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.padding(vertical = 0.dp, horizontal = 4.dp)
+                                ) {
+
+                                    Switch(
+                                        checked = esPeticion,
+                                        onCheckedChange = { esPeticion = it },
+                                        colors = SwitchDefaults.colors(
+                                            checkedThumbColor = MaterialTheme.colorScheme.secondary,
+                                            checkedTrackColor = MaterialTheme.colorScheme.secondaryContainer,
+                                            uncheckedThumbColor = MaterialTheme.colorScheme.secondary,
+                                            uncheckedTrackColor = MaterialTheme.colorScheme.secondaryContainer,
+                                        )
                                     )
-                                )
-                                Text(
-                                    text = if (esPeticion) "Petición" else "Oferta",
-                                    modifier = Modifier.padding(start = 8.dp),
-                                    fontWeight = FontWeight.Bold
-                                )
+                                    Text(
+                                        text = if (esPeticion) "Petición" else "Oferta",
+                                        modifier = Modifier.padding(start = 8.dp),
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
                             }
 
+                            Spacer(modifier = Modifier.height(4.dp))
 
                             // TITULO
                             Row(
-                                modifier = Modifier.padding(vertical = 5.dp),
+                                modifier = Modifier.padding(vertical = 2.dp),
                             ) {
                                 OutlinedTextField(
                                     value = texto, onValueChange = { texto = it },
@@ -134,7 +147,7 @@ fun CreateDialog(
                                 )
                             }
 
-                            Spacer(modifier = Modifier.height(8.dp))
+                            Spacer(modifier = Modifier.height(4.dp))
 
                             // DESCRIPCION
                             Column(
@@ -162,7 +175,7 @@ fun CreateDialog(
 
                             // PRECIO
                             if (!esPeticion) {
-                                Spacer(modifier = Modifier.height(8.dp))
+                                Spacer(modifier = Modifier.height(4.dp))
                                 Row(
                                     modifier = Modifier
                                         .padding(vertical = 5.dp)
@@ -182,7 +195,7 @@ fun CreateDialog(
                                 }
                             }
 
-                            Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(4.dp))
 
                             // CATEGORIAS
 
@@ -214,7 +227,7 @@ fun CreateDialog(
                                                     modifier = Modifier.padding(4.dp)
                                                 ) {
                                                     Icon(
-                                                        imageVector = category.icono,
+                                                        imageVector = ImageVector.vectorResource(category.icono),
                                                         contentDescription = null,
                                                         modifier = Modifier.size(20.dp)
                                                     )
@@ -262,20 +275,19 @@ fun CreateDialog(
                         }
                     }
 
-
                     Spacer(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(8.dp)
-                            .height(2.dp)
-                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.25f))
+                            .padding(horizontal = 8.dp)
+                            .height(1.dp)
+                            .background(MaterialTheme.colorScheme.outline.copy(alpha = 0.25f))
                     )
 
                     // BOTONES
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 5.dp),
+                            .padding(vertical = 2.dp),
                         horizontalArrangement = Arrangement.Center
                     ) {
                         OutlinedButton(
@@ -290,7 +302,7 @@ fun CreateDialog(
                             )
 
                         }
-                        OutlinedButton(
+                        Button(
                             modifier = Modifier
                                 .padding(horizontal = 5.dp),
                             onClick = {

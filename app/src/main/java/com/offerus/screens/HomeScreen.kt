@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,10 +12,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -24,6 +29,7 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,7 +47,9 @@ import androidx.navigation.NavController
 import com.gowtham.ratingbar.RatingBar
 import com.gowtham.ratingbar.RatingBarStyle
 import com.offerus.R
+import com.offerus.components.CategoriasCirculos
 import com.offerus.data.Deal
+import com.offerus.data.ServicioPeticion
 import com.offerus.navigation.AppScreens
 import com.offerus.utils.showToastOnMainThread
 import com.offerus.viewModels.MainViewModel
@@ -169,17 +177,21 @@ fun ReviewDialog(
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun Entrantes(viewModel: MainViewModel, onItemClick: () -> Unit) {
     //obtenemos la lista del viemodel
     var listaEntrantes = viewModel.listaEntrantes.value
     //mostramos la lista
-    Column(
+    val refreshState = rememberPullRefreshState(refreshing = viewModel.isRefreshingHome.value, onRefresh = { viewModel.actualizarListaDeals() })
+    //mostramos la lista
+
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .padding(8.dp)
     ) {
-        LazyColumn {
+        LazyColumn(modifier = Modifier.fillMaxSize().pullRefresh(refreshState)){
             items(listaEntrantes.size) { index ->
                 EntrantesCard(deal = listaEntrantes[index], viewModel) {
                     viewModel.cambiarServicioDetalle(listaEntrantes[index].id_peticion)
@@ -187,18 +199,23 @@ fun Entrantes(viewModel: MainViewModel, onItemClick: () -> Unit) {
                 }
             }
         }
+        PullRefreshIndicator(refreshing = viewModel.isRefreshingHome.value, state = refreshState, modifier = Modifier.align(Alignment.TopCenter))
     }
 }
 
 @Composable
 fun EntrantesCard(deal: Deal, viewModel: MainViewModel, onItemClick: () -> Unit) {
     var context = LocalContext.current
-    Card(
-        modifier = Modifier
-            .padding(8.dp)
-            .clickable(onClick = onItemClick)
-    ) {
-        OfferInfo(deal = deal) { BotonesEntrantes(onAccept = {viewModel.dealAcceptDeny(deal.id, true)}) {viewModel.dealAcceptDeny(deal.id, false)} }
+    //obtener el servicio del deal
+    val servicioPeticion = viewModel.listaPeticiones.collectAsState(listOf()).value.find { it.id == deal.id_peticion }
+    if (servicioPeticion != null) {
+        Card(
+            modifier = Modifier
+                .padding(8.dp)
+                .clickable(onClick = onItemClick)
+        ) {
+            OfferInfo(deal = deal, servicioPeticion) { BotonesEntrantes(onAccept = {viewModel.dealAcceptDeny(deal.id, true)}) {viewModel.dealAcceptDeny(deal.id, false)} }
+        }
     }
 }
 
@@ -229,20 +246,24 @@ fun BotonesEntrantes(onAccept: () -> Unit, onDeny: () -> Unit) {
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun Salientes(viewModel: MainViewModel, onMakeReview: () -> Unit, onItemClick: () -> Unit) {
     val listaSalientes = viewModel.listaSalientes.value
     Log.d("listaComposable", listaSalientes.toString())
+    // pull refresh
+    val refreshState = rememberPullRefreshState(refreshing = viewModel.isRefreshingHome.value, onRefresh = { viewModel.actualizarListaDeals() })
     //mostramos la lista
-    Column(
+
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .padding(8.dp)
     ) {
-        LazyColumn {
+        LazyColumn(modifier = Modifier.fillMaxSize().pullRefresh(refreshState)) {
             items(listaSalientes.size) { index ->
-                SalientesCard(deal = listaSalientes[index]) {
-                    if (listaSalientes[index].estado == "Aceptada") {
+                SalientesCard(deal = listaSalientes[index], viewModel) {
+                    if (listaSalientes[index].estado == "aceptado") {
                         viewModel.dealReview = listaSalientes[index]
                         onMakeReview()
                     } else {
@@ -253,28 +274,33 @@ fun Salientes(viewModel: MainViewModel, onMakeReview: () -> Unit, onItemClick: (
                 }
             }
         }
+        PullRefreshIndicator(refreshing = viewModel.isRefreshingHome.value, state = refreshState, modifier = Modifier.align(Alignment.TopCenter))
     }
+
 }
 
 @Composable
-fun SalientesCard(deal: Deal, onItemClick: () -> Unit) {
+fun SalientesCard(deal: Deal, viewModel: MainViewModel, onItemClick: () -> Unit) {
     var context = LocalContext.current
-    Card(
-        modifier = Modifier
-            .padding(8.dp)
-            .pointerInput(Unit) {
-                detectTapGestures(
-                    onTap = {
-                        onItemClick()
-                    },
-                    onLongPress = {
-                        showToastOnMainThread(context, deal.estado)
-                    })
+    val servicioPeticion = viewModel.listaServiciosApi.value.find { it.id == deal.id_peticion }
+    if (servicioPeticion != null) {
+        Card(
+            modifier = Modifier
+                .padding(8.dp)
+                .pointerInput(Unit) {
+                    detectTapGestures(
+                        onTap = {
+                            onItemClick()
+                        },
+                        onLongPress = {
+                            showToastOnMainThread(context, deal.estado)
+                        })
+                }
+        ) {
+            OfferInfo(deal = deal, servicioPeticion) {
+                //estado aleatorio entre pendiente, aceptada y rechazada
+                IconoEstado(estado = deal.estado)
             }
-    ) {
-        OfferInfo(deal = deal) {
-            //estado aleatorio entre pendiente, aceptada y rechazada
-            IconoEstado(estado = deal.estado)
         }
     }
 }
@@ -294,7 +320,7 @@ fun IconoEstado(estado: String) {
             )
         }
 
-        "aceptada" -> {
+        "aceptado" -> {
             Icon(
                 painter = painterResource(R.drawable.logorecortado),
                 contentDescription = null,
@@ -305,7 +331,7 @@ fun IconoEstado(estado: String) {
             )
         }
 
-        "rechazada" -> {
+        "rechazado" -> {
             Icon(
                 painter = painterResource(R.drawable.logorecortado),
                 contentDescription = null,
@@ -320,7 +346,7 @@ fun IconoEstado(estado: String) {
 
 @Composable
 fun OfferInfo(
-    deal: Deal, accion: @Composable () -> Unit = {}
+    deal: Deal, servicioPeticion: ServicioPeticion, accion: @Composable () -> Unit = {}
 ) {
     Row(
         modifier = Modifier
@@ -334,16 +360,22 @@ fun OfferInfo(
             horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(4.dp)
         ) {
             UserAvatar(iniciales = "AC")
-            Text(text = deal.username_host)
+            if (deal.username_host == servicioPeticion.username) {
+                Text(text = deal.username_cliente)
+            } else {
+                Text(text = deal.username_host)
+            }
+
         }
 
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = "Titulo de la solicitud me jdsakfld ejkalds sdfd",
+                text = servicioPeticion.titulo,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
             )
-            Text(text = "30€", modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp))
+            Text(text = "${servicioPeticion.precio}€", modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp))
+            CategoriasCirculos(nombresCategorias = servicioPeticion.categorias)
         }
 
         accion()
