@@ -70,8 +70,10 @@ class MainViewModel @Inject constructor(
 
 
     fun iniciarListas() {
+        Log.d("iniciarListas", "INICIO - iniciando listas...")
         actualizarListaDeals()
         obtenerMisOfertas()
+        Log.d("iniciarListas", "FIN - iniciado listas")
     }
 
     fun obtenerMisOfertas() {
@@ -157,6 +159,7 @@ class MainViewModel @Inject constructor(
                     //authenticate(usuariog, contrasena)
                     login(usuariog, contrasena)
                     Log.d("SeriesViewModel", "Usuario guardado autenticado")
+
                     iniciarListas()
                 } catch (e: AuthenticationException) {
                     Log.e("SeriesViewModel", "Error al autenticar usuario guardado")
