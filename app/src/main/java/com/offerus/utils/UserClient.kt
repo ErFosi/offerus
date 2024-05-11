@@ -86,6 +86,7 @@ class UserClient @Inject constructor() {
                     exception is ClientRequestException && exception.response.status == HttpStatusCode.BadRequest -> throw UserExistsException()
                     exception is ClientRequestException && exception.response.status == HttpStatusCode.UnprocessableEntity -> throw UnprocessableEntityException()
                     exception  is ClientRequestException && exception.response.status == HttpStatusCode.Conflict -> throw DealNoPendienteException()
+                    exception  is ClientRequestException && exception.response.status == HttpStatusCode.ExpectationFailed -> throw ContraseñaNoCoincideException()
                     else -> {
                         exception.printStackTrace()
                         throw exception
@@ -527,7 +528,7 @@ class UserClient @Inject constructor() {
      * @Throws Exception
      * @Return Unit
      */
-    @Throws(AuthenticationException::class,UnprocessableEntityException::class ,Exception::class)
+    @Throws(AuthenticationException::class,UnprocessableEntityException::class ,ContraseñaNoCoincideException::class,Exception::class)
     suspend fun changePassword(request: ContraseñaChange) {
         val token = bearerTokenStorage.last().accessToken
         val jsonContent = Json.encodeToString(request)
@@ -541,6 +542,7 @@ class UserClient @Inject constructor() {
         when (response.status) {
             HttpStatusCode.OK -> Log.d("KTOR", "Contraseña modificada")
             HttpStatusCode.Unauthorized -> throw AuthenticationException()
+            HttpStatusCode.ExpectationFailed -> throw ContraseñaNoCoincideException()
             HttpStatusCode.UnprocessableEntity -> {
                 val errorResponse = Json.decodeFromString<ErrorResponse>(response.bodyAsText())
                 val errorMessages = errorResponse.detail.joinToString("; ") { detail ->
@@ -548,6 +550,7 @@ class UserClient @Inject constructor() {
                 }
                 throw IllegalArgumentException("Validation error: $errorMessages")
             }
+
             else -> throw Exception("Failed to change password: HTTP ${response.status}")
         }
     }
