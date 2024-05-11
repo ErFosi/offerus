@@ -1,10 +1,11 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
-    id ("kotlin-kapt")
+    kotlin("kapt")
     id ("com.google.dagger.hilt.android")
     id ("org.jetbrains.kotlin.plugin.serialization")
     id("com.google.gms.google-services")
+    id ("dagger.hilt.android.plugin")
 }
 
 android {
@@ -64,6 +65,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.compose.material)
+    implementation(libs.androidx.glance.appwidget)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -76,8 +78,8 @@ dependencies {
     implementation("androidx.datastore:datastore-preferences:1.0.0")
 
     // Hilt
-    implementation ("com.google.dagger:hilt-android:2.48.1")
-    kapt ("com.google.dagger:hilt-compiler:2.48.1")
+    implementation ("com.google.dagger:hilt-android:2.48")
+    kapt ("com.google.dagger:hilt-compiler:2.48")
 
     //Room
     val room_version = "2.6.1"
@@ -144,4 +146,7 @@ dependencies {
 
     implementation("androidx.compose.material:material-android:1.6.7")
 
+    implementation("androidx.glance:glance-appwidget:1.0.0")
+    implementation("androidx.glance:glance-material:1.0.0")
+    implementation("androidx.glance:glance-material3:1.0.0")
 }
