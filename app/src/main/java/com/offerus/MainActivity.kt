@@ -22,6 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.offerus.navigation.MainNavigation
+import com.offerus.services.suscribeToFCM
 import com.offerus.ui.theme.OfferUSTheme
 import com.offerus.utils.isNetworkAvailable
 import com.offerus.viewModels.MainViewModel
@@ -55,10 +56,12 @@ class MainActivity : AppCompatActivity() {
                     Toast.makeText(this, mensaje, Toast.LENGTH_LONG).show()
                 }else {
                     logedIn = mainViewModel.obtenerUsuarioLogeado() != ""
+                    val context = this
                     LaunchedEffect(logedIn) {
                         if (logedIn) {
                             Log.d("login", "Usuario logeado1: $logedIn")
                             mainViewModel.loginUsuarioGuardado()
+                            suscribeToFCM(context)
                         }
                     }
 
