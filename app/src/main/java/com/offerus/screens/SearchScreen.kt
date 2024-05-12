@@ -540,7 +540,8 @@ fun OfertasCard(peticion: ServicioPeticion, onItemClick: () -> Unit, mainViewMod
         modifier = Modifier
             .padding(8.dp)
             .clickable(onClick = {
-                mainViewModel.cambiarServicioDetalle(peticion.id)
+
+                mainViewModel.cambiarServicioDetalle(peticion)
                 onItemClick()
             })
 

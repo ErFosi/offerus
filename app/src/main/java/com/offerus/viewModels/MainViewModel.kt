@@ -515,6 +515,11 @@ class MainViewModel @Inject constructor(
             }
         }
     }
+
+    fun cambiarServicioDetalle(servicioPeticion: ServicioPeticion) {
+        servicioDetalle.value = servicioPeticion
+
+    }
     //--------------------------------------------------------------//
     //------------------------- EDIT REQUESTS ----------------------//
     //--------------------------------------------------------------//
