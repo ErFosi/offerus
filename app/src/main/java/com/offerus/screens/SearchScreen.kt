@@ -664,7 +664,7 @@ fun OfertasCard(deal: Deal, onItemClick: () -> Unit, myOffers: Boolean, viewMode
                 .clickable(onClick = onItemClick)
         ) {
 
-            OfferInfo(deal = deal, servicioPeticion) {
+            OfferInfo(deal = deal, servicioPeticion = servicioPeticion, viewModel = viewModel,) {
                 if (myOffers) {
                     BotonesMisOfertas()
                 } else {

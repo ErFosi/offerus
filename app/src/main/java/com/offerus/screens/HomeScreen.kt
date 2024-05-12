@@ -214,7 +214,7 @@ fun EntrantesCard(deal: Deal, viewModel: MainViewModel, onItemClick: () -> Unit)
                 .padding(8.dp)
                 .clickable(onClick = onItemClick)
         ) {
-            OfferInfo(deal = deal, servicioPeticion) { BotonesEntrantes(onAccept = {viewModel.dealAcceptDeny(deal.id, true)}) {viewModel.dealAcceptDeny(deal.id, false)} }
+            OfferInfo(deal = deal, servicioPeticion = servicioPeticion, viewModel = viewModel) { BotonesEntrantes(onAccept = {viewModel.dealAcceptDeny(deal.id, true)}) {viewModel.dealAcceptDeny(deal.id, false)} }
         }
     }
 }
@@ -297,7 +297,7 @@ fun SalientesCard(deal: Deal, viewModel: MainViewModel, onItemClick: () -> Unit)
                         })
                 }
         ) {
-            OfferInfo(deal = deal, servicioPeticion) {
+            OfferInfo(deal = deal, servicioPeticion = servicioPeticion, viewModel = viewModel) {
                 //estado aleatorio entre pendiente, aceptada y rechazada
                 IconoEstado(estado = deal.estado)
             }
@@ -346,6 +346,7 @@ fun IconoEstado(estado: String) {
 
 @Composable
 fun OfferInfo(
+    viewModel: MainViewModel,
     deal: Deal, servicioPeticion: ServicioPeticion, accion: @Composable () -> Unit = {}
 ) {
     Row(
@@ -359,10 +360,12 @@ fun OfferInfo(
         Column(
             horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(4.dp)
         ) {
-            UserAvatar(iniciales = "AC")
+
             if (deal.username_host == servicioPeticion.username) {
+                UserAvatar(username = deal.username_cliente, viewModel = viewModel)
                 Text(text = deal.username_cliente)
             } else {
+                UserAvatar(username = deal.username_host, viewModel = viewModel)
                 Text(text = deal.username_host)
             }
 
