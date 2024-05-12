@@ -52,7 +52,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -65,8 +64,9 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -81,8 +81,6 @@ import com.offerus.utils.createDealListExample
 import com.offerus.utils.showToastOnMainThread
 import com.offerus.viewModels.MainViewModel
 
-
-@OptIn(ExperimentalWearMaterialApi::class)
 @Composable
 fun OffersScreen(
     navController: NavController,
@@ -149,8 +147,6 @@ fun OffersScreen(
 
 
     }
-
-
 
     Surface {
 
@@ -313,36 +309,9 @@ fun SubPageSearch(
                 )
             }
 
-
         }
-        ListaOfertas(myOffers = myOffers, onItemClick = {navController.navigate(AppScreens.OfferDetailsScreen.route)} )
-        if ( myOffers ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight()
-                    .wrapContentSize(Alignment.BottomEnd)
-                    .padding(16.dp)
-            ) {
-                FloatingActionButton(
-                    onClick = { onOpenCreateDialog() },
-
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .size(56.dp),
-                    shape = CircleShape
-                ) {
-                    Icon(Icons.Filled.Add, "Floating action button.")
-                }
-            }
-        }
-
 
     }
-}
-
-@Composable
-fun OfferList(){
 
 }
 
@@ -571,7 +540,7 @@ fun OfertasCard(peticion: ServicioPeticion, onItemClick: () -> Unit, mainViewMod
         modifier = Modifier
             .padding(8.dp)
             .clickable(onClick = {
-                mainViewModel.cambiarServicioDetalle(peticion)
+                mainViewModel.cambiarServicioDetalle(peticion.id)
                 onItemClick()
             })
 
@@ -598,7 +567,7 @@ fun PeticionInfo(
         Column(
             horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(4.dp)
         ) {
-            UserAvatar(iniciales = "AC")
+            //UserAvatar(username = "oier")
             Text(text = peticion.username)
         }
 
@@ -786,7 +755,7 @@ fun EditDescriptionDialog(
     Dialog(onDismissRequest = { onDismissRequest() }) {
         Card(
             modifier = Modifier
-                //.background(Color.White, shape = RoundedCornerShape(8.dp))
+            //.background(Color.White, shape = RoundedCornerShape(8.dp))
         ) {
 
             Column {

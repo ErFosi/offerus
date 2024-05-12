@@ -40,7 +40,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -81,8 +80,6 @@ class MainViewModel @Inject constructor(
     var listaSolicitudesFavoritas = mutableStateOf(emptyList<ServicioPeticion>())
     var listaOfertasFavoritas = mutableStateOf(emptyList<ServicioPeticion>())
 
-
-    fun iniciarListas() {
 
     fun iniciarListas() {
         Log.d("iniciarListas", "INICIO - iniciando listas...")
@@ -299,7 +296,6 @@ class MainViewModel @Inject constructor(
         httpUserClient.changePassword(passwordChange)
         Log.e("KTOR", "Cambio de contrasena completado")
 
-        }
     }
     fun updateUserData(fullName: String, age: Int, email: String, phone: String, sex: String,lat: Double, lon: Double, descr: String, suscriptions: String) {
         val update = UsuarioUpdate(fullName, age, lat, lon, email, phone, sex, descr, suscriptions)
@@ -329,7 +325,6 @@ class MainViewModel @Inject constructor(
                 continuation.resume(defaultBitmap)
             }
         }
-        return bitmap
     }
 
     fun uploadUserProfile(bitmap: Bitmap) {
@@ -364,7 +359,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun getRequests(searchText: String, categories: String, maxDistance: Double, minPrice: Double, maxPrice: Double, asc: String) {
-        val filter = BusquedaPeticionServicio(searchText, categories, maxDistance, minPrice, maxPrice, 0.0, 0.0, "precio_asc")
+        val filter = BusquedaPeticionServicio(searchText, null, 10000000000000.0, minPrice, maxPrice, 0.0, 0.0, "precio_asc")
         Log.e("peticion", " $searchText , $maxDistance , $maxPrice")
         var respuesta: List<ServicioPeticion>
         try {
@@ -427,6 +422,7 @@ class MainViewModel @Inject constructor(
         }
     }
 
+
     //--------------------------------------------------------------//
 //-------------------------- REGISTER --------------------------//
 //--------------------------------------------------------------//
@@ -442,8 +438,6 @@ class MainViewModel @Inject constructor(
     }
     //----------------- HOME SCREEN ---------------//
 
-    // Recordar subpestañas
-    var selectedTabIndexHome = mutableIntStateOf(0) // Estado para almacenar la pestaña seleccionada
 
     // servicio para mostrar detalles
     var servicioDetalle = mutableStateOf<ServicioPeticion?>(null)
@@ -490,6 +484,7 @@ class MainViewModel @Inject constructor(
                         isRefreshingHome.value = false
                     }
                 }
+
                 else{
                     isRefreshingHome.value = false
                 }
@@ -519,11 +514,6 @@ class MainViewModel @Inject constructor(
                 servicioDetalle.value = servicioRepository.getServicio(idPeticion)
             }
         }
-    }
-
-    fun cambiarServicioDetalle(servicioPeticion: ServicioPeticion) {
-        servicioDetalle.value = servicioPeticion
-
     }
     //--------------------------------------------------------------//
     //------------------------- EDIT REQUESTS ----------------------//

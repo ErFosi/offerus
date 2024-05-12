@@ -84,7 +84,7 @@ fun OfferDetailsContent(paddingValues: PaddingValues, viewModel: MainViewModel) 
     val categorias =
         servicioPeticion.categorias.replace("[", "").replace("]", "").split(", ").map { it.trim() }
 
-    val favorito = rememberSaveable { mutableStateOf(mainViewModel.esPeticionFavorita(servicioPeticion.id)) }
+    val favorito = rememberSaveable { mutableStateOf(viewModel.esPeticionFavorita(servicioPeticion.id)) }
 
 
     Surface {
@@ -127,9 +127,9 @@ fun OfferDetailsContent(paddingValues: PaddingValues, viewModel: MainViewModel) 
                             IconButton(onClick = {
 
                                 if (favorito.value) {
-                                    mainViewModel.deleteFavorite(servicioPeticion.id)
+                                    viewModel.deleteFavorite(servicioPeticion.id)
                                 } else {
-                                    mainViewModel.addFavorite(servicioPeticion.id, servicioPeticion)
+                                    viewModel.addFavorite(servicioPeticion.id, servicioPeticion)
                                 }
                                 favorito.value = !favorito.value
 
@@ -344,7 +344,7 @@ fun BotonesDetalles(viewModel: MainViewModel, servicioPeticion: ServicioPeticion
         Spacer(modifier = Modifier.width(16.dp))
 
         ElevatedButton(onClick = {
-            viewModel.crearDeal(servicioPeticion.id, servicioPeticion.username, "cuadron11")
+            viewModel.createDeal(servicioPeticion.id)
             showToastOnMainThread(context, "Solicitud enviada")
 
         }) {
