@@ -37,7 +37,9 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -57,11 +59,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -89,10 +93,13 @@ import com.offerus.components.createImageFileFromBitMap
 import com.offerus.components.getBipMapFromUri
 import com.offerus.components.languageSwitcher
 import com.offerus.components.mapa
+import com.offerus.data.CATEGORIAS
 import com.offerus.navigation.AppScreens
 import com.offerus.ui.theme.OfferUSTheme
 import com.offerus.utils.ContraseñaNoCoincideException
 import com.offerus.utils.isNetworkAvailable
+import com.offerus.utils.obtenerCategorias
+import com.offerus.utils.obtenerCategoriasString
 import com.offerus.viewModels.MainViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -509,14 +516,15 @@ fun UserScreenContent(
             color = MaterialTheme.colorScheme.secondary
         )
         AnimatedVisibility(visible = suscripcionesExpanded){
-            val keyboardController = LocalSoftwareKeyboardController.current
+            var selectedCategories by remember { mutableStateOf(obtenerCategorias(infoUsuario.suscripciones)) }
+            /*val keyboardController = LocalSoftwareKeyboardController.current
             var gratisChecked by rememberSaveable { mutableStateOf(false) }
             var deporteChecked by rememberSaveable { mutableStateOf(false) }
             var hogarChecked by rememberSaveable { mutableStateOf(false) }
             var otrosChecked by rememberSaveable { mutableStateOf(false) }
             var entretenimientoChecked by rememberSaveable { mutableStateOf(false) }
             var academicoChecked by rememberSaveable { mutableStateOf(false) }
-            var onlineChecked by rememberSaveable { mutableStateOf(false) }
+            var onlineChecked by rememberSaveable { mutableStateOf(false) }*/
 
             Card(modifier = Modifier.padding(start = 30.dp, end = 30.dp)) {
                 Column(
@@ -527,7 +535,7 @@ fun UserScreenContent(
                 ) {
                     Row (verticalAlignment = Alignment.CenterVertically){
 
-                        Column(modifier = Modifier.width(135.dp)) {
+                        /*Column(modifier = Modifier.width(135.dp)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Checkbox(checked = gratisChecked, onCheckedChange = { gratisChecked = it })
                                 Text(text = "Gratis")
@@ -558,6 +566,73 @@ fun UserScreenContent(
                                 Checkbox(checked = onlineChecked, onCheckedChange = { onlineChecked = it})
                                 Text(text = "Online")
                             }
+                        }*/
+                        Column(modifier = Modifier.fillMaxWidth()) {
+                            CATEGORIAS.chunked(2).forEach { categoriesRow ->
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.Center,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    categoriesRow.forEach { category ->
+                                        Card(
+                                            modifier = Modifier
+                                                .padding(2.dp),
+                                            colors = CardDefaults.cardColors(
+                                                containerColor = category.color.copy(
+                                                    alpha = 0.15f
+                                                )
+                                            ),
+
+                                            ) {
+                                            Row(
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                modifier = Modifier.padding(4.dp)
+                                            ) {
+                                                Icon(
+                                                    imageVector = ImageVector.vectorResource(category.icono),
+                                                    contentDescription = null,
+                                                    modifier = Modifier.size(20.dp)
+                                                )
+                                                Spacer(modifier = Modifier.width(2.dp))
+                                                Text(
+                                                    text = category.nombre,
+                                                    fontSize = 14.sp,
+
+                                                    )
+                                                Checkbox(
+                                                    checked = selectedCategories.contains(
+                                                        category.nombre
+                                                    ),
+                                                    onCheckedChange = { isChecked ->
+                                                        selectedCategories = if (isChecked) {
+                                                            selectedCategories + category.nombre
+                                                        } else {
+                                                            selectedCategories - category.nombre
+                                                        }
+
+                                                        Log.d(
+                                                            "CATEGORIAS",
+                                                            obtenerCategoriasString(
+                                                                selectedCategories
+                                                            )
+                                                        )
+                                                    },
+                                                    colors = CheckboxDefaults.colors(
+                                                        checkedColor = category.color.copy(alpha = 0.45f),
+                                                        uncheckedColor = category.color.copy(
+                                                            alpha = 0.25f
+                                                        )
+                                                    ),
+                                                    modifier = Modifier
+                                                        .padding(0.dp)
+                                                        .size(32.dp),
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                     Row(
@@ -569,7 +644,7 @@ fun UserScreenContent(
                         horizontalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
                         OutlinedButton(onClick = {
-                            /*TODO*/
+                            suscripcionesExpanded = false
                         }) {
                             Icon(
                                 imageVector = Icons.Default.Clear,
@@ -578,7 +653,18 @@ fun UserScreenContent(
                         }
 
                         Button(onClick = {
-                            /*TODO*/
+                            viewModel.updateUserData(
+                                fullName = infoUsuario.nombre_apellido,
+                                age = infoUsuario.edad,
+                                email = infoUsuario.mail,
+                                phone = infoUsuario.telefono,
+                                lat = infoUsuario.latitud,
+                                lon = infoUsuario.longitud,
+                                descr = infoUsuario.descripcion,
+                                sex = infoUsuario.sexo,
+                                suscriptions = obtenerCategoriasString(selectedCategories)
+                            )
+                            Toast.makeText(context, R.string.datos_actualizados, Toast.LENGTH_SHORT).show()
                         }) {
                             Text(text = "")
                             Icon(
