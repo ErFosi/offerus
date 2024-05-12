@@ -61,6 +61,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.offerus.R
 import com.offerus.navigation.AppScreens
+import com.offerus.services.suscribeToFCM
 import com.offerus.utils.AuthenticationException
 import com.offerus.utils.UserExistsException
 import com.offerus.viewModels.MainViewModel
@@ -201,8 +202,7 @@ fun LoginBox(
     }
     LaunchedEffect (sesionIniciada) {
         if (sesionIniciada){
-            // TODO suscribeToFCM(context)
-
+            suscribeToFCM(context)
             mainViewModel.iniciarListas()
             mainViewModel.actualizarInfoUsuario()
             navController.popBackStack()
