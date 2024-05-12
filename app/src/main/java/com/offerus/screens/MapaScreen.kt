@@ -37,11 +37,13 @@ import com.offerus.components.TopBarSecundario
 import com.offerus.components.mapa
 import com.offerus.ui.theme.OfferUSTheme
 import com.offerus.utils.isNetworkAvailable
+import com.offerus.utils.obtenerCategorias
 import com.offerus.viewModels.MainViewModel
 
 @Composable
 fun MapaScreen(
-    navController: NavHostController
+    navController: NavHostController,
+    viewModel: MainViewModel
 ){
     Scaffold(topBar = { TopBarSecundario(navController) }) {
             innerPadding ->
@@ -50,14 +52,14 @@ fun MapaScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            MapaScreenContent()
+            MapaScreenContent( viewModel = viewModel)
         }
     }
 }
 
 @Composable
 fun MapaScreenContent(
-
+    viewModel: MainViewModel
 ) {
     val context = LocalContext.current
 
@@ -92,12 +94,23 @@ fun MapaScreenContent(
 
 
         if (marcadores == null) {
-            // TODO OBTENER MARCADORES ??
-            /*viewModel.getMarcadores {
-                if (it != null) {
-                    marcadores = it
-                }
-            }*/
+            var listado = viewModel.listaSolicitudes
+            if (viewModel.selectedTabIndex == 1){
+                listado = viewModel.listaSolicitudes
+            }else{
+                listado = viewModel.listaOfertas
+            }
+            marcadores = listado.value.map {
+                            val categorias = obtenerCategorias(it.categorias)
+                            Marcador(
+                                nombre = it.titulo,
+                                latitud = it.latitud,
+                                longitud = it.longitud,
+                                precio = it.precio.toString()+'€',
+                                categoria = categorias.first(),
+                                categorias = categorias
+                            )
+                        }
         }
         val requestPermissionLauncher = rememberLauncherForActivityResult(
             ActivityResultContracts.RequestMultiplePermissions()
@@ -141,9 +154,8 @@ fun MapaScreenContent(
                 marcadores = marcadores!!,
                 permisoUbicacion = permisoUbicacion,
                 sePuedeDesplazar = true,
-                /*cameraPosition = CameraPosition.Builder()
-                    .target(LatLng(0.0, 0.0)) // TODO PONER LA UBICACICON DEL USUARIO
-                    .zoom(5f).build()*/
+                lat = viewModel.infoUsuario.value.latitud,
+                lon = viewModel.infoUsuario.value.longitud
             )
         }else{
             // TODO REVISAR SI ESTO ES NECESARIO
@@ -151,9 +163,8 @@ fun MapaScreenContent(
                 marcadores = listOf(),
                 permisoUbicacion = permisoUbicacion,
                 sePuedeDesplazar = true,
-                /*cameraPosition = CameraPosition.Builder()
-                    .target(LatLng(0.0, 0.0)) // TODO PONER LA UBICACICON DEL USUARIO
-                    .zoom(5f).build()*/
+                lat = viewModel.infoUsuario.value.latitud,
+                lon = viewModel.infoUsuario.value.longitud
             )
         }
     }

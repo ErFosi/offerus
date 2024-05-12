@@ -80,6 +80,8 @@ class MainViewModel @Inject constructor(
     var listaSolicitudesFavoritas = mutableStateOf(emptyList<ServicioPeticion>())
     var listaOfertasFavoritas = mutableStateOf(emptyList<ServicioPeticion>())
 
+    var selectedTabIndex by mutableStateOf(0)
+
 
     fun iniciarListas() {
         Log.d("iniciarListas", "INICIO - iniciando listas...")

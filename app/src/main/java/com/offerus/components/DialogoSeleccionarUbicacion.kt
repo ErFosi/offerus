@@ -70,7 +70,7 @@ fun DialogoSeleccionarUbicacion(
 
     val cameraPosition = CameraPosition.Builder().target(ubicacion).zoom(10f).build()
     val cameraPositionState = rememberCameraPositionState {
-        position = cameraPosition
+        position = if (lat != 0.0 && lon != 0.0) CameraPosition(LatLng(lat, lon), 15f, 0f, 0f) else CameraPosition(LatLng(0.0, 0.0), 15f, 0f, 0f)
     }
 
     val coroutineScope = rememberCoroutineScope()

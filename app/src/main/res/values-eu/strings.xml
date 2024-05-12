@@ -43,4 +43,5 @@
     <string name="invalid_fields">Pasahitzak 6 digitu izan behar ditu gutxienez, eta pasahitz berriak bat etorri behar dira</string>
     <string name="ubicacion_actualizada">Kokapena aldatu egin da</string>
     <string name="datos_actualizados" >Aldaketa zuzenki gorde da</string>
+    <string name="no_ubicacion">Adi: ez duzu kokapenik aukeratu</string>
 </resources>

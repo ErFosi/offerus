@@ -43,4 +43,5 @@
     <string name="invalid_fields">La nueva contraseña debe tener al menos 6 dígitos y las contraseñas deben coincidir.</string>
     <string name="ubicacion_actualizada">Ubicación actualizada correctamente</string>
     <string name="datos_actualizados" >Datos actualizados correctamente</string>
+    <string name="no_ubicacion">Aviso: no has seleccionado tu ubicación</string>
 </resources>
