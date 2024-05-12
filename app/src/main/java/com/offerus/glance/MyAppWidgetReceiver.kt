@@ -4,26 +4,21 @@ import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
 import androidx.glance.appwidget.state.updateAppWidgetState
 import androidx.glance.appwidget.updateAll
 import androidx.glance.state.PreferencesGlanceStateDefinition
-import com.offerus.model.repositories.UserDataRepository
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@AndroidEntryPoint
+
 class MyAppWidgetReceiver() : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = OfferusWidget()
     private val coroutineScope = MainScope()
-    @Inject
-    lateinit var userDataRepository: UserDataRepository
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
         super.onUpdate(context, appWidgetManager, appWidgetIds)
 
@@ -54,8 +49,6 @@ class MyAppWidgetReceiver() : GlanceAppWidgetReceiver() {
         }
     }
 
-    companion object {
-        val globalStandings = stringPreferencesKey("standings") // key para guardar los datos entiendo
-    }
+
 
 }

@@ -19,7 +19,6 @@ import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.provideContent
 import androidx.glance.appwidget.updateAll
-import androidx.glance.currentState
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
 import androidx.glance.layout.Column
@@ -34,7 +33,6 @@ import androidx.glance.text.TextAlign
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
 import com.offerus.R
-import java.util.prefs.Preferences
 
 class OfferusWidget : GlanceAppWidget() {
 
@@ -48,7 +46,7 @@ class OfferusWidget : GlanceAppWidget() {
 
     @Composable
     private fun Content() {
-        val prefs = currentState<Preferences>()
+
 
 
         Column(modifier = GlanceModifier.cornerRadius(8.dp).fillMaxSize().padding(8.dp)) {

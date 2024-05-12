@@ -684,11 +684,11 @@ class UserClient @Inject constructor() {
      * @Return Unit
      */
     @Throws(AuthenticationException::class, Exception::class)
-    suspend fun subscribeToFCM(token: String) {
+    suspend fun subscribeToFCM(tokenFCM: String) {
         val token = bearerTokenStorage.last().accessToken
         val response: HttpResponse = clienteHttp.post("https://offerus.zapto.org/suscribir_fcm") {
             header(HttpHeaders.Authorization, "Bearer $token")
-            parameter("fcm_client_token", token)
+            parameter("fcm_client_token", tokenFCM)
             accept(ContentType.Application.Json)
         }
 
