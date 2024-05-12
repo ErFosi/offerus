@@ -84,7 +84,7 @@ class UserClient @Inject constructor() {
                 when {
                     exception is ClientRequestException && exception.response.status == HttpStatusCode.Unauthorized -> throw AuthenticationException()
                     exception is ClientRequestException && exception.response.status == HttpStatusCode.BadRequest -> throw UserExistsException()
-                    exception is ClientRequestException && exception.response.status == HttpStatusCode.UnprocessableEntity -> throw UnprocessableEntityException()
+                    //exception is ClientRequestException && exception.response.status == HttpStatusCode.UnprocessableEntity -> throw UnprocessableEntityException()
                     exception  is ClientRequestException && exception.response.status == HttpStatusCode.Conflict -> throw DealNoPendienteException()
                     exception  is ClientRequestException && exception.response.status == HttpStatusCode.ExpectationFailed -> throw ContraseñaNoCoincideException()
                     else -> {
@@ -688,8 +688,9 @@ class UserClient @Inject constructor() {
         val token = bearerTokenStorage.last().accessToken
         val response: HttpResponse = clienteHttp.post("https://offerus.zapto.org/suscribir_fcm") {
             header(HttpHeaders.Authorization, "Bearer $token")
-            parameter("fcm_client_token", tokenFCM)
-            accept(ContentType.Application.Json)
+            contentType(ContentType.Application.Json)
+            setBody(mapOf("fcm_client_token" to tokenFCM))
+
         }
 
         when (response.status) {
