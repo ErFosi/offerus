@@ -385,7 +385,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun cargarListasPeticiones(){
-        val filter = BusquedaPeticionServicio("", "gratis,deporte,hogar,otros,entretenimiento,academico,online", 1000000000.0, 0.0, 1000000000.0, 0.0, 0.0, "precio_asc")
+        val filter = BusquedaPeticionServicio(null, null, null, null, null, null, null, "precio_asc")
         var respuesta: List<ServicioPeticion>
         try {
             viewModelScope.launch {
