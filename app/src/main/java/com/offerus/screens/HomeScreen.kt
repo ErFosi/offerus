@@ -77,7 +77,7 @@ fun HomeScreen(navController: NavController, viewModel: MainViewModel) {
                         text = { Text(title) })
                 }
             }
-
+/*
             // Mostrar la subpantalla correspondiente a la pestaña seleccionada
             when (selectedTabIndex.value) {
                 0 -> Entrantes(viewModel) {
@@ -88,6 +88,8 @@ fun HomeScreen(navController: NavController, viewModel: MainViewModel) {
                     navController.navigate(AppScreens.OfferDetailsScreen.route)
                 }
             }
+            */
+
         }
     }
 }
@@ -168,7 +170,7 @@ fun ReviewDialog(
         }
     }
 }
-
+/*
 @Composable
 fun Entrantes(viewModel: MainViewModel, onItemClick: () -> Unit) {
     //obtenemos la lista del viemodel
@@ -190,7 +192,7 @@ fun Entrantes(viewModel: MainViewModel, onItemClick: () -> Unit) {
         }
     }
 }
-
+*/
 @Composable
 fun EntrantesCard(deal: Deal, onItemClick: () -> Unit) {
     var context = LocalContext.current
@@ -227,7 +229,7 @@ fun BotonesEntrantes() {
         }
     }
 }
-
+/*
 @Composable
 fun Salientes(viewModel: MainViewModel, onMakeReview: () -> Unit, onItemClick: () -> Unit) {
     val listaSalientes = viewModel.listaSalientes
@@ -254,7 +256,7 @@ fun Salientes(viewModel: MainViewModel, onMakeReview: () -> Unit, onItemClick: (
         }
     }
 }
-
+*/
 @Composable
 fun SalientesCard(deal: Deal, onItemClick: () -> Unit) {
     var context = LocalContext.current
@@ -348,9 +350,3 @@ fun OfferInfo(
         accion()
     }
 }
-
-
-
-
-
-

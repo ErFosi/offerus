@@ -62,23 +62,24 @@ import com.offerus.viewModels.MainViewModel
 @Composable
 fun OfferDetails(
     navController: NavController,
-    viewModel: MainViewModel
+    mainViewModel: MainViewModel
 ) {
     Scaffold(topBar = { TopBarSecundario(navController) }) {
-        OfferDetailsContent(it, viewModel)
+        OfferDetailsContent(it, mainViewModel)
     }
 }
 
 @Composable
-fun OfferDetailsContent(paddingValues: PaddingValues, viewModel: MainViewModel) {
+fun OfferDetailsContent(paddingValues: PaddingValues, mainViewModel: MainViewModel) {
 
-    var servicioPeticion = viewModel.servicioDetalle.value ?: return
+    val servicioPeticion = mainViewModel.servicioDetalle.value ?: return
 
     // lista de categorias
     val categorias =
         servicioPeticion.categorias.replace("[", "").replace("]", "").split(", ").map { it.trim() }
 
-    val favorito = rememberSaveable { mutableStateOf(false) }
+    val favorito = rememberSaveable { mutableStateOf(mainViewModel.esPeticionFavorita(servicioPeticion.id)) }
+
 
     Surface {
         Column(
@@ -118,8 +119,16 @@ fun OfferDetailsContent(paddingValues: PaddingValues, viewModel: MainViewModel) 
                             }
                             //icono de favorito
                             IconButton(onClick = {
+
+                                if (favorito.value) {
+                                    mainViewModel.deleteFavorite(servicioPeticion.id)
+                                } else {
+                                    mainViewModel.addFavorite(servicioPeticion.id, servicioPeticion)
+                                }
                                 favorito.value = !favorito.value
+
                                 Log.d("favoritos", favorito.toString())
+
                             }) {
                                 if (favorito.value) {
                                     Icon(
@@ -279,7 +288,7 @@ fun OfferDetailsContent(paddingValues: PaddingValues, viewModel: MainViewModel) 
                 }
             }
 
-            BotonesDetalles(viewModel, servicioPeticion)
+            BotonesDetalles(mainViewModel, servicioPeticion)
         }
     }
 }
@@ -321,7 +330,7 @@ fun BotonesDetalles(viewModel: MainViewModel, servicioPeticion: ServicioPeticion
         Spacer(modifier = Modifier.width(16.dp))
 
         ElevatedButton(onClick = {
-            viewModel.crearDeal(servicioPeticion.id, servicioPeticion.username, "cuadron11")
+            //viewModel.crearDeal(servicioPeticion.id, servicioPeticion.username, "cuadron11")
             showToastOnMainThread(context, "Solicitud enviada")
 
         }) {
