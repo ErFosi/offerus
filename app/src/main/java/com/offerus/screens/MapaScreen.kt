@@ -141,9 +141,9 @@ fun MapaScreenContent(
                 marcadores = marcadores!!,
                 permisoUbicacion = permisoUbicacion,
                 sePuedeDesplazar = true,
-                cameraPosition = CameraPosition.Builder()
+                /*cameraPosition = CameraPosition.Builder()
                     .target(LatLng(0.0, 0.0)) // TODO PONER LA UBICACICON DEL USUARIO
-                    .zoom(5f).build()
+                    .zoom(5f).build()*/
             )
         }else{
             // TODO REVISAR SI ESTO ES NECESARIO
@@ -151,9 +151,9 @@ fun MapaScreenContent(
                 marcadores = listOf(),
                 permisoUbicacion = permisoUbicacion,
                 sePuedeDesplazar = true,
-                cameraPosition = CameraPosition.Builder()
+                /*cameraPosition = CameraPosition.Builder()
                     .target(LatLng(0.0, 0.0)) // TODO PONER LA UBICACICON DEL USUARIO
-                    .zoom(5f).build()
+                    .zoom(5f).build()*/
             )
         }
     }

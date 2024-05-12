@@ -193,20 +193,22 @@ fun LoginBox(
                 mostrarErrorLogin = true
                 sesionIniciada = false
             } catch (e: Exception) {
-                mostrarErrorLogin = true
+                mostrarErrorLogin = false
                 sesionIniciada = false
                 mostrarErrorConexion = true
             }
         }
     }
-    LaunchedEffect(sesionIniciada) {
-        if (sesionIniciada) {
+    LaunchedEffect (sesionIniciada) {
+        if (sesionIniciada){
             // TODO suscribeToFCM(context)
-            Log.d("iniciarListas", "Sesión iniciada")
+
             mainViewModel.iniciarListas()
+            mainViewModel.actualizarInfoUsuario()
             navController.popBackStack()
             navController.navigate(AppScreens.MainScreen.route)
         }
+
     }
 
     if (mostrarErrorLogin){

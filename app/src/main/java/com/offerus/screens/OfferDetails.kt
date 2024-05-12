@@ -191,10 +191,10 @@ fun OfferDetailsContent(paddingValues: PaddingValues, viewModel: MainViewModel) 
                                 permisoUbicacion = false,
                                 marcadores = listOf(marcador),
                                 sePuedeDesplazar = false,
-                                cameraPosition = CameraPosition.fromLatLngZoom(
+                                /*cameraPosition = CameraPosition.fromLatLngZoom(
                                     LatLng(servicioPeticion.latitud, servicioPeticion.longitud),
                                     15f
-                                ),
+                                ),*/
 
                                 )
                         }
@@ -220,7 +220,7 @@ fun OfferDetailsContent(paddingValues: PaddingValues, viewModel: MainViewModel) 
                                     verticalArrangement = Arrangement.Center,
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
-                                    UserAvatar(iniciales = "AC")
+                                    UserAvatar(username = servicioPeticion.username, viewModel = viewModel)
                                     Text(text = servicioPeticion.username, textAlign = TextAlign.Center)
                                     RatingBar(
                                         modifier = Modifier

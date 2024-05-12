@@ -528,7 +528,7 @@ class UserClient @Inject constructor() {
      * @Throws Exception
      * @Return Unit
      */
-    @Throws(AuthenticationException::class,UnprocessableEntityException::class ,ContraseñaNoCoincideException::class,Exception::class)
+    @Throws(AuthenticationException::class,UnprocessableEntityException::class, ContraseñaNoCoincideException::class ,Exception::class)
     suspend fun changePassword(request: ContraseñaChange) {
         val token = bearerTokenStorage.last().accessToken
         val jsonContent = Json.encodeToString(request)
@@ -539,7 +539,7 @@ class UserClient @Inject constructor() {
             setBody(jsonContent)
         }
 
-        when (response.status) {
+        /*when (response.status) {
             HttpStatusCode.OK -> Log.d("KTOR", "Contraseña modificada")
             HttpStatusCode.Unauthorized -> throw AuthenticationException()
             HttpStatusCode.ExpectationFailed -> throw ContraseñaNoCoincideException()
@@ -552,7 +552,7 @@ class UserClient @Inject constructor() {
             }
 
             else -> throw Exception("Failed to change password: HTTP ${response.status}")
-        }
+        }*/
     }
 
     /**

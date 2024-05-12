@@ -8,7 +8,6 @@ import android.graphics.Paint
 import android.location.Location
 import android.util.Log
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -23,6 +22,7 @@ import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapType
@@ -65,7 +65,9 @@ fun mapa(
     marcadores: List<Marcador>,
     permisoUbicacion: Boolean,
     sePuedeDesplazar: Boolean,
-    cameraPosition: CameraPosition = CameraPosition.Builder().target(LatLng(0.0, 0.0)).zoom(10f).build()
+    lat: Double = 43.0,
+    lon: Double = 44.0,
+
 ){
     val context = LocalContext.current
     var ubicacion: Location? by rememberSaveable { mutableStateOf(null) }
@@ -104,9 +106,9 @@ fun mapa(
             scrollGesturesEnabledDuringRotateOrZoom = false
         )
     }
-    val cameraPositionState = rememberCameraPositionState {
-        position = cameraPosition
-    }
+    val cameraPositionState = CameraPositionState (
+        position = CameraPosition(LatLng(lat, lon), 15f, 0f, 0f)
+    )
 
     GoogleMap(
         modifier = Modifier.fillMaxSize(),
@@ -115,7 +117,8 @@ fun mapa(
             mapType = MapType.HYBRID
         ),
         uiSettings = settings,
-        cameraPositionState = cameraPositionState
+        cameraPositionState = cameraPositionState,
+
 
     ){
 

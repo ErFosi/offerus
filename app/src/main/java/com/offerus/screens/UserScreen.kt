@@ -1,8 +1,12 @@
 package com.offerus.screens
 
+import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.net.Uri
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,6 +21,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -46,24 +51,29 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import androidx.navigation.NavHostController
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.rememberCameraPositionState
 import com.gowtham.ratingbar.RatingBar
 import com.gowtham.ratingbar.RatingBarStyle
 import com.offerus.Idioma
@@ -75,11 +85,17 @@ import com.offerus.components.Marcador
 import com.offerus.components.ProfilePicture
 import com.offerus.components.ThemeSwitcher
 import com.offerus.components.TopBarSecundario
+import com.offerus.components.createImageFileFromBitMap
+import com.offerus.components.getBipMapFromUri
 import com.offerus.components.languageSwitcher
 import com.offerus.components.mapa
 import com.offerus.navigation.AppScreens
 import com.offerus.ui.theme.OfferUSTheme
+import com.offerus.utils.ContraseñaNoCoincideException
+import com.offerus.utils.isNetworkAvailable
 import com.offerus.viewModels.MainViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.io.File
 
 
@@ -101,6 +117,7 @@ fun UserScreen(
 }
 
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun UserScreenContent(
     viewModel: MainViewModel,
@@ -131,6 +148,8 @@ fun UserScreenContent(
     val config = LocalConfiguration.current
     val context = LocalContext.current
     val booleanState by viewModel.tema.collectAsState(initial = true)
+    val coroutineScope = rememberCoroutineScope()
+    val infoUsuario = viewModel.infoUsuario.value
 
     Column(
         modifier = Modifier
@@ -156,40 +175,56 @@ fun UserScreenContent(
                 // Profile picture
                 var uri by remember { mutableStateOf<Uri?>(Uri.parse("")) }
                 if (uri == Uri.parse("")){
-                    if (true) { // TODO: check if there is internet connection
-                        /*try {
-                            viewModel.getProfilePicture { bitmap ->
-                                if (bitmap != null) {
-                                    uri = context.createImageFileFromBitMap(bitmap)
-                                }
-                            }
-                        }catch (e: NotFoundException){
-                            Log.d("Ajustes", "No se ha podido obtener la imagen de perfil")
-                        }*/
-
+                    if (isNetworkAvailable(context)) {
+                        coroutineScope.launch(Dispatchers.IO) {
+                            val bitmap = viewModel.getUserProfile(viewModel.usuario)
+                            uri = context.createImageFileFromBitMap(bitmap, infoUsuario.username)
+                            Log.d("uri", uri.toString())
+                        }
                     }else{
-                        /*Toast.makeText(
+                        Toast.makeText(
                             context,
                             R.string.no_internet_pic,
                             Toast.LENGTH_SHORT
-                        ).show()*/
+                        ).show()
                     }
-                    uri = "android.resource://com.offerus/drawable/baseline_adb_24".toUri()
+                    //uri = "android.resource://com.offerus/drawable/baseline_adb_24".toUri()
+                    uri = "file:///storage/emulated/0/Android/data/com.offerus/cache/JPEG_default_.jpg".toUri()
                 }
-
-                //image to show bottom sheet
-                ProfilePicture(
-                    directory = File("images"),
-                    uri = uri,
-                    onSetUri = {
-                        /*if (isNetworkAvailable(context)) context.getFileFromUri(it)?.let {
-                                it1 -> viewModel.subirFotoDePerfil(it1)
-                            uri = it
-                        }
-                        else Toast.makeText(context, R.string.no_internet_pic, Toast.LENGTH_SHORT).show()*/
-                    },
-                    editable = true
-                )
+                if (uri.toString() != "" || true) {
+                    //image to show bottom sheet
+                    ProfilePicture(
+                        directory = File("images"),
+                        uri = uri,
+                        onSetUri = {
+                            if (isNetworkAvailable(context)) context.getBipMapFromUri(it)
+                                ?.let { it1 ->
+                                    viewModel.uploadUserProfile(it1)
+                                    uri = it
+                                }
+                            else Toast.makeText(
+                                context,
+                                R.string.no_internet_pic,
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        },
+                        editable = true
+                    )
+                }/*else{
+                    Box(
+                        modifier = Modifier
+                            .size(120.dp) // Ajusta el tamaño del círculo según tus necesidades
+                            .background(color = MaterialTheme.colorScheme.primary, shape = CircleShape),
+                    ) {
+                        Text(
+                            text = infoUsuario.username.first().toString(),
+                            color = Color.White,
+                            fontSize = 50.sp,
+                            modifier = Modifier.align(Alignment.Center),
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }*/
             }
             Column(
                 modifier = Modifier
@@ -198,7 +233,7 @@ fun UserScreenContent(
                 horizontalAlignment = Alignment.Start
             ) {
                 Text(
-                    text = "User Name", // TODO: get user name
+                    text = viewModel.usuario,
                     style = MaterialTheme.typography.titleLarge,
                     modifier = Modifier.padding(start = 30.dp)
                 )
@@ -279,10 +314,20 @@ fun UserScreenContent(
                 modifier = Modifier
                     .padding(start = 30.dp, top = 20.dp, end = 20.dp)
                     .weight(1f)
-                    .clickable(onClick = { sobreMiExpanded = !sobreMiExpanded })
+                    .clickable(onClick = {
+                        sobreMiExpanded = !sobreMiExpanded
+                        contrasenaExpanded = false
+                        datosPersonalesExpanded = false
+                        suscripcionesExpanded = false
+                    })
             )
             IconButton(
-                onClick = { sobreMiExpanded = !sobreMiExpanded },
+                onClick = {
+                            sobreMiExpanded = !sobreMiExpanded
+                            contrasenaExpanded = false
+                            datosPersonalesExpanded = false
+                            suscripcionesExpanded = false
+                          },
                 modifier = Modifier.padding(top = 8.dp, end = 30.dp, bottom = 0.dp)
             ) {
                 Icon(
@@ -308,9 +353,9 @@ fun UserScreenContent(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = "aqui va el texto de sobre mi bhipavujsgbhdfgvuia sfvgoasdfvg yyaosidfvgygb asbfv ioalfvg ",
+                        text = infoUsuario.descripcion,
                         modifier = Modifier.width(270.dp)
-                    ) // TODO: get user description
+                    )
                     IconButton(
                         onClick = { sobreMiEdit = true },
                         modifier = Modifier.padding(top = 0.dp, end = 0.dp, bottom = 0.dp)
@@ -335,10 +380,20 @@ fun UserScreenContent(
                 modifier = Modifier
                     .padding(start = 30.dp, top = 20.dp, end = 20.dp)
                     .weight(1f)
-                    .clickable(onClick = { datosPersonalesExpanded = !datosPersonalesExpanded })
+                    .clickable(onClick = {
+                        datosPersonalesExpanded = !datosPersonalesExpanded
+                        contrasenaExpanded = false
+                        sobreMiExpanded = false
+                        suscripcionesExpanded = false
+                    })
             )
             IconButton(
-                onClick = { datosPersonalesExpanded = !datosPersonalesExpanded },
+                onClick = {
+                    datosPersonalesExpanded = !datosPersonalesExpanded
+                    contrasenaExpanded = false
+                    sobreMiExpanded = false
+                    suscripcionesExpanded = false
+                          },
                 modifier = Modifier.padding(top = 8.dp, end = 30.dp, bottom = 0.dp)
             ) {
                 Icon(
@@ -373,31 +428,31 @@ fun UserScreenContent(
                             Icon(Icons.Filled.Person, contentDescription = null, modifier = Modifier
                                 .padding(end = 5.dp)
                                 .size(20.dp))
-                            Text(text = "Nombre y apellidos") // TODO: get user name
+                            Text(text = infoUsuario.nombre_apellido)
                         }
                         Row(modifier = Modifier.padding(vertical = 5.dp), verticalAlignment = Alignment.CenterVertically) {
                             Icon(Icons.Filled.Phone, contentDescription = null, modifier = Modifier
                                 .padding(end = 5.dp)
                                 .size(20.dp))
-                            Text(text = "Telefono") // TODO: get user name
+                            Text(text = infoUsuario.telefono)
                         }
                         Row(modifier = Modifier.padding(vertical = 5.dp), verticalAlignment = Alignment.CenterVertically) {
                             Icon(Icons.Filled.Email, contentDescription = null, modifier = Modifier
                                 .padding(end = 5.dp)
                                 .size(20.dp))
-                            Text(text = "Email") // TODO: get user name
+                            Text(text = infoUsuario.mail)
                         }
                         Row(modifier = Modifier.padding(vertical = 5.dp), verticalAlignment = Alignment.CenterVertically) {
                             Icon(Icons.Filled.DateRange, contentDescription = null, modifier = Modifier
                                 .padding(end = 5.dp)
                                 .size(20.dp))
-                            Text(text = "Edad") // TODO: get user name
+                            Text(text = infoUsuario.edad.toString())
                         }
                         Row(modifier = Modifier.padding(vertical = 5.dp), verticalAlignment = Alignment.CenterVertically) {
                             Icon(painter = painterResource(R.drawable.gender), contentDescription = null, modifier = Modifier
                                 .padding(end = 5.dp)
                                 .size(20.dp))
-                            Text(text = "Sexo") // TODO: get user name
+                            Text(text = infoUsuario.sexo)
                         }
                     }
                     IconButton(
@@ -423,10 +478,20 @@ fun UserScreenContent(
                 modifier = Modifier
                     .padding(start = 30.dp, top = 20.dp, end = 20.dp)
                     .weight(1f)
-                    .clickable(onClick = { suscripcionesExpanded = !suscripcionesExpanded })
+                    .clickable(onClick = {
+                        suscripcionesExpanded = !suscripcionesExpanded
+                        contrasenaExpanded = false
+                        datosPersonalesExpanded = false
+                        sobreMiExpanded = false
+                    })
             )
             IconButton(
-                onClick = { suscripcionesExpanded = !suscripcionesExpanded },
+                onClick = {
+                    suscripcionesExpanded = !suscripcionesExpanded
+                    contrasenaExpanded = false
+                    datosPersonalesExpanded = false
+                    sobreMiExpanded = false
+                          },
                 modifier = Modifier.padding(top = 8.dp, end = 30.dp, bottom = 0.dp)
             ) {
                 Icon(
@@ -534,10 +599,16 @@ fun UserScreenContent(
                 modifier = Modifier
                     .padding(start = 30.dp, top = 20.dp, end = 20.dp)
                     .weight(1f)
-                    .clickable(onClick = { contrasenaExpanded = !contrasenaExpanded })
+                    .clickable(onClick = { contrasenaExpanded = !contrasenaExpanded
+                        suscripcionesExpanded = false
+                        datosPersonalesExpanded = false
+                        sobreMiExpanded = false})
             )
             IconButton(
-                onClick = { contrasenaExpanded = !contrasenaExpanded },
+                onClick = { contrasenaExpanded = !contrasenaExpanded
+                    suscripcionesExpanded = false
+                    datosPersonalesExpanded = false
+                    sobreMiExpanded = false},
                 modifier = Modifier.padding(top = 8.dp, end = 30.dp, bottom = 0.dp)
             ) {
                 Icon(
@@ -617,22 +688,56 @@ fun UserScreenContent(
                         horizontalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
                         OutlinedButton(onClick = {
-                            /*TODO*/
+                            oldPass = ""
+                            password = ""
+                            confirmPassword = ""
+                            contrasenaExpanded = false
                         }) {
                             Icon(
                                 imageVector = Icons.Default.Clear,
                                 contentDescription = ""// stringResource(R.string.Cancelar)
                             )
                         }
-
+                        var toast by rememberSaveable {
+                            mutableStateOf(-1)
+                        }
                         Button(onClick = {
-                            /*TODO*/
+                            if (validateFields(oldPass, password, confirmPassword)){
+                                coroutineScope.launch(Dispatchers.IO) {
+                                    try {
+                                        viewModel.modifyPassword(oldPass, password)
+                                        viewModel.setUsuarioLogueado(infoUsuario.username, password)
+                                        oldPass = ""
+                                        password = ""
+                                        confirmPassword = ""
+                                        contrasenaExpanded = false
+                                        toast = 0
+                                    } catch (e: ContraseñaNoCoincideException) {
+                                        toast = 1
+
+                                    } catch (e: Exception) {
+                                        toast = 2
+                                    }
+                                }
+
+                            }else{
+                                Toast.makeText(context, R.string.invalid_fields, Toast.LENGTH_SHORT).show()
+                            }
+
                         }) {
                             Text(text = "")
                             Icon(
                                 imageVector = Icons.Default.Check,
                                 contentDescription = ""//stringResource(R.string.Borrar)
                             )
+                        }
+                        when (toast) {
+                            0 -> {  Toast.makeText(context, R.string.datos_actualizados, Toast.LENGTH_SHORT).show()
+                                toast = -1}
+                            1 -> {  Toast.makeText(context, R.string.contrasena_incorrecta, Toast.LENGTH_SHORT).show()
+                                toast = -1}
+                            2 -> { Toast.makeText(context, R.string.no_internet, Toast.LENGTH_SHORT).show()
+                                toast = -1}
                         }
                     }
                 }
@@ -641,14 +746,48 @@ fun UserScreenContent(
 
         if (sobreMiEdit){
             DialogoSobreMi(
+                sobreMiOld = infoUsuario.descripcion,
                 onDismissRequest = { sobreMiEdit = false },
-                onConfirmation = { sobreMiEdit = false /*TODO*/ }
+                onConfirmation = {
+                    sobreMiEdit = false
+                    //sobreMiExpanded = false
+                    viewModel.updateUserData(
+                        fullName = infoUsuario.nombre_apellido,
+                        age = infoUsuario.edad,
+                        email = infoUsuario.mail,
+                        phone = infoUsuario.telefono,
+                        sex = infoUsuario.sexo,
+                        lat = infoUsuario.latitud,
+                        lon = infoUsuario.longitud,
+                        descr = it,
+                        suscriptions = infoUsuario.suscripciones
+                    )
+                    //viewModel.actualizarInfoUsuario()
+                    Toast.makeText(context, R.string.datos_actualizados, Toast.LENGTH_SHORT).show()
+                }
             )
         }
         if (datosPersonalesEdit) {
             DialogoDatosPersonales(
+                infoUsuario = infoUsuario,
                 onDismissRequest = { datosPersonalesEdit = false },
-                onConfirmation = { datosPersonalesEdit = false /*TODO*/ }
+                onConfirmation = {
+                    datosPersonalesEdit = false
+                    //datosPersonalesExpanded = false
+                    viewModel.updateUserData(
+                        fullName = it.nombre_apellido,
+                        age = it.edad,
+                        email = it.mail,
+                        phone = it.telefono,
+                        sex = it.sexo,
+                        lat = infoUsuario.latitud,
+                        lon = infoUsuario.longitud,
+                        descr = infoUsuario.descripcion,
+                        suscriptions = infoUsuario.suscripciones
+                    )
+                    //viewModel.actualizarInfoUsuario()
+                    Toast.makeText(context, R.string.datos_actualizados, Toast.LENGTH_SHORT).show()
+                }
             )
         }
 
@@ -687,15 +826,14 @@ fun UserScreenContent(
                     .height(200.dp),
             ){
                 val marcador1 = Marcador(
-                    // TODO poner aquí la ubicación del usuarioo
-                    latitud = 43.2628005,
-                    longitud = -2.9479811,
-                    nombre = "Mi ubicación",
+                    latitud = infoUsuario.latitud,
+                    longitud = infoUsuario.longitud,
+                    nombre = stringResource(id = R.string.miubicacion),
                     categoria = "null",
                     precio = "null"
                 )
-                val marcador2 = Marcador(
-                    // TODO poner aquí la ubicación del usuarioo
+
+                /*val marcador2 = Marcador(
                     latitud = 43.2628005,
                     longitud = -2.9479819,
                     nombre = "Mi ubicación",
@@ -703,25 +841,44 @@ fun UserScreenContent(
                     precio = "null"
                 )
                 val marcador3 = Marcador(
-                    // TODO poner aquí la ubicación del usuarioo
                     latitud = 43.2628405,
                     longitud = -2.9479834,
                     nombre = "Mi ubicación",
                     categoria = "Deporte",
                     precio = "null"
-                )
+                )*/
+
                 mapa(
                     permisoUbicacion = false,
-                    marcadores = listOf(marcador1, marcador2, marcador3),
+                    marcadores = listOf(marcador1),
                     sePuedeDesplazar = false,
-                    cameraPosition = CameraPosition.fromLatLngZoom(LatLng(marcador1.latitud, marcador1.longitud), 15F)
+                    lat = infoUsuario.latitud,
+                    lon = infoUsuario.longitud
                 )
             }
         }
         if (ubicacionEdit) {
             DialogoSeleccionarUbicacion(
+                lat= infoUsuario.latitud,
+                lon= infoUsuario.longitud,
                 onDismissRequest = { ubicacionEdit = false },
-                onConfirmation = { ubicacionEdit = false /*TODO*/ }
+                onConfirmation = {
+
+                    viewModel.updateUserData(
+                        fullName = infoUsuario.nombre_apellido,
+                        age = infoUsuario.edad,
+                        email = infoUsuario.mail,
+                        phone = infoUsuario.telefono,
+                        sex = infoUsuario.sexo,
+                        lat = it.latitude,
+                        lon = it.longitude,
+                        descr = infoUsuario.descripcion,
+                        suscriptions = infoUsuario.suscripciones
+                    )
+                    //viewModel.actualizarInfoUsuario()
+                    ubicacionEdit = false
+                    Toast.makeText(context, R.string.ubicacion_actualizada, Toast.LENGTH_SHORT).show()
+                }
             )
         }
 
@@ -753,7 +910,7 @@ fun UserScreenContent(
 
             Row(
                 modifier = Modifier
-                    .padding(start = 80.dp, end = 80.dp , bottom = 20.dp)
+                    .padding(start = 80.dp, end = 80.dp, bottom = 20.dp)
                     .width(350.dp),
                 horizontalArrangement = Arrangement.Center
             ) {
@@ -789,7 +946,7 @@ fun validateFields(
     password: String,
     confirmPassword: String,
 ): Boolean {
-    return oldPass.isNotBlank() && password.isNotBlank() && confirmPassword.isNotBlank() && password == confirmPassword
+    return oldPass.isNotBlank() && password.isNotBlank() && confirmPassword.isNotBlank() && password == confirmPassword && password.length >= 6 && oldPass.length >= 6
 }
 
 
