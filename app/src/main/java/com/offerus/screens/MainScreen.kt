@@ -11,8 +11,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -22,6 +25,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -37,10 +41,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
@@ -69,6 +75,7 @@ fun MainScreen(
     navControllerMain: NavHostController,
     mainViewModel: MainViewModel
 ){
+    mainViewModel.iniciarListas()
 
     //navControler para el BOTTOM BAR
     val navController = rememberNavController()
@@ -117,7 +124,7 @@ fun MainScreen(
                 }
                 composable(BottomBarRoute.SEARCH) {
                     // Contenido de la pestaña Team
-                    OffersScreen(mainViewModel = mainViewModel, myOffers = false, navController = navControllerMain, myLikes = false)
+                    OffersScreen(mainViewModel = mainViewModel, navController = navControllerMain)
                 }
                 composable(BottomBarRoute.MYOFFERS) {
                     // Contenido de la pestaña Table
@@ -208,9 +215,20 @@ fun ToolBar(
                         modifier = Modifier
                             .padding(end = 8.dp)
                             .clickable { onUserClick() }) {
-                        UserAvatar(username, viewModel)
+                        UserAvatar("AC")
                         Text(text = username, fontSize = 12.sp, lineHeight = 12.sp)
                     }
+                    Spacer(
+                        modifier = Modifier
+
+                            .height(32.dp)
+
+                            .width(2.dp)
+                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.25f))
+                    )
+
+
+
                 }
             }
 

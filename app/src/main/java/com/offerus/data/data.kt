@@ -28,6 +28,7 @@ data class ServicioPeticion(
     val longitud: Double,
     val categorias: String
 )
+
 @Immutable
 @Serializable
 @Entity(tableName = "Deal")

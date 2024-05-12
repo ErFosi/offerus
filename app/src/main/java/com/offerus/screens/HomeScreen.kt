@@ -96,6 +96,8 @@ fun HomeScreen(navController: NavController, viewModel: MainViewModel) {
                     navController.navigate(AppScreens.OfferDetailsScreen.route)
                 }
             }
+
+
         }
     }
 }
