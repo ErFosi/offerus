@@ -148,9 +148,9 @@ fun DialogoSeleccionarUbicacion(
                                 }
                             }
                         },
-                        modifier = Modifier.padding(horizontal = 20.dp).fillMaxWidth()
+                        modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 10.dp).fillMaxWidth()
                     ) {
-                        Text(text = stringResource(id = R.string.seleccionarMiUbicacion))
+                        Text(text = stringResource(id = R.string.seleccionarMiUbicacion), textAlign = TextAlign.Center )
                     }
                 }
 
@@ -158,7 +158,7 @@ fun DialogoSeleccionarUbicacion(
                     onClick = { abrirMapa = !abrirMapa },
                     modifier = Modifier.padding(horizontal = 20.dp).fillMaxWidth()
                 ) {
-                    Text(text = stringResource(id = R.string.ubicacionMapa))
+                    Text(text = stringResource(id = R.string.ubicacionMapa), textAlign = TextAlign.Center)
                 }
                 AnimatedVisibility(visible = abrirMapa) {
                     Column(

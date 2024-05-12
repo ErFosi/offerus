@@ -182,12 +182,14 @@ fun ProfilePicture(
                             .align(Alignment.BottomEnd),
                     ) {
                         Icon(
-                            painter = painterResource(id = R.drawable.baseline_add_circle_24),
+                            painter = painterResource(id = R.drawable.baseline_add_24),
                             contentDescription = null,
                             modifier = Modifier
+                                .background(MaterialTheme.colorScheme.secondaryContainer)
                                 .size(40.dp),
                             //.padding(bottom = SpacingSmall),
-                            tint = MaterialTheme.colorScheme.secondaryContainer
+                            tint = MaterialTheme.colorScheme.tertiaryContainer,
+
                         )
                     }
                 }
@@ -305,10 +307,10 @@ fun Context.createImageFile(): File {
     return image
 }
 
-fun Context.createImageFileFromBitMap(bitmap: Bitmap): Uri {
+fun Context.createImageFileFromBitMap(bitmap: Bitmap, username: String): Uri {
     // Create an image file name
-    val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
-    val imageFileName = "JPEG_" + timeStamp + "_"
+    //val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+    val imageFileName = "JPEG_" + username + "_"
     val imageFile = File(externalCacheDir, "${imageFileName}.jpg")
 
     // Write the bitmap to the file
@@ -328,7 +330,7 @@ fun Context.getBipMapFromUri(uri: Uri): Bitmap? {
         val outputStream = ByteArrayOutputStream()
         
         try {
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 50, outputStream)
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 20, outputStream)
             val compressedByteArray = outputStream.toByteArray()
             BitmapFactory.decodeByteArray(compressedByteArray, 0, compressedByteArray.size)
 

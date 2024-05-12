@@ -148,12 +148,13 @@ fun OffersScreen(
 
             Spacer(modifier = Modifier.height(20.dp))
             SubPageSearch(
+                mainViewModel = mainViewModel,
                 onOpenFilterDialog = {  openFilterDialog.value = true },
                 myOffers = myOffers,
                 navController = navController,
                 onOpenCreateDialog = { openCreateDialog.value = true }
             )
-            ListaOfertas(myOffers = myOffers, onItemClick = {navController.navigate(AppScreens.OfferDetailsScreen.route)} )
+            ListaOfertas(mainViewModel = mainViewModel, myOffers = myOffers, onItemClick = {navController.navigate(AppScreens.OfferDetailsScreen.route)} )
 
 
 
@@ -166,6 +167,7 @@ fun OffersScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SubPageSearch(
+    mainViewModel: MainViewModel,
     navController: NavController,
     onOpenFilterDialog: () -> Unit,
     myOffers: Boolean,
@@ -239,7 +241,7 @@ fun SubPageSearch(
 
 
         }
-        ListaOfertas(myOffers = myOffers, onItemClick = {navController.navigate(AppScreens.OfferDetailsScreen.route)} )
+        ListaOfertas(mainViewModel = mainViewModel, myOffers = myOffers, onItemClick = {navController.navigate(AppScreens.OfferDetailsScreen.route)} )
         if ( myOffers ) {
             Box(
                 modifier = Modifier
@@ -630,7 +632,7 @@ fun DropdownCategorias(
 }
 
 @Composable
-fun ListaOfertas(onItemClick: () -> Unit, myOffers: Boolean) {
+fun ListaOfertas(mainViewModel: MainViewModel, onItemClick: () -> Unit, myOffers: Boolean) {
     //obtenemos la lista del viemodel
     var listaEntrantes = createDealListExample()
     //mostramos la lista
@@ -641,14 +643,14 @@ fun ListaOfertas(onItemClick: () -> Unit, myOffers: Boolean) {
     ) {
         LazyColumn {
             items(listaEntrantes.size) { index ->
-                OfertasCard(deal = listaEntrantes[index], myOffers = myOffers, onItemClick = onItemClick)
+                OfertasCard(viewModel = mainViewModel, deal = listaEntrantes[index], myOffers = myOffers, onItemClick = onItemClick)
             }
         }
     }
 }
 
 @Composable
-fun OfertasCard(deal: Deal, onItemClick: () -> Unit, myOffers: Boolean) {
+fun OfertasCard(viewModel: MainViewModel, deal: Deal, onItemClick: () -> Unit, myOffers: Boolean) {
     var context = LocalContext.current
     Card(
         modifier = Modifier
@@ -656,7 +658,7 @@ fun OfertasCard(deal: Deal, onItemClick: () -> Unit, myOffers: Boolean) {
             .clickable(onClick = onItemClick)
     ) {
 
-        OfferInfo(deal = deal) {
+        OfferInfo(usuario = deal.username_host, viewModel = viewModel, deal = deal) {
             if ( myOffers ) {
                 BotonesMisOfertas()
             } else {

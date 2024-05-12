@@ -223,7 +223,7 @@ fun OfferDetailsContent(paddingValues: PaddingValues, viewModel: MainViewModel) 
                                     verticalArrangement = Arrangement.Center,
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
-                                    UserAvatar(iniciales = "AC")
+                                    UserAvatar(username = servicioPeticion.username, viewModel = viewModel)
                                     Text(text = servicioPeticion.username, textAlign = TextAlign.Center)
                                     RatingBar(
                                         modifier = Modifier

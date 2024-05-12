@@ -1,9 +1,12 @@
 package com.offerus.screens
 
+import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.net.Uri
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,6 +21,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -52,16 +56,19 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import androidx.navigation.NavHostController
 import com.google.android.gms.maps.model.CameraPosition
@@ -110,6 +117,7 @@ fun UserScreen(
 }
 
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun UserScreenContent(
     viewModel: MainViewModel,
@@ -168,9 +176,10 @@ fun UserScreenContent(
                 var uri by remember { mutableStateOf<Uri?>(Uri.parse("")) }
                 if (uri == Uri.parse("")){
                     if (isNetworkAvailable(context)) {
-                        val bitmap = viewModel.getUserProfile(viewModel.usuario)
-                        if (bitmap != null) {
-                            uri = context.createImageFileFromBitMap(bitmap)
+                        coroutineScope.launch(Dispatchers.IO) {
+                            val bitmap = viewModel.getUserProfile(viewModel.usuario)
+                            uri = context.createImageFileFromBitMap(bitmap, infoUsuario.username)
+                            Log.d("uri", uri.toString())
                         }
                     }else{
                         Toast.makeText(
@@ -179,22 +188,43 @@ fun UserScreenContent(
                             Toast.LENGTH_SHORT
                         ).show()
                     }
-                    uri = "android.resource://com.offerus/drawable/baseline_adb_24".toUri()
+                    //uri = "android.resource://com.offerus/drawable/baseline_adb_24".toUri()
+                    uri = "file:///storage/emulated/0/Android/data/com.offerus/cache/JPEG_default_.jpg".toUri()
                 }
-
-                //image to show bottom sheet
-                ProfilePicture(
-                    directory = File("images"),
-                    uri = uri,
-                    onSetUri = {
-                        if (isNetworkAvailable(context)) context.getBipMapFromUri(it)?.let {
-                                it1 -> viewModel.uploadUserProfile(it1)
-                            uri = it
-                        }
-                        else Toast.makeText(context, R.string.no_internet_pic, Toast.LENGTH_SHORT).show()
-                    },
-                    editable = true
-                )
+                if (uri.toString() != "" || true) {
+                    //image to show bottom sheet
+                    ProfilePicture(
+                        directory = File("images"),
+                        uri = uri,
+                        onSetUri = {
+                            if (isNetworkAvailable(context)) context.getBipMapFromUri(it)
+                                ?.let { it1 ->
+                                    viewModel.uploadUserProfile(it1)
+                                    uri = it
+                                }
+                            else Toast.makeText(
+                                context,
+                                R.string.no_internet_pic,
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        },
+                        editable = true
+                    )
+                }/*else{
+                    Box(
+                        modifier = Modifier
+                            .size(120.dp) // Ajusta el tamaño del círculo según tus necesidades
+                            .background(color = MaterialTheme.colorScheme.primary, shape = CircleShape),
+                    ) {
+                        Text(
+                            text = infoUsuario.username.first().toString(),
+                            color = Color.White,
+                            fontSize = 50.sp,
+                            modifier = Modifier.align(Alignment.Center),
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }*/
             }
             Column(
                 modifier = Modifier
@@ -284,10 +314,20 @@ fun UserScreenContent(
                 modifier = Modifier
                     .padding(start = 30.dp, top = 20.dp, end = 20.dp)
                     .weight(1f)
-                    .clickable(onClick = { sobreMiExpanded = !sobreMiExpanded })
+                    .clickable(onClick = {
+                        sobreMiExpanded = !sobreMiExpanded
+                        contrasenaExpanded = false
+                        datosPersonalesExpanded = false
+                        suscripcionesExpanded = false
+                    })
             )
             IconButton(
-                onClick = { sobreMiExpanded = !sobreMiExpanded },
+                onClick = {
+                            sobreMiExpanded = !sobreMiExpanded
+                            contrasenaExpanded = false
+                            datosPersonalesExpanded = false
+                            suscripcionesExpanded = false
+                          },
                 modifier = Modifier.padding(top = 8.dp, end = 30.dp, bottom = 0.dp)
             ) {
                 Icon(
@@ -340,10 +380,20 @@ fun UserScreenContent(
                 modifier = Modifier
                     .padding(start = 30.dp, top = 20.dp, end = 20.dp)
                     .weight(1f)
-                    .clickable(onClick = { datosPersonalesExpanded = !datosPersonalesExpanded })
+                    .clickable(onClick = {
+                        datosPersonalesExpanded = !datosPersonalesExpanded
+                        contrasenaExpanded = false
+                        sobreMiExpanded = false
+                        suscripcionesExpanded = false
+                    })
             )
             IconButton(
-                onClick = { datosPersonalesExpanded = !datosPersonalesExpanded },
+                onClick = {
+                    datosPersonalesExpanded = !datosPersonalesExpanded
+                    contrasenaExpanded = false
+                    sobreMiExpanded = false
+                    suscripcionesExpanded = false
+                          },
                 modifier = Modifier.padding(top = 8.dp, end = 30.dp, bottom = 0.dp)
             ) {
                 Icon(
@@ -428,10 +478,20 @@ fun UserScreenContent(
                 modifier = Modifier
                     .padding(start = 30.dp, top = 20.dp, end = 20.dp)
                     .weight(1f)
-                    .clickable(onClick = { suscripcionesExpanded = !suscripcionesExpanded })
+                    .clickable(onClick = {
+                        suscripcionesExpanded = !suscripcionesExpanded
+                        contrasenaExpanded = false
+                        datosPersonalesExpanded = false
+                        sobreMiExpanded = false
+                    })
             )
             IconButton(
-                onClick = { suscripcionesExpanded = !suscripcionesExpanded },
+                onClick = {
+                    suscripcionesExpanded = !suscripcionesExpanded
+                    contrasenaExpanded = false
+                    datosPersonalesExpanded = false
+                    sobreMiExpanded = false
+                          },
                 modifier = Modifier.padding(top = 8.dp, end = 30.dp, bottom = 0.dp)
             ) {
                 Icon(
@@ -539,10 +599,16 @@ fun UserScreenContent(
                 modifier = Modifier
                     .padding(start = 30.dp, top = 20.dp, end = 20.dp)
                     .weight(1f)
-                    .clickable(onClick = { contrasenaExpanded = !contrasenaExpanded })
+                    .clickable(onClick = { contrasenaExpanded = !contrasenaExpanded
+                        suscripcionesExpanded = false
+                        datosPersonalesExpanded = false
+                        sobreMiExpanded = false})
             )
             IconButton(
-                onClick = { contrasenaExpanded = !contrasenaExpanded },
+                onClick = { contrasenaExpanded = !contrasenaExpanded
+                    suscripcionesExpanded = false
+                    datosPersonalesExpanded = false
+                    sobreMiExpanded = false},
                 modifier = Modifier.padding(top = 8.dp, end = 30.dp, bottom = 0.dp)
             ) {
                 Icon(

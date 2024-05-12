@@ -34,12 +34,15 @@ import com.offerus.utils.UserExistsException
 import com.offerus.utils.showToastOnMainThread
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import kotlin.coroutines.resume
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
@@ -294,18 +297,20 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun getUserProfile(username: String): Bitmap {
-        var bitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888)
-        try {
-            viewModelScope.launch {
-                bitmap = httpUserClient.descargarImagenDeUsuario(username)
-                Log.e("KTOR", "Perfil de usuario conseguida")
+    suspend fun getUserProfile(username: String): Bitmap {
+        return suspendCancellableCoroutine { continuation ->
+            try {
+                viewModelScope.launch {
+                    val bitmap = httpUserClient.descargarImagenDeUsuario(username)
+                    Log.e("viewmodel", "Perfil de usuario conseguida")
+                    continuation.resume(bitmap)
+                }
+            } catch (e: Exception) {
+                Log.e("KTOR", e.toString())
+                val defaultBitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888)
+                continuation.resume(defaultBitmap)
             }
-        } catch (e: Exception) {
-            Log.e("KTOR", e.toString())
-
         }
-        return bitmap
     }
 
     fun uploadUserProfile(bitmap: Bitmap) {

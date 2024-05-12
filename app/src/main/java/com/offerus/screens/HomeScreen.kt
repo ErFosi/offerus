@@ -198,7 +198,7 @@ fun EntrantesCard(deal: Deal, viewModel: MainViewModel, onItemClick: () -> Unit)
             .padding(8.dp)
             .clickable(onClick = onItemClick)
     ) {
-        OfferInfo(deal = deal) { BotonesEntrantes(onAccept = {viewModel.dealAcceptDeny(deal.id, true)}) {viewModel.dealAcceptDeny(deal.id, false)} }
+        OfferInfo(viewModel = viewModel, usuario = deal.username_host ,deal = deal) { BotonesEntrantes(onAccept = {viewModel.dealAcceptDeny(deal.id, true)}) {viewModel.dealAcceptDeny(deal.id, false)} }
     }
 }
 
@@ -241,7 +241,7 @@ fun Salientes(viewModel: MainViewModel, onMakeReview: () -> Unit, onItemClick: (
     ) {
         LazyColumn {
             items(listaSalientes.size) { index ->
-                SalientesCard(deal = listaSalientes[index]) {
+                SalientesCard(viewModel = viewModel,deal = listaSalientes[index]) {
                     if (listaSalientes[index].estado == "Aceptada") {
                         viewModel.dealReview = listaSalientes[index]
                         onMakeReview()
@@ -257,7 +257,7 @@ fun Salientes(viewModel: MainViewModel, onMakeReview: () -> Unit, onItemClick: (
 }
 
 @Composable
-fun SalientesCard(deal: Deal, onItemClick: () -> Unit) {
+fun SalientesCard(deal: Deal, viewModel: MainViewModel, onItemClick: () -> Unit) {
     var context = LocalContext.current
     Card(
         modifier = Modifier
@@ -272,7 +272,9 @@ fun SalientesCard(deal: Deal, onItemClick: () -> Unit) {
                     })
             }
     ) {
-        OfferInfo(deal = deal) {
+        OfferInfo(deal = deal,
+            viewModel = viewModel,
+            usuario = deal.username_host) {
             //estado aleatorio entre pendiente, aceptada y rechazada
             IconoEstado(estado = deal.estado)
         }
@@ -320,7 +322,10 @@ fun IconoEstado(estado: String) {
 
 @Composable
 fun OfferInfo(
-    deal: Deal, accion: @Composable () -> Unit = {}
+    usuario: String,
+    viewModel: MainViewModel,
+    deal: Deal, accion: @Composable () -> Unit = {},
+
 ) {
     Row(
         modifier = Modifier
@@ -333,7 +338,7 @@ fun OfferInfo(
         Column(
             horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(4.dp)
         ) {
-            UserAvatar(iniciales = "AC")
+            UserAvatar(viewModel = viewModel, username = usuario)
             Text(text = deal.username_host)
         }
 

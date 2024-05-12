@@ -2,7 +2,8 @@ package com.offerus.screens
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import androidx.compose.foundation.background
+import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,7 +13,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -31,26 +31,36 @@ import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.offerus.R
+import com.offerus.components.ProfilePicture
+import com.offerus.components.createImageFileFromBitMap
 import com.offerus.navigation.AppScreens
 import com.offerus.navigation.BottomBarRoute
 import com.offerus.navigation.SECTIONS
+import com.offerus.utils.isNetworkAvailable
 import com.offerus.viewModels.MainViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.io.File
+import java.net.URI
 
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @SuppressLint("UnrememberedMutableState")
@@ -83,8 +93,10 @@ fun MainScreen(
     Scaffold(
         topBar = { ToolBar(
                 mainViewModel.usuario,
+                viewModel = mainViewModel,
+                onFavoritesClick = { navControllerMain.navigate(route = AppScreens.Favorites.route) },
                 onUserClick = {navControllerMain.navigate(route = AppScreens.UserScreen.route) }
-        ) { navControllerMain.navigate(route = AppScreens.Favorites.route) }
+        )
         },
         bottomBar = { if (enableBottomNavigation){
             AppBottomBar(selectedDestination, onNavigateToSection)
@@ -154,7 +166,8 @@ fun AppBottomBar(currentRoute: String?, onNavigate: (String) -> Unit) {
 fun ToolBar(
     username: String,
     onUserClick: () -> Unit,
-    onFavoritesClick: () -> Unit
+    onFavoritesClick: () -> Unit,
+    viewModel: MainViewModel
 ) {
     var context = LocalContext.current
     if(username!=null) {
@@ -196,7 +209,7 @@ fun ToolBar(
                         modifier = Modifier
                             .padding(end = 8.dp)
                             .clickable { onUserClick() }) {
-                        UserAvatar("AC")
+                        UserAvatar(username, viewModel)
                         Text(text = username, fontSize = 12.sp, lineHeight = 12.sp)
                     }
                 }
@@ -206,9 +219,37 @@ fun ToolBar(
     }
 }
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @Composable
-fun UserAvatar(iniciales: String) {
-    Box(
+fun UserAvatar(username: String, viewModel: MainViewModel) {
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    var uri by remember { mutableStateOf<Uri>(Uri.parse("file:///storage/emulated/0/Android/data/com.offerus/cache/JPEG_${username}_.jpg")) }
+
+    val file = File(URI.create(uri.toString()))
+    if (!file.exists()){
+        uri = "file:///storage/emulated/0/Android/data/com.offerus/cache/JPEG_default_.jpg".toUri()
+    }
+    if (!file.exists() || true){
+        if (isNetworkAvailable(context)) {
+            coroutineScope.launch(Dispatchers.IO) {
+                val bitmap = viewModel.getUserProfile(viewModel.usuario)
+                uri = context.createImageFileFromBitMap(bitmap, username)
+                //Log.d("uri", uri.toString())
+            }
+        }
+    }
+    Box(modifier = Modifier.size(30.dp)){
+        ProfilePicture(
+            directory = File("images"),
+            uri = uri,
+            onSetUri = {},
+            editable = false
+        )
+    }
+
+
+    /*Box(
         modifier = Modifier
             .size(30.dp) // Ajusta el tamaño del círculo según tus necesidades
             .background(color = MaterialTheme.colorScheme.primary, shape = CircleShape),
@@ -220,7 +261,7 @@ fun UserAvatar(iniciales: String) {
             modifier = Modifier.align(Alignment.Center),
             fontWeight = FontWeight.Bold
         )
-    }
+    }*/
 }
 
 @Composable
