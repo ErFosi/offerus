@@ -43,4 +43,7 @@
     <string name="invalid_fields">The password must have at least 6 characters and the new password must match</string>
     <string name="ubicacion_actualizada">The location was updated successfully</string>
     <string name="datos_actualizados" >The data was updated successfully</string>
+    <string name="biometric_auth_prompt_text">Use your fingerprint to log in</string>
+    <string name="biometric_auth_prompt_title">Authentication</string>
+    <string name="cancel">Cancel</string>
 </resources>

@@ -11,6 +11,7 @@ import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
+import com.offerus.R
 
 
 enum class BiometricAuthenticationStatus {
@@ -27,7 +28,7 @@ enum class DeviceBiometricsSupport {
     UNSUPPORTED
 }
 class BiometricAuthManager(
-    context: Context, authUsername: String, onAuthenticationSucceeded: () -> Unit,
+    context: Context, onAuthenticationSucceeded: () -> Unit,
 ) {
 
     /*------------------------------------------------
@@ -63,7 +64,7 @@ class BiometricAuthManager(
 
                 // Else indicate that is an error and then the string.
                 else if (errorCode != BiometricPrompt.ERROR_CANCELED && errorCode != BiometricPrompt.ERROR_NEGATIVE_BUTTON && errorCode != BiometricPrompt.ERROR_USER_CANCELED) {
-                    Toast.makeText(context, "context.getString(R.string.biometric_auth_error_toast_message, errString)", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "error", Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -71,9 +72,9 @@ class BiometricAuthManager(
     // Prompt data showed to the user
     private val biometricPromptInfo: BiometricPrompt.PromptInfo =
         BiometricPrompt.PromptInfo.Builder()
-            .setTitle("context.getString(R.string.biometric_auth_prompt_title, authUsername)")
-            .setSubtitle("context.getString(R.string.biometric_auth_prompt_text)")
-            .setNegativeButtonText("context.getString(R.string.cancel_button)")
+            .setTitle(context.getString(R.string.biometric_auth_prompt_title))
+            .setSubtitle(context.getString(R.string.biometric_auth_prompt_text))
+            .setNegativeButtonText(context.getString(R.string.cancel))
             .build()
 
 

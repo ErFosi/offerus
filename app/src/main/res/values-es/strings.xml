@@ -43,4 +43,7 @@
     <string name="invalid_fields">La nueva contraseña debe tener al menos 6 dígitos y las contraseñas deben coincidir.</string>
     <string name="ubicacion_actualizada">Ubicación actualizada correctamente</string>
     <string name="datos_actualizados" >Datos actualizados correctamente</string>
+    <string name="biometric_auth_prompt_text">Introduzca la huella para iniciar sesión</string>
+    <string name="biometric_auth_prompt_title">Autentticación</string>
+    <string name="cancel">Cancelar</string>
 </resources>

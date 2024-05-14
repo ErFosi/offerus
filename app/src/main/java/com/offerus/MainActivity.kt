@@ -1,7 +1,6 @@
 package com.offerus
 
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -11,7 +10,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -24,6 +22,8 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.offerus.navigation.MainNavigation
 import com.offerus.services.suscribeToFCM
 import com.offerus.ui.theme.OfferUSTheme
+import com.offerus.utils.BiometricAuthManager
+import com.offerus.utils.DeviceBiometricsSupport
 import com.offerus.utils.isNetworkAvailable
 import com.offerus.viewModels.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -36,9 +36,10 @@ class MainActivity : AppCompatActivity() {
     // private val viewmodel by viewModels<>()  //hiltviewmodel
 
     private val mainViewModel by viewModels<MainViewModel>()
-
+    private lateinit var biometricAuthManager: BiometricAuthManager
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         installSplashScreen()
         setContent {
             OfferUSTheme(
@@ -46,6 +47,10 @@ class MainActivity : AppCompatActivity() {
                 darkTheme = mainViewModel.tema.collectAsState(initial = true).value
             ) {
                 // Log in if there is a user saved in the datastore
+
+                var huella by rememberSaveable {
+                    mutableStateOf(false)
+                }
                 var logedIn by rememberSaveable {
                     mutableStateOf(false)
                 }
@@ -55,15 +60,45 @@ class MainActivity : AppCompatActivity() {
                     val mensaje = stringResource(R.string.no_internet)
                     Toast.makeText(this, mensaje, Toast.LENGTH_LONG).show()
                 }else {
-                    logedIn = mainViewModel.obtenerUsuarioLogeado() != ""
-                    val context = this
-                    LaunchedEffect(logedIn) {
+
+
+
+                        logedIn = mainViewModel.obtenerUsuarioLogeado() != ""
+                        val context = this
                         if (logedIn) {
-                            Log.d("login", "Usuario logeado1: $logedIn")
-                            mainViewModel.loginUsuarioGuardado()
-                            suscribeToFCM(context)
+
+                            if (!this::biometricAuthManager.isInitialized) {
+                                biometricAuthManager = BiometricAuthManager(
+                                    context = this,
+                                    onAuthenticationSucceeded = {
+                                        mainViewModel.loginUsuarioGuardado()
+                                        suscribeToFCM(context)
+                                        huella = true
+                                    }
+                                )
+                            }
+                            var huellaSupport=biometricAuthManager.checkBiometricSupport()
+                            if(huellaSupport== DeviceBiometricsSupport.SUPPORTED && !huella) {
+                                biometricAuthManager.submitBiometricAuthorization()
+                            }
+
+
                         }
-                    }
+
+
+                            /*LaunchedEffect(logedIn) {
+
+                                Log.d("login", "Usuario logeado1: $logedIn")
+                                mainViewModel.loginUsuarioGuardado()
+                                suscribeToFCM(context)
+                            }*/
+
+
+
+
+
+
+
 
                 }
 
@@ -76,7 +111,7 @@ class MainActivity : AppCompatActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    MainNavigation(logedIn, mainViewModel)
+                    MainNavigation( huella, mainViewModel)
                 }
             }
         }

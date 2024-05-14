@@ -27,6 +27,7 @@ import com.offerus.model.repositories.ServicioRepository
 import com.offerus.model.repositories.UserDataRepository
 import com.offerus.utils.AuthClient
 import com.offerus.utils.AuthenticationException
+import com.offerus.utils.BiometricAuthenticationStatus
 import com.offerus.utils.CambioDeIdioma
 import com.offerus.utils.ContraseñaNoCoincideException
 import com.offerus.utils.UserClient
@@ -34,7 +35,6 @@ import com.offerus.utils.UserExistsException
 import com.offerus.utils.showToastOnMainThread
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -80,7 +80,9 @@ class MainViewModel @Inject constructor(
     var listaSolicitudesFavoritas = mutableStateOf(emptyList<ServicioPeticion>())
     var listaOfertasFavoritas = mutableStateOf(emptyList<ServicioPeticion>())
 
+    //huella
 
+    var biometricAuthenticationStatus: BiometricAuthenticationStatus by mutableStateOf( BiometricAuthenticationStatus.NOT_AUTHENTICATED_YET)
     fun iniciarListas() {
         Log.d("iniciarListas", "INICIO - iniciando listas...")
         actualizarListaDeals()
