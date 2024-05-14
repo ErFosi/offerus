@@ -700,4 +700,19 @@ class UserClient @Inject constructor() {
         }
     }
 
+    @Throws(Exception::class)
+    suspend fun obtenerNotaUsuario(usuario: String){
+        val response: HttpResponse = clienteHttp.get("https://offerus.zapto.org/usuario/nota") {
+            parameter("username", usuario)
+            accept(ContentType.Application.Json)
+        }
+
+        if (response.status == HttpStatusCode.OK) {
+            return Json.decodeFromString(response.bodyAsText())
+        }
+        else {
+            throw Exception("Failed to fetch user data: HTTP ${response.status}")
+        }
+    }
+
 }
