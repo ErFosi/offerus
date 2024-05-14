@@ -46,4 +46,5 @@
     <string name="biometric_auth_prompt_text">Introduzca la huella para iniciar sesión</string>
     <string name="biometric_auth_prompt_title">Autentticación</string>
     <string name="cancel">Cancelar</string>
+    <string name="no_ubicacion">Aviso: no has seleccionado tu ubicación</string>
 </resources>

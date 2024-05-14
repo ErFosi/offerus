@@ -66,6 +66,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -685,10 +686,12 @@ fun UserScreenContent(
                 modifier = Modifier
                     .padding(start = 30.dp, top = 20.dp, end = 20.dp)
                     .weight(1f)
-                    .clickable(onClick = { contrasenaExpanded = !contrasenaExpanded
+                    .clickable(onClick = {
+                        contrasenaExpanded = !contrasenaExpanded
                         suscripcionesExpanded = false
                         datosPersonalesExpanded = false
-                        sobreMiExpanded = false})
+                        sobreMiExpanded = false
+                    })
             )
             IconButton(
                 onClick = { contrasenaExpanded = !contrasenaExpanded
@@ -933,13 +936,16 @@ fun UserScreenContent(
                     categoria = "Deporte",
                     precio = "null"
                 )*/
-
+                Log.d("MAPA", "lat: ${infoUsuario.latitud} lon: ${infoUsuario.longitud}")
+                if (infoUsuario.latitud == 0.0 && infoUsuario.longitud == 0.0) {
+                    Text(text = stringResource(id = R.string.no_ubicacion), modifier = Modifier.padding(10.dp), fontStyle = FontStyle.Italic)
+                }
                 mapa(
                     permisoUbicacion = false,
                     marcadores = listOf(marcador1),
                     sePuedeDesplazar = false,
                     lat = infoUsuario.latitud,
-                    lon = infoUsuario.longitud
+                    lon = infoUsuario.longitud,
                 )
             }
         }

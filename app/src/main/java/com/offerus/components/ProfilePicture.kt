@@ -330,7 +330,7 @@ fun Context.getBipMapFromUri(uri: Uri): Bitmap? {
         val outputStream = ByteArrayOutputStream()
         
         try {
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 20, outputStream)
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 50, outputStream)
             val compressedByteArray = outputStream.toByteArray()
             BitmapFactory.decodeByteArray(compressedByteArray, 0, compressedByteArray.size)
 

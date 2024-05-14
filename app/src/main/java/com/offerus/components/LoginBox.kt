@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -34,6 +35,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -174,6 +176,7 @@ fun LoginBox(
     /////////////////////////////////////////////////////////////////
 
     ///////////////  METODOS PARA LOGIN Y REGISTRO ///////////////
+    var recordarUser by remember { mutableStateOf(false) }
 
     var sesionIniciada by remember { mutableStateOf(false) }
     var mostrarErrorLogin by remember { mutableStateOf(false) }  // VARIABLE QUE INDICA EL LOGIN INCORRECTO
@@ -188,7 +191,7 @@ fun LoginBox(
                 mainViewModel.login(username, password)
                 sesionIniciada = true
                 mainViewModel.usuario = username // guardar el nombre de usuario en el viewmodel
-                mainViewModel.setUsuarioLogueado(username, password) // guardar el nombre de usuario y contraseña en el datastore
+                if (recordarUser) mainViewModel.setUsuarioLogueado(username, password) // guardar el nombre de usuario y contraseña en el datastore --> solo si el usuario ha marcado la casilla de recordar
                 mostrarErrorLogin = false
             } catch (e: AuthenticationException) {
                 mostrarErrorLogin = true
@@ -252,7 +255,17 @@ fun LoginBox(
             R.string.RegistroExitoso,
             Toast.LENGTH_SHORT
         ).show()
-        // TODO QUE SE CAMBIE DE PANTALLA A LA DE LOGIN
+        // cambiar a la pantalla de login
+        offsetX.value = screenWidthInPx
+        // vaciar todas las variables
+        usernameRegistro = ""
+        passwordRegistro = ""
+        confirmarpassword = ""
+        fullName = ""
+        age = ""
+        email = ""
+        phone = ""
+        sex = ""
     }
     if (mostrarErrorRegistro){
         // Show error message
@@ -368,6 +381,17 @@ fun LoginBox(
                         invalidPassword = invalidPassword,
                         invalidConfirmPassword = invalidConfirmPassword
                     )
+                }
+            }
+            if (offsetX.value > screenWidthInPx / 2) {
+                Row( modifier = Modifier
+                    .height(25.dp)
+                    .fillMaxWidth()
+                    .padding(start= 8.dp, end=8.dp, bottom=5.dp),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Text("Recordar usuario")
+                    Switch(checked = recordarUser, onCheckedChange = { recordarUser = !recordarUser} , modifier = Modifier.padding(start= 8.dp))
                 }
             }
 

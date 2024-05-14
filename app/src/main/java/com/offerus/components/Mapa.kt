@@ -7,7 +7,11 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.location.Location
 import android.util.Log
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Card
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -16,8 +20,14 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.alpha
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
@@ -30,9 +40,10 @@ import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerInfoWindow
 import com.google.maps.android.compose.MarkerState
-import com.google.maps.android.compose.rememberCameraPositionState
 import com.offerus.R
+import com.offerus.data.CATEGORIAS
 import com.offerus.utils.locationUtils
+import com.offerus.utils.obtenerCategoriasString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.serialization.SerialName
@@ -49,7 +60,8 @@ data class Marcador(
     @SerialName("latitud") val latitud: Double,
     @SerialName("longitud") val longitud: Double,
     @SerialName("categoría") val categoria: String,
-    @SerialName("precio") val precio: String
+    @SerialName("precio") val precio: String,
+    @SerialName("categorias") val categorias: List<String>? = null
 )
 
 
@@ -65,8 +77,8 @@ fun mapa(
     marcadores: List<Marcador>,
     permisoUbicacion: Boolean,
     sePuedeDesplazar: Boolean,
-    lat: Double = 43.0,
-    lon: Double = 44.0,
+    lat: Double = 43.1842,
+    lon: Double = -2.4821,
 
 ){
     val context = LocalContext.current
@@ -81,6 +93,7 @@ fun mapa(
                 ubicacion = location.getLocation(context)
                 if (ubicacion != null) {
                     Log.d("mapa", "Ubicación: ${ubicacion!!.latitude}, ${ubicacion!!.longitude}")
+                    Log.d("mapa", "Marcadores: $marcadores")
                     marcadoresOrdenados = ordenarMarcadoresPorDistancia(marcadores, ubicacion!!)
                     Log.d("mapa", "Marcadores ordenados: $marcadoresOrdenados")
                 }
@@ -107,7 +120,7 @@ fun mapa(
         )
     }
     val cameraPositionState = CameraPositionState (
-        position = CameraPosition(LatLng(lat, lon), 15f, 0f, 0f)
+        position = if (lat != 0.0 && lon != 0.0) CameraPosition(LatLng(lat, lon), 15f, 0f, 0f) else CameraPosition(LatLng(0.00, 0.00), 10f, 0f, 0f)
     )
 
     GoogleMap(
@@ -129,16 +142,59 @@ fun mapa(
 
                 for ((index, marcador) in marcadoresOrdenados.withIndex()) {
                     val marker = LatLng(marcador.latitud, marcador.longitud)
-                    /**
-                     * posibles categorias:
-                     * Gratis
-                     * Deporte
-                     * Entretenimiento
-                     * Académico
-                     * Hogar
-                     * Online
-                     * Otros
-                     */
+                    val distancia = distanciaEntrePuntos(
+                        marcador.latitud,
+                        marcador.longitud,
+                        ubicacion!!.latitude,
+                        ubicacion!!.longitude
+                    )
+                    Log.d("mapa", "Marcador: ${marcador.nombre}")
+                    val categoria = CATEGORIAS.find { it.nombre == marcador.categoria }
+                    if (categoria!=null) {
+                        categoria.let {
+                            MarkerInfoWindow(
+                                state = MarkerState(position = marker),
+                                icon = bitmapDescriptor(context, categoria.icono, categoria.color.copy(alpha = 0.45f)),
+                            ) {
+                                Card {
+                                    Column(
+                                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 10.dp)
+                                    ) {
+                                        Text(
+                                            text = marcador.nombre,
+                                            fontWeight = FontWeight.Bold,
+                                            modifier = Modifier.padding(
+                                                vertical = 4.dp,
+                                                horizontal = 8.dp
+                                            )
+                                        )
+                                        Text(
+                                            text = marcador.precio,
+                                            modifier = Modifier.padding(
+                                                vertical = 4.dp,
+                                                horizontal = 8.dp
+                                            )
+                                        )
+                                        Text(
+                                            text = "${String.format("%.2f", distancia)} km",
+                                            fontStyle = FontStyle.Italic,
+                                            modifier = Modifier.padding(
+                                                vertical = 4.dp,
+                                                horizontal = 8.dp
+                                            )
+                                        )
+                                        CategoriasCirculos(
+                                            nombresCategorias = obtenerCategoriasString(
+                                                marcador.categorias!!
+                                            )
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }else{
+                        Marker(MarkerState(position = marker), title = marcador.nombre)
+                    }
 
                 }
 
@@ -149,7 +205,46 @@ fun mapa(
                 Log.d("mapa", "Marcador: ${marcador.nombre}")
                 val marker = LatLng(marcador.latitud, marcador.longitud)
 
-                when (marcador.categoria) {
+                val categoria = CATEGORIAS.find { it.nombre == marcador.categoria }
+                if (categoria!=null) {
+                    categoria.let {
+                        MarkerInfoWindow(
+                            state = MarkerState(position = marker),
+                            icon = bitmapDescriptor(context, categoria.icono, categoria.color.copy(alpha = 0.45f)),
+                        ){
+                            Card {
+                                Column(
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 10.dp)
+                                ) {
+                                    Text(
+                                        text = marcador.nombre,
+                                        fontWeight = FontWeight.Bold,
+                                        modifier = Modifier.padding(
+                                            vertical = 4.dp,
+                                            horizontal = 8.dp
+                                        )
+                                    )
+                                    Text(
+                                        text = marcador.precio,
+                                        modifier = Modifier.padding(
+                                            vertical = 4.dp,
+                                            horizontal = 8.dp
+                                        )
+                                    )
+                                    CategoriasCirculos(
+                                        nombresCategorias = obtenerCategoriasString(
+                                            marcador.categorias!!
+                                        )
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }else{
+                    Marker(MarkerState(position = marker), title = marcador.nombre)
+                }
+
+                /*when (marcador.categoria) {
                     "Gratis" -> MarkerInfoWindow(
                             state = MarkerState(position = marker),
                             icon = bitmapDescriptor(context, R.drawable.gratis, Color.GREEN),
@@ -193,9 +288,9 @@ fun mapa(
                         snippet = marcador.precio
                     )
 
-                    else -> Marker(MarkerState(position = marker), title = marcador.nombre)
+                    else -> Marker(MarkerState(position = marker), title = marcador.nombre)*/
 
-                }
+
             }
         }
     }
@@ -249,7 +344,7 @@ fun distanciaEntrePuntos(lat1: Double, lon1: Double, lat2: Double, lon2: Double)
 fun bitmapDescriptor(
     context: Context,
     resId: Int,
-    color: Int = Color.RED// Color predeterminado del icono
+    color: androidx.compose.ui.graphics.Color
 ): BitmapDescriptor? {
     val drawable = ContextCompat.getDrawable(context, resId) ?: return null
     val size = drawable.intrinsicWidth.coerceAtLeast(drawable.intrinsicHeight)
@@ -260,7 +355,7 @@ fun bitmapDescriptor(
     val padding = size / 4
     val paint = Paint().apply {
         isAntiAlias = true
-        this.color = color
+        this.color = color.toArgb()
     }
     val radius = (size - 2 * padding) / 2f
     canvas.drawCircle(size / 2f, size / 2f, radius + padding, paint)

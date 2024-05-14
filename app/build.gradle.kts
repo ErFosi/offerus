@@ -1,11 +1,10 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
-    kotlin("kapt")
+    id ("kotlin-kapt")
     id ("com.google.dagger.hilt.android")
     id ("org.jetbrains.kotlin.plugin.serialization")
     id("com.google.gms.google-services")
-    id ("dagger.hilt.android.plugin")
 }
 
 android {
@@ -18,7 +17,6 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
-
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -44,7 +42,6 @@ android {
     }
     buildFeatures {
         compose = true
-        buildConfig= true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
@@ -67,7 +64,6 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.compose.material)
-    implementation(libs.androidx.glance.appwidget)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -148,9 +144,11 @@ dependencies {
 
     implementation("androidx.compose.material:material-android:1.6.7")
 
-    implementation("androidx.glance:glance-appwidget:1.0.0")
-    implementation("androidx.glance:glance-material:1.0.0")
-    implementation("androidx.glance:glance-material3:1.0.0")
+    // For AppWidgets support
+    implementation( "androidx.glance:glance-appwidget:1.0.0" )
+
+    // For interop APIs with Material 3
+    implementation( "androidx.glance:glance-material3:1.0.0" )
 
     //huella
     implementation("androidx.biometric:biometric:1.1.0")

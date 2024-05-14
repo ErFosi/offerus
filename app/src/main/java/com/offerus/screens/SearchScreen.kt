@@ -166,7 +166,8 @@ fun OffersScreen(
                 onOpenFilterDialog = {  openFilterDialog.value = true },
                 navController = navController,
                 onBuscar = { mainViewModel.getRequests(titulo.value,categoria.value,distanciaMaxima.value,precioMinimo.value,precioMaxima.value,"")},
-                onBusquedaChange = { titulo.value = it}
+                onBusquedaChange = { titulo.value = it},
+                setSelectedTab = { mainViewModel.selectedTabIndex = selectedTabIndex }
             )
 
             if (selectedTabIndex == 0) {
@@ -210,6 +211,7 @@ fun OffersScreen(
 @Composable
 fun SubPageSearch(
     navController: NavController,
+    setSelectedTab: () -> Unit,
     onOpenFilterDialog: () -> Unit,
     onBusquedaChange: (String) -> Unit,
     onBuscar: () -> Unit,
@@ -285,6 +287,7 @@ fun SubPageSearch(
 
                     .width(80.dp),
                 onClick = {
+                    setSelectedTab()
                     navController.navigate(AppScreens.MapScreen.route)
                 }
 

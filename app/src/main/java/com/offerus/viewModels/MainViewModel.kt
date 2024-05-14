@@ -35,6 +35,7 @@ import com.offerus.utils.UserExistsException
 import com.offerus.utils.showToastOnMainThread
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -79,6 +80,8 @@ class MainViewModel @Inject constructor(
     var cargaInicialPeticionesFavoritas = mutableStateOf(false)
     var listaSolicitudesFavoritas = mutableStateOf(emptyList<ServicioPeticion>())
     var listaOfertasFavoritas = mutableStateOf(emptyList<ServicioPeticion>())
+
+    var selectedTabIndex by mutableStateOf(0)
 
     //huella
 
