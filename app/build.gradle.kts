@@ -144,4 +144,10 @@ dependencies {
 
     implementation("androidx.compose.material:material-android:1.6.7")
 
+    // For AppWidgets support
+    implementation( "androidx.glance:glance-appwidget:1.0.0" )
+
+    // For interop APIs with Material 3
+    implementation( "androidx.glance:glance-material3:1.0.0" )
+
 }
