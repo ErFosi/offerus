@@ -387,10 +387,10 @@ fun LoginBox(
                 Row( modifier = Modifier
                     .height(25.dp)
                     .fillMaxWidth()
-                    .padding(start= 8.dp, end=8.dp, bottom=5.dp),
+                    .padding(start = 8.dp, end = 8.dp, bottom = 5.dp),
                     horizontalArrangement = Arrangement.Center
                 ) {
-                    Text("Recordar usuario")
+                    Text(stringResource(id = R.string.recordarUsuario))
                     Switch(checked = recordarUser, onCheckedChange = { recordarUser = !recordarUser} , modifier = Modifier.padding(start= 8.dp))
                 }
             }

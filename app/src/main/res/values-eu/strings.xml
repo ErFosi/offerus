@@ -47,4 +47,5 @@
     <string name="biometric_auth_prompt_title">Autentikazioa</string>
     <string name="cancel">Utzi</string>
     <string name="no_ubicacion">Adi: ez duzu kokapenik aukeratu</string>
+    <string name="recordarUsuario">Gogoratu kredentzialak</string>
 </resources>

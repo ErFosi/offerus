@@ -47,4 +47,5 @@
     <string name="biometric_auth_prompt_title">"Autenticación "</string>
     <string name="cancel">Cancelar</string>
     <string name="no_ubicacion">Aviso: no has seleccionado tu ubicación</string>
+    <string name="recordarUsuario">Recordar credenciales</string>
 </resources>
