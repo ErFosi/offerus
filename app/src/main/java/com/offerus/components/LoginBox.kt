@@ -252,7 +252,8 @@ fun LoginBox(
             R.string.RegistroExitoso,
             Toast.LENGTH_SHORT
         ).show()
-        // TODO QUE SE CAMBIE DE PANTALLA A LA DE LOGIN
+        // cambiar a la pantalla de login
+        offsetX.value = screenWidthInPx
     }
     if (mostrarErrorRegistro){
         // Show error message
