@@ -148,6 +148,11 @@ data class ServicioPeticionMod(
 data class PeticionId(
     val id_peticion: Int
 )
+@Serializable
+data class NotaUsuario(
+    val cant: Double,
+    val nota: Int
+)
 
 @Serializable
 data class PeticionesRequestBody(

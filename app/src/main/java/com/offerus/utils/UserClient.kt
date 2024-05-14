@@ -8,6 +8,7 @@ import com.offerus.data.ContraseñaChange
 import com.offerus.data.Deal
 import com.offerus.data.DealPeticionAceptar
 import com.offerus.data.ErrorResponse
+import com.offerus.data.NotaUsuario
 import com.offerus.data.PeticionId
 import com.offerus.data.PeticionesRequestBody
 import com.offerus.data.ServicioPeticion
@@ -701,7 +702,7 @@ class UserClient @Inject constructor() {
     }
 
     @Throws(Exception::class)
-    suspend fun obtenerNotaUsuario(usuario: String){
+    suspend fun obtenerNotaUsuario(usuario: String) : NotaUsuario {
         val response: HttpResponse = clienteHttp.get("https://offerus.zapto.org/usuario/nota") {
             parameter("username", usuario)
             accept(ContentType.Application.Json)
