@@ -66,7 +66,7 @@ fun Login(
         ) {
             var height by rememberSaveable { mutableStateOf(false) }
             val heightdp by animateDpAsState(
-                if (height) 450.dp else 320.dp,
+                if (height) 460.dp else 345.dp,
                 animationSpec = spring(
                     dampingRatio = Spring.DampingRatioMediumBouncy,
                     stiffness = Spring.StiffnessLow
