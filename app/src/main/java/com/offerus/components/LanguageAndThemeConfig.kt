@@ -64,14 +64,6 @@ fun languageSwitcher(
         )
         // LANGUAGE SELECTOR
         {
-            Column {
-                Icon(
-                    painter = painterResource(R.drawable.idioma),
-                    contentDescription = stringResource(R.string.SeleccionarIdioma),
-                    tint = MaterialTheme.colorScheme.primary,
-
-                )
-            }
 
             Column(
                 modifier = Modifier
@@ -83,6 +75,12 @@ fun languageSwitcher(
                     onClick = { expanded = !expanded },
                     modifier = Modifier.fillMaxSize().padding(0.dp),
                     contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp)) {
+                    Icon(
+                        painter = painterResource(R.drawable.idioma),
+                        contentDescription = stringResource(R.string.SeleccionarIdioma),
+                        tint = MaterialTheme.colorScheme.primary,
+
+                        )
                     Text(
                         if (size<70.dp) idiomaSeleccionado.codigo else idiomaSeleccionado.name,
                         Modifier.fillMaxWidth().padding(start = 5.dp).align(Alignment.CenterVertically),

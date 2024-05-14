@@ -84,10 +84,9 @@ fun CreateDialog(
                     Text(
                         text = "Nuevo Servicio",
                         modifier = Modifier
-                            .padding(10.dp),
-                        fontWeight = FontWeight.Bold,
+                            .padding(20.dp),
+                        style = MaterialTheme.typography.titleLarge,
                         textAlign = TextAlign.Center,
-                        fontSize = 20.sp
                     )
 
                     Spacer(
@@ -275,6 +274,7 @@ fun CreateDialog(
                         }
                     }
 
+
                     Spacer(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -287,7 +287,7 @@ fun CreateDialog(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 2.dp),
+                            .padding(top = 5.dp, bottom = 20.dp),
                         horizontalArrangement = Arrangement.Center
                     ) {
                         OutlinedButton(

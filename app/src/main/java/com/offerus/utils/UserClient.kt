@@ -84,7 +84,7 @@ class UserClient @Inject constructor() {
                 when {
                     exception is ClientRequestException && exception.response.status == HttpStatusCode.Unauthorized -> throw AuthenticationException()
                     exception is ClientRequestException && exception.response.status == HttpStatusCode.BadRequest -> throw UserExistsException()
-                    exception is ClientRequestException && exception.response.status == HttpStatusCode.UnprocessableEntity -> throw UnprocessableEntityException()
+                    //exception is ClientRequestException && exception.response.status == HttpStatusCode.UnprocessableEntity -> throw UnprocessableEntityException()
                     exception  is ClientRequestException && exception.response.status == HttpStatusCode.Conflict -> throw DealNoPendienteException()
                     exception  is ClientRequestException && exception.response.status == HttpStatusCode.ExpectationFailed -> throw ContraseñaNoCoincideException()
                     else -> {
@@ -528,7 +528,7 @@ class UserClient @Inject constructor() {
      * @Throws Exception
      * @Return Unit
      */
-    @Throws(AuthenticationException::class,UnprocessableEntityException::class ,ContraseñaNoCoincideException::class,Exception::class)
+    @Throws(AuthenticationException::class,UnprocessableEntityException::class, ContraseñaNoCoincideException::class ,Exception::class)
     suspend fun changePassword(request: ContraseñaChange) {
         val token = bearerTokenStorage.last().accessToken
         val jsonContent = Json.encodeToString(request)
@@ -539,7 +539,7 @@ class UserClient @Inject constructor() {
             setBody(jsonContent)
         }
 
-        when (response.status) {
+        /*when (response.status) {
             HttpStatusCode.OK -> Log.d("KTOR", "Contraseña modificada")
             HttpStatusCode.Unauthorized -> throw AuthenticationException()
             HttpStatusCode.ExpectationFailed -> throw ContraseñaNoCoincideException()
@@ -552,7 +552,7 @@ class UserClient @Inject constructor() {
             }
 
             else -> throw Exception("Failed to change password: HTTP ${response.status}")
-        }
+        }*/
     }
 
     /**
@@ -688,8 +688,9 @@ class UserClient @Inject constructor() {
         val token = bearerTokenStorage.last().accessToken
         val response: HttpResponse = clienteHttp.post("https://offerus.zapto.org/suscribir_fcm") {
             header(HttpHeaders.Authorization, "Bearer $token")
-            parameter("fcm_client_token", tokenFCM)
-            accept(ContentType.Application.Json)
+            contentType(ContentType.Application.Json)
+            setBody(mapOf("fcm_client_token" to tokenFCM))
+
         }
 
         when (response.status) {

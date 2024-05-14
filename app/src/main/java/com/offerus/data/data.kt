@@ -28,6 +28,7 @@ data class ServicioPeticion(
     val longitud: Double,
     val categorias: String
 )
+
 @Immutable
 @Serializable
 @Entity(tableName = "Deal")
@@ -171,14 +172,14 @@ data class ValorarDeal(
  *************************************************************************/
 @Serializable
 data class BusquedaPeticionServicio(
-    val texto_busqueda: String,
-    val categorias: String,
-    val distancia_maxima: Double,
-    val precio_minimo: Double,
-    val precio_maximo: Double,
-    val latitud: Double,
-    val longitud: Double,
-    val ordenar_por: String
+    val texto_busqueda: String?,
+    val categorias: String?,
+    val distancia_maxima: Double?,
+    val precio_minimo: Double?,
+    val precio_maximo: Double?,
+    val latitud: Double?,
+    val longitud: Double?,
+    val ordenar_por: String?
 )
 
 /************************************************************************

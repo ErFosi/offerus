@@ -28,18 +28,22 @@ import com.offerus.model.repositories.UserDataRepository
 import com.offerus.utils.AuthClient
 import com.offerus.utils.AuthenticationException
 import com.offerus.utils.CambioDeIdioma
+import com.offerus.utils.ContraseñaNoCoincideException
 import com.offerus.utils.UserClient
 import com.offerus.utils.UserExistsException
 import com.offerus.utils.showToastOnMainThread
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import kotlin.coroutines.resume
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
@@ -68,10 +72,20 @@ class MainViewModel @Inject constructor(
     var listaMisOfertas = mutableStateOf(emptyList<ServicioPeticion>())
     var listaMisPeticiones = mutableStateOf(emptyList<ServicioPeticion>())
 
+    var cargaInicialPeticiones = mutableStateOf(false)
+    var listaSolicitudes = mutableStateOf(emptyList<ServicioPeticion>())
+    var listaOfertas = mutableStateOf(emptyList<ServicioPeticion>())
+
+    var cargaInicialPeticionesFavoritas = mutableStateOf(false)
+    var listaSolicitudesFavoritas = mutableStateOf(emptyList<ServicioPeticion>())
+    var listaOfertasFavoritas = mutableStateOf(emptyList<ServicioPeticion>())
+
 
     fun iniciarListas() {
+        Log.d("iniciarListas", "INICIO - iniciando listas...")
         actualizarListaDeals()
         obtenerMisOfertas()
+        Log.d("iniciarListas", "FIN - iniciado listas")
     }
 
     fun obtenerMisOfertas() {
@@ -103,7 +117,7 @@ class MainViewModel @Inject constructor(
 
     // variable to store the current user name
     var usuario by mutableStateOf("")
-
+    var infoUsuario = mutableStateOf(UsuarioData("", "", 0, 0.0, 0.0, "", "", "", "", ""))
     // get the theme and language from the data store
     val tema = myPreferencesDataStore.preferencesStatusFlow.map {
         it.temaClaro
@@ -157,6 +171,7 @@ class MainViewModel @Inject constructor(
                     //authenticate(usuariog, contrasena)
                     login(usuariog, contrasena)
                     Log.d("SeriesViewModel", "Usuario guardado autenticado")
+                    actualizarInfoUsuario()
                     iniciarListas()
                 } catch (e: AuthenticationException) {
                     Log.e("SeriesViewModel", "Error al autenticar usuario guardado")
@@ -261,17 +276,26 @@ class MainViewModel @Inject constructor(
         }
         return respuesta
     }
-    fun modifyPassword(password: String, newPassword: String) {
-        val passwordChange = ContraseñaChange(password, newPassword)
+
+    fun actualizarInfoUsuario(){
         try {
             viewModelScope.launch {
-                httpUserClient.changePassword(passwordChange)
-                Log.e("KTOR", "Cambio de contrasena completado")
+                infoUsuario.value = httpUserClient.getDatosUsuario()
+                Log.e("KTOR", "Datos usuario conseguidos")
             }
         } catch (e: Exception) {
             Log.e("KTOR", e.toString())
 
         }
+    }
+
+    @Throws(ContraseñaNoCoincideException::class, Exception::class)
+    suspend fun modifyPassword(password: String, newPassword: String) {
+        val passwordChange = ContraseñaChange(password, newPassword)
+
+        httpUserClient.changePassword(passwordChange)
+        Log.e("KTOR", "Cambio de contrasena completado")
+
     }
     fun updateUserData(fullName: String, age: Int, email: String, phone: String, sex: String,lat: Double, lon: Double, descr: String, suscriptions: String) {
         val update = UsuarioUpdate(fullName, age, lat, lon, email, phone, sex, descr, suscriptions)
@@ -279,6 +303,7 @@ class MainViewModel @Inject constructor(
             viewModelScope.launch {
                 httpUserClient.modifyUser(update)
                 Log.e("KTOR", "Datos de usuario actualizados")
+                actualizarInfoUsuario()
             }
         } catch (e: Exception) {
             Log.e("KTOR", e.toString())
@@ -286,18 +311,20 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun getUserProfile(username: String): Bitmap {
-        var bitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888)
-        try {
-            viewModelScope.launch {
-                bitmap = httpUserClient.descargarImagenDeUsuario(username)
-                Log.e("KTOR", "Perfil de usuario conseguida")
+    suspend fun getUserProfile(username: String): Bitmap {
+        return suspendCancellableCoroutine { continuation ->
+            try {
+                viewModelScope.launch {
+                    val bitmap = httpUserClient.descargarImagenDeUsuario(username)
+                    Log.e("viewmodel", "Perfil de usuario conseguida")
+                    continuation.resume(bitmap)
+                }
+            } catch (e: Exception) {
+                Log.e("KTOR", e.toString())
+                val defaultBitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888)
+                continuation.resume(defaultBitmap)
             }
-        } catch (e: Exception) {
-            Log.e("KTOR", e.toString())
-
         }
-        return bitmap
     }
 
     fun uploadUserProfile(bitmap: Bitmap) {
@@ -331,21 +358,70 @@ class MainViewModel @Inject constructor(
         return respuesta
     }
 
-    fun getRequests(searchText: String, categories: String, maxDistance: Double, minPrice: Double, maxPrice: Double, lat: Double, lon: Double, asc: String): List<ServicioPeticion> {
-        val filter = BusquedaPeticionServicio(searchText, categories, maxDistance, minPrice, maxPrice, lat, lon, asc)
-        Log.e("KTOR", searchText + categories + maxDistance.toString())
-        var respuesta: List<ServicioPeticion> = emptyList()
+    fun getRequests(searchText: String, categories: String, maxDistance: Double, minPrice: Double, maxPrice: Double, asc: String) {
+        val filter = BusquedaPeticionServicio(searchText, null, 10000000000000.0, minPrice, maxPrice, 0.0, 0.0, "precio_asc")
+        Log.e("peticion", " $searchText , $maxDistance , $maxPrice")
+        var respuesta: List<ServicioPeticion>
         try {
             viewModelScope.launch {
-                respuesta = httpUserClient.buscarPeticionesServicio(filter)
+                respuesta = httpUserClient.buscarPeticionesServicio(filter).toMutableList()
+                respuesta = respuesta.sortedBy { it.precio }
+
+                listaSolicitudes.value = respuesta.filter { it.peticion }
+                listaOfertas.value = respuesta.filter { !it.peticion }
+
+
                 Log.e("KTOR", "Peticiones recogidas con exito")
+                Log.e("KTOR", listaOfertas.value.size.toString())
+                Log.e("KTOR", listaSolicitudes.value.size.toString())
+
+
+
             }
         } catch (e: Exception) {
             Log.e("KTOR", e.toString())
 
         }
-        return respuesta
     }
+
+    fun cargarListasPeticiones(){
+        val filter = BusquedaPeticionServicio(null, null, null, null, null, null, null, "precio_asc")
+        var respuesta: List<ServicioPeticion>
+        try {
+            viewModelScope.launch {
+                respuesta = httpUserClient.buscarPeticionesServicio(filter).toMutableList()
+                respuesta = respuesta.sortedBy { it.precio }
+
+                listaSolicitudes.value = respuesta.filter { it.peticion }
+                listaOfertas.value = respuesta.filter { !it.peticion }
+
+                Log.e("KTOR", "Peticiones recogidas con exito")
+                Log.e("KTOR", listaOfertas.value.size.toString())
+                Log.e("KTOR", listaSolicitudes.value.size.toString())
+
+
+                cargaInicialPeticiones.value = true
+
+
+            }
+        } catch (e: Exception) {
+            Log.e("KTOR", e.toString())
+
+        }
+
+    }
+
+    fun ordenarServicios(asc: Boolean){
+
+        if (asc){
+            listaOfertas.value = listaOfertas.value.sortedBy { it.precio }
+            listaSolicitudes.value = listaSolicitudes.value.sortedBy { it.precio }
+        } else {
+            listaOfertas.value = listaOfertas.value.sortedByDescending { it.precio }
+            listaSolicitudes.value = listaSolicitudes.value.sortedByDescending { it.precio }
+        }
+    }
+
 
     //--------------------------------------------------------------//
 //-------------------------- REGISTER --------------------------//
@@ -408,6 +484,7 @@ class MainViewModel @Inject constructor(
                         isRefreshingHome.value = false
                     }
                 }
+
                 else{
                     isRefreshingHome.value = false
                 }
@@ -437,6 +514,11 @@ class MainViewModel @Inject constructor(
                 servicioDetalle.value = servicioRepository.getServicio(idPeticion)
             }
         }
+    }
+
+    fun cambiarServicioDetalle(servicioPeticion: ServicioPeticion) {
+        servicioDetalle.value = servicioPeticion
+
     }
     //--------------------------------------------------------------//
     //------------------------- EDIT REQUESTS ----------------------//
@@ -578,7 +660,15 @@ class MainViewModel @Inject constructor(
         try {
             viewModelScope.launch {
                 respuesta = httpUserClient.obtenerPetFavoritasUsuario()
+
+                listaSolicitudesFavoritas.value = respuesta.filter { it.peticion }
+                listaOfertasFavoritas.value = respuesta.filter { !it.peticion }
+
                 Log.e("KTOR", "Peticion getMyOffers completada")
+
+                if (!cargaInicialPeticionesFavoritas.value){
+                    cargaInicialPeticionesFavoritas.value = true
+                }
             }
         } catch (e: Exception) {
             Log.e("KTOR", e.toString())
@@ -587,12 +677,17 @@ class MainViewModel @Inject constructor(
         return respuesta
     }
 
-    fun addFavorite(requestId: Int) {
+    fun addFavorite(requestId: Int, servicioPeticion: ServicioPeticion) {
         val request = PeticionId(requestId)
         try {
             viewModelScope.launch {
                 httpUserClient.addFavorite(request)
                 Log.e("KTOR", "Peticion Favorita anadida")
+                if ( servicioPeticion.peticion) {
+                    listaSolicitudesFavoritas.value = listaSolicitudes.value + servicioPeticion
+                } else {
+                    listaOfertasFavoritas.value = listaOfertasFavoritas.value + servicioPeticion
+                }
             }
         } catch (e: Exception) {
             Log.e("KTOR", e.toString())
@@ -606,11 +701,81 @@ class MainViewModel @Inject constructor(
             viewModelScope.launch {
                 httpUserClient.deleteFavorite(request)
                 Log.e("KTOR", "Peticion Favorita anadida")
+                listaSolicitudesFavoritas.value =
+                    listaSolicitudesFavoritas.value.toMutableList().apply {
+                        removeAll { it.id == requestId }
+                    }
+
+                listaOfertasFavoritas.value =
+                    listaOfertasFavoritas.value.toMutableList().apply {
+                        removeAll { it.id == requestId }
+                    }
             }
         } catch (e: Exception) {
             Log.e("KTOR", e.toString())
 
         }
     }
+
+    fun filtrarFavoritas(titulo: String,
+                         categoria: String,
+                         distanciaMaxima: Double,
+                         precioMinimo: Double,
+                         precioMaximo: Double
+    ){
+
+        var resultado: List<ServicioPeticion>
+        try {
+            viewModelScope.launch {
+                resultado = httpUserClient.obtenerPetFavoritasUsuario()
+
+                //Log.e("KTOR", "Inicio filtrado")
+                //Log.e("KTOR", resultado.size.toString())
+                if (titulo.isNotEmpty()) {
+                    resultado = resultado.filter { it.titulo.contains(titulo) }
+                    //Log.e("KTOR", titulo)
+                    //Log.e("KTOR", resultado.size.toString())
+
+                }
+                if (!categoria.contains(",")) {
+                    resultado = resultado.filter { it.categorias.contains(categoria) }
+                    //Log.e("KTOR", categoria)
+                    //Log.e("KTOR", resultado.size.toString())
+                }
+                //TODO filtrar por distancia maxima
+                resultado = resultado.filter { it.precio >= precioMinimo }
+                //Log.e("KTOR", resultado.size.toString())
+                resultado = resultado.filter { it.precio <= precioMaximo }
+                //Log.e("KTOR", resultado.size.toString())
+                //Log.e("KTOR", "Fin filtrado")
+                //Log.e("KTOR", listaOfertasFavoritas.value.size.toString())
+
+                listaSolicitudesFavoritas.value = resultado.filter { it.peticion }
+                listaOfertasFavoritas.value = resultado.filter { !it.peticion }
+
+                Log.e("KTOR", "Peticion getMyOffers completada")
+
+                if (!cargaInicialPeticionesFavoritas.value){
+                    cargaInicialPeticionesFavoritas.value = true
+                }
+
+
+
+
+            }
+        } catch (e: Exception) {
+            Log.e("KTOR", e.toString())
+
+        }
+
+
+    }
+
+    fun esPeticionFavorita(id: Int): Boolean{
+        return (listaOfertasFavoritas.value.any { it.id == id } || listaSolicitudesFavoritas.value.any { it.id == id })
+
+
+    }
+
 
 }

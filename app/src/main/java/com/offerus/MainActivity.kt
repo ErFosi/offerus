@@ -1,9 +1,5 @@
 package com.offerus
 
-import android.content.Context
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -15,6 +11,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -25,6 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.offerus.navigation.MainNavigation
+import com.offerus.services.suscribeToFCM
 import com.offerus.ui.theme.OfferUSTheme
 import com.offerus.utils.isNetworkAvailable
 import com.offerus.viewModels.MainViewModel
@@ -58,10 +56,15 @@ class MainActivity : AppCompatActivity() {
                     Toast.makeText(this, mensaje, Toast.LENGTH_LONG).show()
                 }else {
                     logedIn = mainViewModel.obtenerUsuarioLogeado() != ""
-                    if (logedIn) {
-                        Log.d("login", "Usuario logeado1: $logedIn")
-                        mainViewModel.loginUsuarioGuardado()
+                    val context = this
+                    LaunchedEffect(logedIn) {
+                        if (logedIn) {
+                            Log.d("login", "Usuario logeado1: $logedIn")
+                            mainViewModel.loginUsuarioGuardado()
+                            suscribeToFCM(context)
+                        }
                     }
+
                 }
 
                 // Update the app language, to restore the previous app language in case a different

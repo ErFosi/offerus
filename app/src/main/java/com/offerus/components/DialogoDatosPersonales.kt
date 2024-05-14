@@ -1,8 +1,13 @@
 package com.offerus.components
 
+import android.service.autofill.UserData
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -56,14 +61,16 @@ import androidx.compose.ui.unit.toSize
 import androidx.compose.ui.window.Dialog
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.offerus.R
+import com.offerus.data.UsuarioData
 import com.offerus.ui.theme.OfferUSTheme
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DialogoDatosPersonales(
+    infoUsuario: UsuarioData,
     onDismissRequest: () -> Unit,
-    onConfirmation: () -> Unit
+    onConfirmation: (UsuarioData) -> Unit
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     var sexExpanded by rememberSaveable {
@@ -74,11 +81,11 @@ fun DialogoDatosPersonales(
         stringResource(id = R.string.mujer),
         stringResource(id = R.string.otros))
 
-    var nombreYapellido by rememberSaveable { mutableStateOf("") }
-    var edad by rememberSaveable { mutableStateOf("") }
-    var sexo by rememberSaveable { mutableStateOf("") }
-    var telefono by rememberSaveable { mutableStateOf("") }
-    var email by rememberSaveable { mutableStateOf("") }
+    var nombreYapellido by rememberSaveable { mutableStateOf(infoUsuario.nombre_apellido) }
+    var edad by rememberSaveable { mutableStateOf(infoUsuario.edad) }
+    var sexo by rememberSaveable { mutableStateOf(infoUsuario.sexo) }
+    var telefono by rememberSaveable { mutableStateOf(infoUsuario.telefono) }
+    var email by rememberSaveable { mutableStateOf(infoUsuario.mail) }
 
     Dialog(
         onDismissRequest = { onDismissRequest() },
@@ -92,9 +99,17 @@ fun DialogoDatosPersonales(
         ) {
             Text(
                 text = stringResource(R.string.datosPersonales),
-                modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 40.dp),
+                modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 20.dp, bottom = 10.dp),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.titleLarge
+            )
+
+            Spacer(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
+                    .height(2.dp)
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.25f))
             )
 
             OutlinedTextField(
@@ -114,8 +129,8 @@ fun DialogoDatosPersonales(
             OutlinedTextField(
                 modifier = Modifier
                     .padding(start = 20.dp, top = 5.dp, bottom = 5.dp, end = 20.dp) ,
-                value = edad,
-                onValueChange = { if (it.length <=2) edad = it },
+                value = edad.toString(),
+                onValueChange = { if (it.length <=2) edad = it.toInt() },
                 label = { Text(stringResource(R.string.age)) },
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done, keyboardType = KeyboardType.Number),
                 keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
@@ -202,6 +217,14 @@ fun DialogoDatosPersonales(
                 }
             )
 
+            Spacer(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
+                    .height(2.dp)
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.25f))
+            )
+
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 //horizontalArrangement = Arrangement.Center,
@@ -220,7 +243,20 @@ fun DialogoDatosPersonales(
                 }
 
                 Button(onClick = {
-                    onConfirmation()
+                    onConfirmation(
+                        UsuarioData(
+                            nombre_apellido = nombreYapellido,
+                            edad = edad,
+                            sexo = sexo,
+                            telefono = telefono,
+                            mail = email,
+                            descripcion = infoUsuario.descripcion,
+                            latitud = infoUsuario.latitud,
+                            longitud = infoUsuario.longitud,
+                            suscripciones = infoUsuario.suscripciones,
+                            username = infoUsuario.username
+                        )
+                    )
                 }) {
                     Text(text = "")
                     Icon(
@@ -241,8 +277,8 @@ fun DialogoDatosPersonales(
 @Composable
 fun previewDialogodatospersonales() {
     OfferUSTheme(content = {
-        DialogoDatosPersonales(onDismissRequest = {  }) {
+        /*DialogoDatosPersonales(onDismissRequest = {  }) {
 
-        }
+        }*/
     })
 }

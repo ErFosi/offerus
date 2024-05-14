@@ -37,6 +37,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -60,7 +61,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.offerus.R
 import com.offerus.navigation.AppScreens
-import com.offerus.screens.validateFields
+import com.offerus.services.suscribeToFCM
 import com.offerus.utils.AuthenticationException
 import com.offerus.utils.UserExistsException
 import com.offerus.viewModels.MainViewModel
@@ -193,18 +194,23 @@ fun LoginBox(
                 mostrarErrorLogin = true
                 sesionIniciada = false
             } catch (e: Exception) {
-                mostrarErrorLogin = true
+                mostrarErrorLogin = false
                 sesionIniciada = false
                 mostrarErrorConexion = true
             }
         }
     }
-    if (sesionIniciada) {
-        // TODO suscribeToFCM(context)
-        navController.popBackStack()
-        navController.navigate(AppScreens.MainScreen.route)
-        mainViewModel.iniciarListas()
+    LaunchedEffect (sesionIniciada) {
+        if (sesionIniciada){
+            suscribeToFCM(context)
+            mainViewModel.iniciarListas()
+            mainViewModel.actualizarInfoUsuario()
+            navController.popBackStack()
+            navController.navigate(AppScreens.MainScreen.route)
+        }
+
     }
+
     if (mostrarErrorLogin){
         Toast.makeText(
             context,
