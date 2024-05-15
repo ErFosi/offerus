@@ -372,8 +372,8 @@ class MainViewModel @Inject constructor(
         return respuesta
     }
 
-    fun getRequests(searchText: String, categories: String, maxDistance: Double, minPrice: Double, maxPrice: Double, asc: String) {
-        val filter = BusquedaPeticionServicio(searchText, null, 10000000000000.0, minPrice, maxPrice, 0.0, 0.0, "precio_asc")
+    fun getRequests(searchText: String?, categories: String?, maxDistance: Double?, minPrice: Double?, maxPrice: Double?, asc: String) {
+        val filter = BusquedaPeticionServicio(searchText, categories, maxDistance, minPrice, maxPrice, 0.0, 0.0, "precio_asc")
         Log.e("peticion", " $searchText , $maxDistance , $maxPrice")
         var respuesta: List<ServicioPeticion>
         try {
