@@ -60,6 +60,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -97,11 +98,11 @@ fun OffersScreen(
     val tabs = listOf("Ofertas", "Solicitudes")
 
     // FILTRO
-    val titulo = remember { mutableStateOf("") }
-    val categoria = remember { mutableStateOf("gratis,deporte,hogar,otros,entretenimiento,academico,online") }
-    val distanciaMaxima = remember { mutableStateOf(100.0) }
-    val precioMinimo = remember { mutableStateOf(0.0) }
-    val precioMaxima = remember { mutableStateOf(0.0) }
+    val titulo = remember { mutableStateOf<String?>(null) }
+    val categoria = remember { mutableStateOf<String?>(null) }
+    val distanciaMaxima = remember { mutableStateOf<Double?>(null) }
+    val precioMinimo = remember { mutableStateOf<Double?>(null) }
+    val precioMaxima = remember { mutableStateOf<Double?>(null) }
     val ordenarPor = remember { mutableStateOf("precio_asc") }
 
     // LISTAS
@@ -121,11 +122,11 @@ fun OffersScreen(
                 onConfirmation = { openFilterDialog.value = false
                     mainViewModel.getRequests(titulo.value,categoria.value,distanciaMaxima.value,precioMinimo.value,precioMaxima.value,"")},
                 onRefresh = {
-                    titulo.value = ""
-                    categoria.value = "gratis,deporte,hogar,otros,entretenimiento,academico,online"
-                    distanciaMaxima.value = 0.0
-                    precioMaxima.value = 0.0
-                    precioMinimo.value = 0.0
+                    titulo.value = null
+                    categoria.value = null
+                    distanciaMaxima.value = null
+                    precioMaxima.value = null
+                    precioMinimo.value = null
 
 
 
@@ -136,7 +137,7 @@ fun OffersScreen(
                 onPrecioMinChange = { precioMinimo.value = it },
                 onPrecioMaxChange = { precioMaxima.value = it },
                 categoria = categoria.value,
-                distanciaMaxima = distanciaMaxima.value.toFloat(),
+                distanciaMaxima = distanciaMaxima.value?.toFloat(),
                 precioMaximo = precioMaxima.value,
                 precioMinimo = precioMinimo.value,
                 titulo = titulo.value
@@ -326,19 +327,51 @@ fun SearchDialog(
     onDistanciaChange: (Double) -> Unit,
     onPrecioMinChange: (Double) -> Unit,
     onPrecioMaxChange: (Double) -> Unit,
-    titulo: String,
-    precioMinimo: Double,
-    precioMaximo: Double,
-    categoria: String,
-    distanciaMaxima: Float
+    titulo: String?,
+    precioMinimo: Double?,
+    precioMaximo: Double?,
+    categoria: String?,
+    distanciaMaxima: Float?
 
 ){
-    var sliderValue by remember { mutableStateOf(distanciaMaxima.toFloat()) }
+
+    var sliderValue by if (distanciaMaxima == null) {
+        remember { mutableStateOf(0.0F)}
+    } else {
+        remember { mutableStateOf(distanciaMaxima.toFloat()) }
+    }
+
+    var textoTitulo = if (titulo == null) {
+        remember { mutableStateOf("")}
+    } else {
+        remember { mutableStateOf(titulo) }
+    }
+    var textoPrecioMaximo = if (precioMaximo == null) {
+        remember { mutableStateOf("")}
+    } else {
+        remember { mutableStateOf(precioMaximo.toString()) }
+    }
+    var textoPrecioMinimo = if (precioMinimo == null) {
+        remember { mutableStateOf("")}
+    } else {
+        remember { mutableStateOf(precioMinimo.toString()) }
+    }
+
     val titulo = remember { mutableStateOf(titulo) }
-    val precioMinimo = remember { mutableStateOf(precioMinimo.toInt().toString()) }
-    val precioMaxima = remember { mutableStateOf(precioMaximo.toInt().toString()) }
+    val precioMinimo = remember { mutableStateOf(precioMinimo?.toInt().toString()) }
+    val precioMaxima = remember { mutableStateOf(precioMaximo?.toInt().toString()) }
+
+
+    val textoCategoria = if (categoria == null){
+        remember { mutableStateOf("Todas las Categorias") }
+    } else {
+        remember { mutableStateOf(categoria) }
+    }
+
 
     var errorState by remember { mutableStateOf(false) }
+
+
 
 
     Dialog(onDismissRequest = { onDismissRequest() }) {
@@ -365,24 +398,25 @@ fun SearchDialog(
                         Row(
                             modifier = Modifier.padding(vertical = 5.dp),
                         ) {
-                            OutlinedTextField(
-                                value = titulo.value,
-                                onValueChange = {
-                                    titulo.value = it
-                                    onTituloChange(it)
-                                },
-                                modifier = Modifier
-                                    .height(70.dp)
-                                    .padding(vertical = 10.dp),
-                                label = {Text(text = "Titulo")}
-                            )
+
+                                OutlinedTextField(
+                                    value = textoTitulo.value,
+                                    onValueChange = {
+                                        textoTitulo.value = it
+                                        onTituloChange(it)
+                                    },
+                                    modifier = Modifier
+                                        .height(70.dp),
+                                    label = {Text(text = "Titulo")}
+                                )
+
 
                         }
 
                         Row(
                             modifier = Modifier.padding(vertical = 5.dp),
                         ) {
-                            DropdownCategorias(onCategoriaChange = onCategoriaChange, categoria)
+                            DropdownCategorias(onCategoriaChange = onCategoriaChange, textoCategoria.value)
                         }
 
                         Row(
@@ -409,7 +443,7 @@ fun SearchDialog(
                         ) {
                             OutlinedTextField(
 
-                                value = precioMinimo.value.toString(),
+                                value = textoPrecioMinimo.value,
                                 onValueChange = {
 
                                     if ( it.isEmpty() || it.toDoubleOrNull() != null) {
@@ -426,14 +460,20 @@ fun SearchDialog(
                                 },
                                 modifier = Modifier
                                     .height(70.dp)
-                                    .width(65.dp),
+                                    .width(65.dp)
+                                    .onFocusChanged {
+                                                    
+                                    }
+
+
+                                ,
                                 label = {Text(text = "Min")},
                                 singleLine = true,
                                 isError = errorState
                             )
                             Text(text = " - ")
                             OutlinedTextField(
-                                value = precioMaxima.value.toString(),
+                                value = textoPrecioMaximo.value,
                                 onValueChange = {
                                     if ( it.isEmpty() || it.toDoubleOrNull() != null) {
                                         precioMaxima.value = it
@@ -454,6 +494,8 @@ fun SearchDialog(
                             )
                             Text(text = " €")
                         }
+
+
 
                     }
                 }
