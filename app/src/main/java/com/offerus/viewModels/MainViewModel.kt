@@ -59,6 +59,8 @@ class MainViewModel @Inject constructor(
     // pull refresh states
     var isRefreshingHome = mutableStateOf(false)
     var isRefreshingMyOffers = mutableStateOf(false)
+    var isRefreshingSearch = mutableStateOf(false)
+    var isRefreshingFavorites = mutableStateOf(false)
 
     // Recordar subpestañas
     var selectedTabIndexHome =
@@ -75,13 +77,17 @@ class MainViewModel @Inject constructor(
     var listaMisOfertas = mutableStateOf(emptyList<ServicioPeticion>())
     var listaMisPeticiones = mutableStateOf(emptyList<ServicioPeticion>())
 
+    // Variables pantalla search
     var cargaInicialPeticiones = mutableStateOf(false)
     var listaSolicitudes = mutableStateOf(emptyList<ServicioPeticion>())
     var listaOfertas = mutableStateOf(emptyList<ServicioPeticion>())
+    var ordenAscendenteSearch = mutableStateOf(true)
 
+    // Variables pantalla favoritos
     var cargaInicialPeticionesFavoritas = mutableStateOf(false)
     var listaSolicitudesFavoritas = mutableStateOf(emptyList<ServicioPeticion>())
     var listaOfertasFavoritas = mutableStateOf(emptyList<ServicioPeticion>())
+    var ordenAscendenteFavoritas = mutableStateOf(true)
 
     var selectedTabIndex by mutableStateOf(0)
 
@@ -378,22 +384,26 @@ class MainViewModel @Inject constructor(
         var respuesta: List<ServicioPeticion>
         try {
             viewModelScope.launch {
+                isRefreshingSearch.value = true
                 respuesta = httpUserClient.buscarPeticionesServicio(filter).toMutableList()
                 respuesta = respuesta.sortedBy { it.precio }
 
                 listaSolicitudes.value = respuesta.filter { it.peticion }
                 listaOfertas.value = respuesta.filter { !it.peticion }
 
+                ordenarServicios(ordenAscendenteSearch.value)
+
 
                 Log.e("KTOR", "Peticiones recogidas con exito")
                 Log.e("KTOR", listaOfertas.value.size.toString())
                 Log.e("KTOR", listaSolicitudes.value.size.toString())
 
-
+            isRefreshingSearch.value = false
 
             }
         } catch (e: Exception) {
             Log.e("KTOR", e.toString())
+            isRefreshingSearch.value = false
 
         }
     }
@@ -433,6 +443,17 @@ class MainViewModel @Inject constructor(
         } else {
             listaOfertas.value = listaOfertas.value.sortedByDescending { it.precio }
             listaSolicitudes.value = listaSolicitudes.value.sortedByDescending { it.precio }
+        }
+    }
+
+    fun ordenarServiciosFavoritos(asc: Boolean){
+
+        if (asc){
+            listaOfertasFavoritas.value = listaOfertasFavoritas.value.sortedBy { it.precio }
+            listaSolicitudesFavoritas.value = listaSolicitudesFavoritas.value.sortedBy { it.precio }
+        } else {
+            listaOfertasFavoritas.value = listaOfertasFavoritas.value.sortedByDescending { it.precio }
+            listaSolicitudesFavoritas.value = listaSolicitudesFavoritas.value.sortedByDescending { it.precio }
         }
     }
 
@@ -690,7 +711,9 @@ class MainViewModel @Inject constructor(
                 listaSolicitudesFavoritas.value = respuesta.filter { it.peticion }
                 listaOfertasFavoritas.value = respuesta.filter { !it.peticion }
 
-                Log.e("KTOR", "Peticion getMyOffers completada")
+                ordenarServiciosFavoritos(ordenAscendenteFavoritas.value)
+
+                Log.e("KTOR", "Peticion get favoritas completada ")
 
                 if (!cargaInicialPeticionesFavoritas.value){
                     cargaInicialPeticionesFavoritas.value = true
@@ -743,38 +766,47 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun filtrarFavoritas(titulo: String,
-                         categoria: String,
-                         distanciaMaxima: Double,
-                         precioMinimo: Double,
-                         precioMaximo: Double
+    fun filtrarFavoritas(titulo: String?,
+                         categoria: String?,
+                         distanciaMaxima: Double?,
+                         precioMinimo: Double?,
+                         precioMaximo: Double?
     ){
 
         var resultado: List<ServicioPeticion>
         try {
             viewModelScope.launch {
+                isRefreshingFavorites.value = true
                 resultado = httpUserClient.obtenerPetFavoritasUsuario()
 
                 //Log.e("KTOR", "Inicio filtrado")
                 //Log.e("KTOR", resultado.size.toString())
-                if (titulo.isNotEmpty()) {
-                    resultado = resultado.filter { it.titulo.contains(titulo) }
-                    //Log.e("KTOR", titulo)
-                    //Log.e("KTOR", resultado.size.toString())
+                if (titulo != null) {
+                    if (titulo.isNotEmpty()) {
+                        resultado = resultado.filter { it.titulo.contains(titulo) }
+                        //Log.e("KTOR", titulo)
+                        //Log.e("KTOR", resultado.size.toString())
 
+                    }
                 }
-                if (!categoria.contains(",")) {
-                    resultado = resultado.filter { it.categorias.contains(categoria) }
-                    //Log.e("KTOR", categoria)
-                    //Log.e("KTOR", resultado.size.toString())
+                if (categoria != null) {
+                    if (!categoria.contains(",")) {
+                        resultado = resultado.filter { it.categorias.contains(categoria) }
+                        //Log.e("KTOR", categoria)
+                        //Log.e("KTOR", resultado.size.toString())
+                    }
                 }
                 //TODO filtrar por distancia maxima
-                resultado = resultado.filter { it.precio >= precioMinimo }
-                //Log.e("KTOR", resultado.size.toString())
-                resultado = resultado.filter { it.precio <= precioMaximo }
-                //Log.e("KTOR", resultado.size.toString())
-                //Log.e("KTOR", "Fin filtrado")
-                //Log.e("KTOR", listaOfertasFavoritas.value.size.toString())
+
+                if (precioMinimo !=null){
+                    resultado = resultado.filter { it.precio >= precioMinimo }
+                }
+
+                if (precioMaximo !=null){
+                    resultado = resultado.filter { it.precio <= precioMaximo }
+                }
+
+
 
                 listaSolicitudesFavoritas.value = resultado.filter { it.peticion }
                 listaOfertasFavoritas.value = resultado.filter { !it.peticion }
@@ -784,12 +816,13 @@ class MainViewModel @Inject constructor(
                 if (!cargaInicialPeticionesFavoritas.value){
                     cargaInicialPeticionesFavoritas.value = true
                 }
+                isRefreshingFavorites.value = false
 
 
             }
         } catch (e: Exception) {
             Log.e("KTOR", e.toString())
-
+            isRefreshingFavorites.value = false
         }
 
 
