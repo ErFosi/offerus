@@ -26,7 +26,9 @@ import io.ktor.client.plugins.HttpResponseValidator
 import io.ktor.client.plugins.auth.providers.BearerTokens
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.accept
+import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.delete
+import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.forms.formData
 import io.ktor.client.request.forms.submitForm
 import io.ktor.client.request.forms.submitFormWithBinaryData
@@ -146,7 +148,20 @@ class UserClient @Inject constructor() {
         val byteArray = stream.toByteArray()
         val token = bearerTokenStorage.last().accessToken
         Log.d("KTOR", "Subiendo imagen de perfil")
-        clienteHttp.submitFormWithBinaryData(
+        clienteHttp.post("https://offerus.zapto.org/profile/image") {
+            setBody(
+                MultiPartFormDataContent(
+                    formData {
+                        append("file", byteArray, Headers.build {
+                            append(HttpHeaders.ContentType, "image/jpeg")
+                            append(HttpHeaders.ContentDisposition, "filename=profile_image.jpg")
+                        })
+                    }
+                )
+            )
+            bearerAuth(token)
+        }
+        /*clienteHttp.submitFormWithBinaryData(
             url = "https://offerus.zapto.org/profile/image",
             formData = formData {
                 append("file", byteArray, Headers.build {
@@ -157,7 +172,7 @@ class UserClient @Inject constructor() {
         ) {
             method = HttpMethod.Post
             header(HttpHeaders.Authorization, "Bearer $token")
-        }
+        }*/
         Log.d("KTOR", "Imagen de perfil subida")
     }
 
