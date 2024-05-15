@@ -120,7 +120,7 @@ fun mapa(
         )
     }
     val cameraPositionState = CameraPositionState (
-        position = if (lat != 0.0 && lon != 0.0) CameraPosition(LatLng(lat, lon), 15f, 0f, 0f) else CameraPosition(LatLng(0.00, 0.00), 10f, 0f, 0f)
+        position = if (lat != 0.0 && lon != 0.0) CameraPosition(LatLng(lat, lon), 10f, 0f, 0f) else CameraPosition(LatLng(0.00, 0.00), 10f, 0f, 0f)
     )
 
     GoogleMap(

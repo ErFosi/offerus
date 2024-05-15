@@ -58,6 +58,7 @@ import com.offerus.components.mapa
 import com.offerus.data.ServicioPeticion
 import com.offerus.utils.crearContacto
 import com.offerus.utils.enviarEmail
+import com.offerus.utils.obtenerCategorias
 import com.offerus.utils.showToastOnMainThread
 import com.offerus.viewModels.MainViewModel
 
@@ -93,9 +94,7 @@ fun OfferDetailsContent(paddingValues: PaddingValues, viewModel: MainViewModel) 
             .any { it.estado == "pendiente" }
         Log.d("pendiente", pendiente.toString())
         // lista de categorias
-        val categorias =
-            servicioPeticion.categorias.replace("[", "").replace("]", "").split(", ")
-                .map { it.trim() }
+        val categorias = obtenerCategorias(servicioPeticion.categorias)
 
         val favorito =
             rememberSaveable { mutableStateOf(viewModel.esPeticionFavorita(servicioPeticion.id)) }
@@ -202,8 +201,10 @@ fun OfferDetailsContent(paddingValues: PaddingValues, viewModel: MainViewModel) 
                         servicioPeticion.titulo,
                         servicioPeticion.latitud,
                         servicioPeticion.longitud,
-                        categorias[0],
-                        servicioPeticion.precio.toString() + "€"
+                        //categorias[0],
+                        "none",
+                        servicioPeticion.precio.toString() + "€",
+                        //categorias
                     )
                     item {
                         Card(modifier = Modifier.padding(start = 30.dp, end = 30.dp)) {
