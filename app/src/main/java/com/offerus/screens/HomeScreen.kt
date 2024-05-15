@@ -1,7 +1,7 @@
 package com.offerus.screens
 
-import android.annotation.SuppressLint
 import android.util.Log
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
@@ -13,14 +13,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -30,10 +27,8 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
@@ -41,13 +36,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
-import com.gowtham.ratingbar.RatingBar
-import com.gowtham.ratingbar.RatingBarStyle
 import com.offerus.R
 import com.offerus.components.CategoriasCirculos
+import com.offerus.components.ReviewDialog
 import com.offerus.data.Deal
 import com.offerus.data.ServicioPeticion
 import com.offerus.navigation.AppScreens
@@ -60,7 +52,7 @@ fun HomeScreen(navController: NavController, viewModel: MainViewModel) {
     var selectedTabIndex = viewModel.selectedTabIndexHome
 
     // Lista de pestañas
-    val tabs = listOf("Entrantes", "Salientes")
+    val tabs = listOf("Entrantes", "Salientes", "Valoraciones pend.")
 
     // Superficie principal
     Surface {
@@ -68,10 +60,12 @@ fun HomeScreen(navController: NavController, viewModel: MainViewModel) {
 
             // dialogo para realizar la review
             if (viewModel.dialogoReview.value) {
-                ReviewDialog(viewModel.dealReview,
+                ReviewDialog(viewModel.usuario, viewModel.dealReview,
                     onDismissRequest = { viewModel.dialogoReview.value = false }) {
                     //enviar la review
-                    viewModel.enviarReview()
+                    viewModel.dealRate(
+                        viewModel.dealReview!!
+                    )
                     viewModel.dialogoReview.value = false
                 }
             }
@@ -95,97 +89,33 @@ fun HomeScreen(navController: NavController, viewModel: MainViewModel) {
                 1 -> Salientes(viewModel, onMakeReview = { viewModel.dialogoReview.value = true }) {
                     navController.navigate(AppScreens.OfferDetailsScreen.route)
                 }
-            }
 
-
-        }
-    }
-}
-
-@SuppressLint("UnrememberedMutableState")
-@Composable
-fun ReviewDialog(
-    deal: Deal?,
-    onDismissRequest: () -> Unit,
-    onConfirmation: () -> Unit
-) {
-
-    var valoracion = mutableStateOf(0F)
-
-    Dialog(
-        onDismissRequest = { onDismissRequest() }
-    ) {
-        Card {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = "Valoración del servicio",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp,
-                    modifier = Modifier.padding(8.dp)
-                )
-
-                //info del deal
-                if (deal != null) {
-                    Text(text = "usuario: ${deal.username_host}", fontWeight = FontWeight.Bold)
-                    Text(text = "Id peticion: ${deal.id_peticion}")
-
-                    // valoracion en estrellas
-                    RatingBar(
-                        modifier = Modifier
-                            .padding(bottom = 20.dp, top = 15.dp, start = 5.dp, end = 5.dp)
-                            .scale(0.75F),
-                        value = valoracion.value,
-                        style = RatingBarStyle.Fill(
-                            MaterialTheme.colorScheme.primary,
-                            MaterialTheme.colorScheme.outline
-                        ),
-                        onValueChange = {
-                            valoracion.value = it
-                        },
-                        onRatingChanged = {
-                            Log.d("TAG", "onRatingChanged: $it")
-                        }
-                    )
-
-                    IconButton(onClick = {
-                        //actualizar la review dependiendo de si es cliente o host
-                        if (deal != null) {
-                            if (deal.username_host == "cuadron11") {
-                                deal.nota_host = valoracion.value.toInt()
-                            } else {
-                                deal.nota_cliente = valoracion.value.toInt()
-                            }
-                        }
-                        onConfirmation()
-                    }, modifier = Modifier
-                        .padding(8.dp)
-                        .size(32.dp)) {
-                        Icon(
-                            imageVector = Icons.Filled.CheckCircle,
-                            contentDescription = "Aceptar",
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(32.dp)
-                        )
+                2 -> {
+                    ValoracionesPendientes(
+                        viewModel,
+                        onMakeReview = { viewModel.dialogoReview.value = true }) {
+                        navController.navigate(AppScreens.OfferDetailsScreen.route)
                     }
-                } else {
-                    Text(text = "Peticion no encontrada")
                 }
-
             }
+
+
         }
     }
 }
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun Entrantes(viewModel: MainViewModel, onItemClick: () -> Unit) {
-    //obtenemos la lista del viemodel
-    var listaEntrantes = viewModel.listaEntrantes.value
-    //mostramos la lista
-    val refreshState = rememberPullRefreshState(refreshing = viewModel.isRefreshingHome.value, onRefresh = { viewModel.actualizarListaDeals() })
+fun ValoracionesPendientes(
+    viewModel: MainViewModel,
+    onMakeReview: () -> Unit,
+    onItemClick: () -> Unit
+) {
+    val listaValoracionesPendientes = viewModel.listaValoracionesPendientes.value
+    // pull refresh
+    val refreshState = rememberPullRefreshState(
+        refreshing = viewModel.isRefreshingHome.value,
+        onRefresh = { viewModel.actualizarListaDeals() })
     //mostramos la lista
 
     Box(
@@ -193,46 +123,288 @@ fun Entrantes(viewModel: MainViewModel, onItemClick: () -> Unit) {
             .fillMaxSize()
             .padding(8.dp)
     ) {
-        LazyColumn(modifier = Modifier.fillMaxSize().pullRefresh(refreshState)){
-            items(listaEntrantes.size) { index ->
-                EntrantesCard(deal = listaEntrantes[index], viewModel) {
-                    viewModel.cambiarServicioDetalle(listaEntrantes[index].id_peticion)
-                    onItemClick()
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .pullRefresh(refreshState)
+        ) {
+            if (listaValoracionesPendientes.isEmpty()) {
+                item {
+                    Column(modifier = Modifier.fillMaxSize()) {
+                        Text(
+                            text = "No hay valoraciones pendientes.",
+                            modifier = Modifier.padding(8.dp)
+                        )
+                        Text(text = "Desliza hacia arriba para refrescar.")
+                    }
+
+                }
+            }
+            items(listaValoracionesPendientes.size) { index ->
+                ValoracionesPendientesCard(deal = listaValoracionesPendientes[index], viewModel) {
+                    if (listaValoracionesPendientes[index].estado == "aceptado") {
+                        viewModel.dealReview = listaValoracionesPendientes[index]
+                        onMakeReview()
+                    } else {
+                        viewModel.cambiarServicioDetalle(listaValoracionesPendientes[index].id_peticion)
+                        onItemClick()
+                    }
                 }
             }
         }
-        PullRefreshIndicator(refreshing = viewModel.isRefreshingHome.value, state = refreshState, modifier = Modifier.align(Alignment.TopCenter))
+        PullRefreshIndicator(
+            refreshing = viewModel.isRefreshingHome.value,
+            state = refreshState,
+            modifier = Modifier.align(Alignment.TopCenter)
+        )
+    }
+}
+
+@Composable
+fun ValoracionesPendientesOfferInfo(
+    deal: Deal,
+    servicioPeticion: ServicioPeticion,
+    viewModel: MainViewModel
+) {
+    Log.d("ValoracionesPendientesOfferInfo", "deal: $deal")
+    Log.d("ValoracionesPendientesOfferInfo", "servicioPeticion: $servicioPeticion")
+    Row(
+        modifier = Modifier
+            .padding(8.dp)
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(Modifier.weight(1f)) {
+            Text(
+                text = servicioPeticion.titulo,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(4.dp)
+            )
+            Text(
+                text = "${servicioPeticion.precio}€",
+                modifier = Modifier.padding(4.dp)
+            )
+            CategoriasCirculos(nombresCategorias = servicioPeticion.categorias)
+        }
+
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.border(
+                1.dp,
+                MaterialTheme.colorScheme.outline,
+                shape = CardDefaults.shape
+            )
+        ) {
+            // Foto de perfil y nombre de usuario
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.padding(8.dp)
+            ) {
+                val username = if (viewModel.usuario == servicioPeticion.username) {
+                    deal.username_cliente
+                } else {
+                    deal.username_host
+                }
+                UserAvatar(username = username, viewModel = viewModel)
+                Text(text = username)
+
+
+                // estado valoracion
+
+                if (deal.nota_host != -1) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = R.drawable.review_made),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.secondary
+                    )
+                } else {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = R.drawable.review_made),
+                        contentDescription = null
+                    )
+                }
+
+            }
+
+        }
+
+    }
+}
+
+@Composable
+fun ValoracionesPendientesCard(deal: Deal, viewModel: MainViewModel, onItemClick: () -> Unit) {
+    var context = LocalContext.current
+    val servicioPeticion = viewModel.listaServiciosApi.value.find { it.id == deal.id_peticion }
+    if (servicioPeticion != null) {
+        Card(
+            modifier = Modifier
+                .padding(8.dp)
+                .pointerInput(deal) {
+                    detectTapGestures(
+                        onTap = {
+                            onItemClick()
+                        },
+                        onLongPress = {
+                            showToastOnMainThread(context, deal.estado)
+                        })
+                }
+        ) {
+            ValoracionesPendientesOfferInfo(
+                deal = deal,
+                servicioPeticion = servicioPeticion,
+                viewModel = viewModel
+            )
+        }
+    }
+}
+
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun Entrantes(viewModel: MainViewModel, onItemClick: () -> Unit) {
+    //obtenemos la lista del viemodel
+    var listaEntrantes = viewModel.listaEntrantes.value
+    //mostramos la lista
+    val refreshState = rememberPullRefreshState(
+        refreshing = viewModel.isRefreshingHome.value,
+        onRefresh = { viewModel.actualizarListaDeals() })
+    //mostramos la lista
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(8.dp)
+    ) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .pullRefresh(refreshState)
+        ) {
+            if (listaEntrantes.isEmpty()) {
+                item {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "No hay solicitudes entrantes.",
+                            modifier = Modifier.padding(8.dp)
+                        )
+                        Text(text = "Desliza hacia arriba para refrescar.")
+                    }
+                }
+            } else {
+                items(listaEntrantes.size) { index ->
+                    EntrantesCard(deal = listaEntrantes[index], viewModel) {
+                        viewModel.cambiarServicioDetalle(listaEntrantes[index].id_peticion)
+                        onItemClick()
+                    }
+                }
+            }
+
+        }
+        PullRefreshIndicator(
+            refreshing = viewModel.isRefreshingHome.value,
+            state = refreshState,
+            modifier = Modifier.align(Alignment.TopCenter)
+        )
     }
 }
 
 @Composable
 fun EntrantesCard(deal: Deal, viewModel: MainViewModel, onItemClick: () -> Unit) {
-    var context = LocalContext.current
     //obtener el servicio del deal
-    val servicioPeticion = viewModel.listaPeticiones.collectAsState(listOf()).value.find { it.id == deal.id_peticion }
+    val servicioPeticion =
+        viewModel.listaPeticiones.collectAsState(listOf()).value.find { it.id == deal.id_peticion }
     if (servicioPeticion != null) {
-        Card(
-            modifier = Modifier
-                .padding(8.dp)
-                .clickable(onClick = onItemClick)
-        ) {
-            OfferInfo(deal = deal, servicioPeticion = servicioPeticion, viewModel = viewModel) { BotonesEntrantes(onAccept = {viewModel.dealAcceptDeny(deal.id, true)}) {viewModel.dealAcceptDeny(deal.id, false)} }
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Card(
+                modifier = Modifier
+                    .padding(8.dp)
+                    .weight(1f)
+                    .clickable(onClick = onItemClick)
+            ) {
+                EntrantesOfferInfo(
+                    deal = deal,
+                    servicioPeticion = servicioPeticion,
+                    viewModel = viewModel
+                )
+            }
+
         }
+
     }
 }
 
 @Composable
+fun EntrantesOfferInfo(
+    viewModel: MainViewModel,
+    deal: Deal,
+    servicioPeticion: ServicioPeticion
+) {
+    Row(
+        modifier = Modifier
+            .padding(8.dp)
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(Modifier.weight(1f)) {
+            Text(
+                text = servicioPeticion.titulo,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(4.dp)
+            )
+            Text(
+                text = "${servicioPeticion.precio}€",
+                modifier = Modifier.padding(4.dp)
+            )
+            CategoriasCirculos(nombresCategorias = servicioPeticion.categorias)
+        }
+
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.border(
+                1.dp,
+                MaterialTheme.colorScheme.outline,
+                shape = CardDefaults.shape
+            )
+        ) {
+            // Foto de perfil y nombre de usuario
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.padding(top = 8.dp)
+            ) {
+                val username = if (viewModel.usuario == servicioPeticion.username) {
+                    deal.username_cliente
+                } else {
+                    deal.username_host
+                }
+                UserAvatar(username = username, viewModel = viewModel)
+                Text(text = username)
+            }
+            BotonesEntrantes(
+                onAccept = { viewModel.dealAcceptDeny(deal.id, true) },
+                onDeny = { viewModel.dealAcceptDeny(deal.id, false) }
+            )
+        }
+
+    }
+}
+
+
+@Composable
 fun BotonesEntrantes(onAccept: () -> Unit, onDeny: () -> Unit) {
     var context = LocalContext.current
-    Column {
+    Row {
         IconButton(onClick = {
             onAccept()
             showToastOnMainThread(context, "Petición aceptada")
         }) {
             Icon(
-                imageVector = Icons.Filled.Check,
+                painterResource(id = R.drawable.logorecortado),
                 contentDescription = "Aceptar",
-                tint = MaterialTheme.colorScheme.primary
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(28.dp)
             )
         }
         IconButton(onClick = {
@@ -240,9 +412,10 @@ fun BotonesEntrantes(onAccept: () -> Unit, onDeny: () -> Unit) {
             showToastOnMainThread(context, "Petición rechazada")
         }) {
             Icon(
-                imageVector = Icons.Filled.Close,
+                painterResource(id = R.drawable.logorecortado),
                 contentDescription = "Rechazar",
-                tint = MaterialTheme.colorScheme.error
+                tint = MaterialTheme.colorScheme.error,
+                modifier = Modifier.size(28.dp)
             )
         }
     }
@@ -254,7 +427,9 @@ fun Salientes(viewModel: MainViewModel, onMakeReview: () -> Unit, onItemClick: (
     val listaSalientes = viewModel.listaSalientes.value
     Log.d("listaComposable", listaSalientes.toString())
     // pull refresh
-    val refreshState = rememberPullRefreshState(refreshing = viewModel.isRefreshingHome.value, onRefresh = { viewModel.actualizarListaDeals() })
+    val refreshState = rememberPullRefreshState(
+        refreshing = viewModel.isRefreshingHome.value,
+        onRefresh = { viewModel.actualizarListaDeals() })
     //mostramos la lista
 
     Box(
@@ -262,7 +437,23 @@ fun Salientes(viewModel: MainViewModel, onMakeReview: () -> Unit, onItemClick: (
             .fillMaxSize()
             .padding(8.dp)
     ) {
-        LazyColumn(modifier = Modifier.fillMaxSize().pullRefresh(refreshState)) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .pullRefresh(refreshState)
+        ) {
+            if (listaSalientes.isEmpty()) {
+                item {
+                    Column(modifier = Modifier.fillMaxSize()) {
+                        Text(
+                            text = "No hay solicitudes salientes.",
+                            modifier = Modifier.padding(8.dp)
+                        )
+                        Text(text = "Desliza hacia arriba para refrescar.")
+                    }
+
+                }
+            }
             items(listaSalientes.size) { index ->
                 SalientesCard(deal = listaSalientes[index], viewModel) {
                     if (listaSalientes[index].estado == "aceptado") {
@@ -276,7 +467,11 @@ fun Salientes(viewModel: MainViewModel, onMakeReview: () -> Unit, onItemClick: (
                 }
             }
         }
-        PullRefreshIndicator(refreshing = viewModel.isRefreshingHome.value, state = refreshState, modifier = Modifier.align(Alignment.TopCenter))
+        PullRefreshIndicator(
+            refreshing = viewModel.isRefreshingHome.value,
+            state = refreshState,
+            modifier = Modifier.align(Alignment.TopCenter)
+        )
     }
 
 }
@@ -289,7 +484,7 @@ fun SalientesCard(deal: Deal, viewModel: MainViewModel, onItemClick: () -> Unit)
         Card(
             modifier = Modifier
                 .padding(8.dp)
-                .pointerInput(Unit) {
+                .pointerInput(deal) {
                     detectTapGestures(
                         onTap = {
                             onItemClick()
@@ -301,7 +496,7 @@ fun SalientesCard(deal: Deal, viewModel: MainViewModel, onItemClick: () -> Unit)
         ) {
             OfferInfo(deal = deal, servicioPeticion = servicioPeticion, viewModel = viewModel) {
                 //estado aleatorio entre pendiente, aceptada y rechazada
-                IconoEstado(estado = deal.estado)
+                IconoEstado(deal)
             }
         }
     }
@@ -309,10 +504,10 @@ fun SalientesCard(deal: Deal, viewModel: MainViewModel, onItemClick: () -> Unit)
 
 //icono pendiente, aceptada, rechazada
 @Composable
-fun IconoEstado(estado: String) {
+fun IconoEstado(deal: Deal) {
+    val estado = deal.estado
     when (estado) {
         "pendiente" -> {
-
             Icon(
                 imageVector = ImageVector.vectorResource(R.drawable.pending),
                 contentDescription = "pendiente",
@@ -323,14 +518,18 @@ fun IconoEstado(estado: String) {
         }
 
         "aceptado" -> {
-            Icon(
-                painter = painterResource(R.drawable.logorecortado),
-                contentDescription = null,
-                modifier = Modifier
-                    .padding(12.dp)
-                    .size(28.dp),
-                tint = MaterialTheme.colorScheme.primary
-            )
+            Column {
+                Icon(
+                    painter = painterResource(R.drawable.logorecortado),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .padding(12.dp)
+                        .size(28.dp),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+
+            }
+
         }
 
         "rechazado" -> {
@@ -363,12 +562,26 @@ fun OfferInfo(
             horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(4.dp)
         ) {
 
-            if (deal.username_host == servicioPeticion.username) {
+            if (viewModel.usuario == servicioPeticion.username) { // si yo soy el creador del servicio, muestro la foto del cliente
                 UserAvatar(username = deal.username_cliente, viewModel = viewModel)
                 Text(text = deal.username_cliente)
             } else {
                 UserAvatar(username = deal.username_host, viewModel = viewModel)
                 Text(text = deal.username_host)
+            }
+            if (deal.estado == "aceptado") {
+                if (deal.nota_cliente != -1) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = R.drawable.review_made),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.secondary
+                    )
+                }else {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = R.drawable.review_made),
+                        contentDescription = null
+                    )
+                }
             }
 
         }
@@ -377,9 +590,12 @@ fun OfferInfo(
             Text(
                 text = servicioPeticion.titulo,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
+                modifier = Modifier.padding(vertical = 4.dp, horizontal = 4.dp)
             )
-            Text(text = "${servicioPeticion.precio}€", modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp))
+            Text(
+                text = "${servicioPeticion.precio}€",
+                modifier = Modifier.padding(vertical = 4.dp, horizontal = 4.dp)
+            )
             CategoriasCirculos(nombresCategorias = servicioPeticion.categorias)
         }
 

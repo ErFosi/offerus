@@ -3,7 +3,6 @@ package com.offerus.screens
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.net.Uri
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,6 +18,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Scaffold
@@ -138,21 +138,24 @@ fun AppBottomBar(currentRoute: String?, onNavigate: (String) -> Unit) {
                     NavigationBarItem(
                         icon = { Icon(painter = painterResource(destinations.selectedIcon), contentDescription = null, modifier = Modifier.size(32.dp)) },
                         selected = currentRoute == destinations.route,
-                        onClick = { onNavigate(destinations.route) }
+                        onClick = { onNavigate(destinations.route) },
+                        colors = NavigationBarItemDefaults.colors(indicatorColor = MaterialTheme.colorScheme.primaryContainer)
                     )
                 }
                 BottomBarRoute.SEARCH -> {
                     NavigationBarItem(
                         icon = { Icon(ImageVector.vectorResource(id = destinations.selectedIcon), contentDescription = null, modifier = Modifier.size(24.dp)) },
                         selected = currentRoute == destinations.route,
-                        onClick = { onNavigate(destinations.route) }
+                        onClick = { onNavigate(destinations.route) },
+                        colors = NavigationBarItemDefaults.colors(indicatorColor = MaterialTheme.colorScheme.primaryContainer)
                     )
                 }
                 BottomBarRoute.MYOFFERS -> {
                     NavigationBarItem(
                         icon = { Icon(ImageVector.vectorResource(id = destinations.selectedIcon), contentDescription = null, modifier = Modifier.size(24.dp)) },
                         selected = currentRoute == destinations.route,
-                        onClick = { onNavigate(destinations.route) }
+                        onClick = { onNavigate(destinations.route) },
+                        colors = NavigationBarItemDefaults.colors(indicatorColor = MaterialTheme.colorScheme.primaryContainer)
                     )
                 }
             }

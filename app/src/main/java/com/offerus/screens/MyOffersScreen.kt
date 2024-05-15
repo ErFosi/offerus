@@ -14,18 +14,21 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -106,22 +109,30 @@ fun MyOffersScreen(navController: NavController, viewModel: MainViewModel) {
         }
         FloatingActionButton(
             onClick = { createDialog = true },
+            elevation = FloatingActionButtonDefaults.elevation(8.dp),
+            shape = CircleShape,
             modifier = Modifier
                 .padding(16.dp)
                 .align(Alignment.BottomEnd)
                 .size(56.dp),
-            shape = CircleShape,
+
             //backgroundColor = MaterialTheme.colors.primary
         ) {
-            Icon(Icons.Filled.Add, contentDescription = "Agregar")
+            Icon(Icons.Filled.Add, contentDescription = "Agregar", tint = MaterialTheme.colorScheme.tertiaryContainer)
         }
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun MisOfertas(viewModel: MainViewModel, onItemClick: () -> Unit) {
     val listaMisOfertas = viewModel.listaMisOfertas.value
-    Column(
+
+    val refreshState = rememberPullRefreshState(
+        refreshing = viewModel.isRefreshingMyOffers.value,
+        onRefresh = { viewModel.obtenerMisOfertas() })
+
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .padding(8.dp)
@@ -129,15 +140,36 @@ fun MisOfertas(viewModel: MainViewModel, onItemClick: () -> Unit) {
         LazyVerticalStaggeredGrid(
             columns = StaggeredGridCells.Fixed(2),
             //columns = GridCells.Fixed(2),
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize().pullRefresh(refreshState)
         ) {
+            if (listaMisOfertas.isEmpty()) {
+                item {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "No hay ofertas. Crea una nueva.",
+                            modifier = Modifier.padding(8.dp)
+                        )
+                        Text(text = "Desliza hacia arriba para refrescar.")
+                    }
+                }
+            } else {
             items(listaMisOfertas.size) { index ->
                 MisOfertasCard(listaMisOfertas[index], viewModel) {
                     viewModel.servicioDetalle.value = listaMisOfertas[index]
+                    viewModel.obtenerInfoUsuario(listaMisOfertas[index].username)
                     onItemClick()
                 }
             }
+            }
         }
+        PullRefreshIndicator(
+            refreshing = viewModel.isRefreshingMyOffers.value,
+            state = refreshState,
+            modifier = Modifier.align(Alignment.TopCenter)
+        )
     }
 }
 
@@ -167,16 +199,16 @@ fun BotonesMyOffers(onEditClick: () -> Unit, onDeleteClick: () -> Unit) {
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier.padding(4.dp)
     ) {
-        // Botón de aceptar
+        // Botón de  editar
         OutlinedButton(
             onClick = {
 
                 onEditClick() },
             modifier = Modifier.size(30.dp),  //avoid the oval shape
             shape = CircleShape,
-            border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.tertiaryContainer),
             contentPadding = PaddingValues(0.dp),  //avoid the little icon
-            colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.primary)
+            colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.tertiaryContainer)
         ) {
             Icon(
                 imageVector = Icons.Filled.Create,
@@ -205,25 +237,52 @@ fun BotonesMyOffers(onEditClick: () -> Unit, onDeleteClick: () -> Unit) {
 
 
 // MIS PETICIONES
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun MisPeticiones(viewModel: MainViewModel, onItemClick: () -> Unit) {
     var listaMisPeticiones = viewModel.listaMisPeticiones.value
-    Column(
+
+    val refreshState = rememberPullRefreshState(
+        refreshing = viewModel.isRefreshingMyOffers.value,
+        onRefresh = { viewModel.obtenerMisOfertas() })
+
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .padding(8.dp)
     ) {
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            modifier = Modifier.fillMaxSize()
+        LazyVerticalStaggeredGrid(
+            columns = StaggeredGridCells.Fixed(2),
+            modifier = Modifier.fillMaxSize().pullRefresh(refreshState)
         ) {
+            if (listaMisPeticiones.isEmpty()) {
+                item {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "No hay ofertas. Crea una nueva.",
+                            modifier = Modifier.padding(8.dp)
+                        )
+                        Text(text = "Desliza hacia arriba para refrescar.")
+                    }
+                }
+            } else {
             items(listaMisPeticiones.size) { index ->
                 MisOfertasCard(listaMisPeticiones[index], viewModel) {
                     viewModel.servicioDetalle.value = listaMisPeticiones[index]
+                    viewModel.obtenerInfoUsuario(listaMisPeticiones[index].username)
                     onItemClick()
                 }
             }
+            }
         }
+        PullRefreshIndicator(
+            refreshing = viewModel.isRefreshingMyOffers.value,
+            state = refreshState,
+            modifier = Modifier.align(Alignment.TopCenter)
+        )
     }
 }
 
