@@ -97,15 +97,19 @@ fun MyFavoritesPage(
     val ordenMenorMayor by mainViewModel.ordenAscendenteFavoritas
 
     // LISTAS
-    mainViewModel.getMyFavorites()
+    //mainViewModel.getMyFavorites()
     val listaOfertasFavoritas = mainViewModel.listaOfertasFavoritas
     val listaSolicitudesFavoritas = mainViewModel.listaSolicitudesFavoritas
 
+
     //PRECARGAR PETICIONES
     if (!mainViewModel.cargaInicialPeticionesFavoritas.value) {
-        Log.e("KTOR", "alkdsjhfgl composable")
+
         mainViewModel.getMyFavorites()
+        mainViewModel.cargaInicialPeticionesFavoritas.value = true
     }
+
+
 
     when {
 
