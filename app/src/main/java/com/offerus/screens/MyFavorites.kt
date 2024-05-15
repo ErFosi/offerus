@@ -2,18 +2,26 @@ package com.offerus.screens
 
 
 
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Refresh
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -32,6 +40,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -41,6 +50,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.offerus.R
 import com.offerus.components.TopBarSecundario
+import com.offerus.data.ServicioPeticion
 import com.offerus.navigation.AppScreens
 import com.offerus.viewModels.MainViewModel
 
@@ -77,22 +87,29 @@ fun MyFavoritesPage(
     val tabs = listOf("Ofertas", "Solicitudes")
 
     // FILTRO
-    val titulo = remember { mutableStateOf("") }
-    val categoria = remember { mutableStateOf("gratis,deporte,hogar,otros,entretenimiento,academico,online") }
-    val distanciaMaxima = remember { mutableStateOf(0.0) }
-    val precioMinimo = remember { mutableStateOf(0.0) }
-    val precioMaxima = remember { mutableStateOf(1000.0) }
+    val titulo = remember { mutableStateOf<String?>(null) }
+    val categoria = remember { mutableStateOf<String?>(null) }
+    val distanciaMaxima = remember { mutableStateOf<Double?>(null) }
+    val precioMinimo = remember { mutableStateOf<Double?>(null) }
+    val precioMaxima = remember { mutableStateOf<Double?>(null) }
     val ordenarPor = remember { mutableStateOf("precio_asc") }
 
+    val ordenMenorMayor by mainViewModel.ordenAscendenteFavoritas
+
     // LISTAS
-    mainViewModel.getMyFavorites()
+    //mainViewModel.getMyFavorites()
     val listaOfertasFavoritas = mainViewModel.listaOfertasFavoritas
     val listaSolicitudesFavoritas = mainViewModel.listaSolicitudesFavoritas
 
+
     //PRECARGAR PETICIONES
     if (!mainViewModel.cargaInicialPeticionesFavoritas.value) {
+
         mainViewModel.getMyFavorites()
+        mainViewModel.cargaInicialPeticionesFavoritas.value = true
     }
+
+
 
     when {
 
@@ -105,11 +122,12 @@ fun MyFavoritesPage(
                     },
 
                 onRefresh = {
-                    titulo.value = ""
-                    categoria.value = "gratis,deporte,hogar,otros,entretenimiento,academico,online"
-                    distanciaMaxima.value = 0.0
-                    precioMaxima.value = 0.0
-                    precioMinimo.value = 0.0
+                    titulo.value = null
+                    categoria.value = null
+                    distanciaMaxima.value = null
+                    precioMaxima.value = null
+                    precioMinimo.value = null
+                    mainViewModel.filtrarFavoritas(titulo.value,categoria.value,distanciaMaxima.value,precioMinimo.value,precioMaxima.value)
                 },
                 onTituloChange = { titulo.value = it },
                 onCategoriaChange = { categoria.value = it },
@@ -117,7 +135,7 @@ fun MyFavoritesPage(
                 onPrecioMinChange = { precioMinimo.value = it },
                 onPrecioMaxChange = { precioMaxima.value = it },
                 categoria = categoria.value,
-                distanciaMaxima = distanciaMaxima.value.toFloat(),
+                distanciaMaxima = distanciaMaxima.value?.toFloat(),
                 precioMaximo = precioMaxima.value,
                 precioMinimo = precioMinimo.value,
                 titulo = titulo.value
@@ -175,10 +193,25 @@ fun MyFavoritesPage(
                 IconButton(
                     modifier = Modifier
                         .padding(5.dp)
-                        .width(50.dp),
-                    onClick = { /*TODO*/ }
+                        .width(30.dp),
+                    onClick = { mainViewModel.ordenAscendenteFavoritas.value = !ordenMenorMayor
+                        mainViewModel.ordenarServiciosFavoritos(ordenMenorMayor)
+                    }
                 ) {
-                    Icon(Icons.Outlined.Refresh, "Buscar")
+                    if (ordenMenorMayor){
+                        Icon(
+                            painter = painterResource(id = R.drawable.descendente),
+                            null,
+                            modifier = Modifier.size(50.dp)
+                        )
+                    } else {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ascendente),
+                            null,
+                            modifier = Modifier.size(50.dp)
+                        )
+                    }
+
                 }
             }
             Row (modifier = Modifier
@@ -189,20 +222,7 @@ fun MyFavoritesPage(
                 ){
 
 
-                OutlinedButton(
-                    modifier = Modifier
 
-                        .width(80.dp),
-                    onClick = {
-                        navController.navigate(AppScreens.MapScreen.route)
-                    }
-
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.baseline_map_24),
-                        null
-                    )
-                }
 
                 Spacer(modifier = Modifier.width(6.dp))
 
@@ -221,7 +241,7 @@ fun MyFavoritesPage(
             }
 
             if (selectedTabIndex == 0) {
-                if (listaOfertasFavoritas.value.isEmpty()){
+                if (listaOfertasFavoritas.value.isEmpty() && mainViewModel.cargaInicialPeticionesFavoritas.value){
 
                     Text(
                         text = "No hay Resultados de Ofertas",
@@ -232,11 +252,12 @@ fun MyFavoritesPage(
                             .padding(60.dp)
                     )
                 } else {
-                    ListaOfertas(onItemClick = {navController.navigate(AppScreens.OfferDetailsScreen.route)} ,listaOfertasFavoritas.value, mainViewModel)
+                    ListaOfertasFavoritas(onItemClick = {navController.navigate(AppScreens.OfferDetailsScreen.route)} ,listaOfertasFavoritas.value, mainViewModel,
+                        {  mainViewModel.filtrarFavoritas(titulo.value,categoria.value,distanciaMaxima.value,precioMinimo.value,precioMaxima.value) })
                 }
 
             } else {
-                if (listaSolicitudesFavoritas.value.isEmpty()){
+                if (listaSolicitudesFavoritas.value.isEmpty() && mainViewModel.cargaInicialPeticionesFavoritas.value){
                     Text(
                         text = "No hay Resultados de Solicitudes",
                         style =  MaterialTheme.typography.headlineMedium,
@@ -246,7 +267,8 @@ fun MyFavoritesPage(
                             .padding(60.dp)
                     )
                 } else {
-                    ListaOfertas(onItemClick = {navController.navigate(AppScreens.OfferDetailsScreen.route)} ,listaSolicitudesFavoritas.value, mainViewModel)
+                    ListaOfertasFavoritas(onItemClick = {navController.navigate(AppScreens.OfferDetailsScreen.route)} ,listaSolicitudesFavoritas.value, mainViewModel,
+                        {  mainViewModel.filtrarFavoritas(titulo.value,categoria.value,distanciaMaxima.value,precioMinimo.value,precioMaxima.value)})
                 }
             }
 
@@ -255,5 +277,37 @@ fun MyFavoritesPage(
 
         }
 
+    }
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun ListaOfertasFavoritas(onItemClick: () -> Unit, listaPeticiones: List<ServicioPeticion>, mainViewModel: MainViewModel, onRefresh: () -> Unit) {
+
+    val refreshState = rememberPullRefreshState(
+        refreshing = mainViewModel.isRefreshingFavorites.value,
+        onRefresh = {onRefresh()}
+    )
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .fillMaxHeight()
+            .padding(8.dp)
+            .pullRefresh(refreshState)
+    ) {
+
+        LazyColumn {
+            items(listaPeticiones.size) { index ->
+                OfertasCard(peticion = listaPeticiones[index], onItemClick = onItemClick, mainViewModel)
+            }
+        }
+
+
+        PullRefreshIndicator(
+            refreshing = mainViewModel.isRefreshingFavorites.value,
+            state = refreshState,
+            modifier = Modifier.align(Alignment.TopCenter)
+        )
     }
 }

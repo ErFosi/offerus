@@ -2,6 +2,7 @@ package com.offerus.screens
 
 import android.graphics.drawable.Drawable
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,6 +22,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
@@ -31,6 +33,9 @@ import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Refresh
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Card
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenuItem
@@ -74,6 +79,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import androidx.wear.compose.material.ExperimentalWearMaterialApi
 import com.offerus.R
+import com.offerus.components.CategoriasCirculos
 import com.offerus.components.DropdownCategorias
 import com.offerus.data.Deal
 import com.offerus.data.ServicioPeticion
@@ -82,6 +88,7 @@ import com.offerus.utils.createDealListExample
 import com.offerus.utils.showToastOnMainThread
 import com.offerus.viewModels.MainViewModel
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun OffersScreen(
     navController: NavController,
@@ -114,6 +121,7 @@ fun OffersScreen(
     }
 
 
+
     when {
 
         openFilterDialog.value -> {
@@ -127,6 +135,7 @@ fun OffersScreen(
                     distanciaMaxima.value = null
                     precioMaxima.value = null
                     precioMinimo.value = null
+                    mainViewModel.getRequests(titulo.value,categoria.value,distanciaMaxima.value,precioMinimo.value,precioMaxima.value,"")
 
 
 
@@ -151,76 +160,99 @@ fun OffersScreen(
 
     Surface {
 
-        Column {
 
-            TabRow(selectedTabIndex) {
-                // Crear una pestaña para cada elemento en la lista de pestañas
-                tabs.forEachIndexed { index, title ->
-                    Tab(selected = selectedTabIndex == index,
-                        onClick = { selectedTabIndex = index },
-                        text = { Text(title) })
+
+        Column{
+
+
+
+                TabRow(selectedTabIndex) {
+                    // Crear una pestaña para cada elemento en la lista de pestañas
+                    tabs.forEachIndexed { index, title ->
+                        Tab(selected = selectedTabIndex == index,
+                            onClick = { selectedTabIndex = index },
+                            text = { Text(title) })
+                    }
                 }
-            }
 
-            Spacer(modifier = Modifier.height(20.dp))
-            SubPageSearch(
-                onOpenFilterDialog = {  openFilterDialog.value = true },
-                navController = navController,
-                onBuscar = { mainViewModel.getRequests(titulo.value,categoria.value,distanciaMaxima.value,precioMinimo.value,precioMaxima.value,"")},
-                onBusquedaChange = { titulo.value = it},
-                setSelectedTab = { mainViewModel.selectedTabIndex = selectedTabIndex }
-            )
+                Spacer(modifier = Modifier.height(20.dp))
+                SubPageSearch(
+                    onOpenFilterDialog = { openFilterDialog.value = true },
+                    navController = navController,
+                    onBuscar = {
+                        mainViewModel.getRequests(
+                            titulo.value,
+                            categoria.value,
+                            distanciaMaxima.value,
+                            precioMinimo.value,
+                            precioMaxima.value,
+                            ""
+                        )
+                    },
+                    onBusquedaChange = { titulo.value = it },
+                    setSelectedTab = { mainViewModel.selectedTabIndex = selectedTabIndex },
+                    mainViewModel = mainViewModel
+                )
 
-            if (selectedTabIndex == 0) {
-                if (listaOfertas.value.isEmpty() && mainViewModel.cargaInicialPeticiones.value){
-                    Text(
-                        text = "No hay Resultados de Ofertas",
-                        style =  MaterialTheme.typography.headlineMedium,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(60.dp)
-                    )
+                if (selectedTabIndex == 0) {
+                    if (listaOfertas.value.isEmpty() && mainViewModel.cargaInicialPeticiones.value) {
+                        Text(
+                            text = "No hay Resultados de Ofertas",
+                            style = MaterialTheme.typography.headlineMedium,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(60.dp)
+                        )
+                    } else {
+                        ListaOfertas(onItemClick = { navController.navigate(AppScreens.OfferDetailsScreen.route) },
+                            listaOfertas.value,
+                            mainViewModel,
+                            { mainViewModel.getRequests(titulo.value,categoria.value,distanciaMaxima.value,precioMinimo.value,precioMaxima.value,"") }
+                            )
+                    }
+
                 } else {
-                    ListaOfertas(onItemClick = {navController.navigate(AppScreens.OfferDetailsScreen.route)} ,listaOfertas.value, mainViewModel)
+                    if (listaSolicitudes.value.isEmpty() && mainViewModel.cargaInicialPeticiones.value) {
+                        Text(
+                            text = "No hay Resultados de Solicitudes",
+                            style = MaterialTheme.typography.headlineMedium,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(60.dp)
+                        )
+                    } else {
+                        ListaOfertas(onItemClick = { navController.navigate(AppScreens.OfferDetailsScreen.route) },
+                            listaSolicitudes.value,
+                            mainViewModel,
+                            { mainViewModel.getRequests(titulo.value,categoria.value,distanciaMaxima.value,precioMinimo.value,precioMaxima.value,"") }
+                        )
+                    }
                 }
 
-            } else {
-                if (listaSolicitudes.value.isEmpty() && mainViewModel.cargaInicialPeticiones.value){
-                    Text(
-                        text = "No hay Resultados de Solicitudes",
-                        style =  MaterialTheme.typography.headlineMedium,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(60.dp)
-                    )
-                } else {
-                    ListaOfertas(onItemClick = {navController.navigate(AppScreens.OfferDetailsScreen.route)} ,listaSolicitudes.value, mainViewModel)
-                }
-            }
 
 
 
 
         }
-
     }
+
+
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SubPageSearch(
     navController: NavController,
+    mainViewModel: MainViewModel,
     setSelectedTab: () -> Unit,
     onOpenFilterDialog: () -> Unit,
     onBusquedaChange: (String) -> Unit,
     onBuscar: () -> Unit,
 ){
 
-    var ordenMenorMayor = remember {
-        mutableStateOf(true)
-    }
+    val ordenMenorMayor by mainViewModel.ordenAscendenteSearch
     Column {
 
         Row ( modifier = Modifier
@@ -256,20 +288,22 @@ fun SubPageSearch(
             IconButton(
                 modifier = Modifier
                     .padding(5.dp)
-                    .width(50.dp),
-                onClick = { ordenMenorMayor.value = !ordenMenorMayor.value }
+                    .width(30.dp),
+                onClick = { mainViewModel.ordenAscendenteSearch.value = !ordenMenorMayor
+                            mainViewModel.ordenarServicios(ordenMenorMayor)
+                }
             ) {
-                if (ordenMenorMayor.value){
+                if (ordenMenorMayor){
                     Icon(
                         painter = painterResource(id = R.drawable.descendente),
                         null,
-                        modifier = Modifier.size(100.dp)
+                        modifier = Modifier.size(50.dp)
                     )
                 } else {
                     Icon(
                         painter = painterResource(id = R.drawable.ascendente),
                         null,
-                        modifier = Modifier.size(100.dp)
+                        modifier = Modifier.size(50.dp)
                     )
                 }
 
@@ -338,6 +372,7 @@ fun SearchDialog(
 
 ){
 
+    val context = LocalContext.current
     var sliderValue by if (distanciaMaxima == null) {
         remember { mutableStateOf(0.0F)}
     } else {
@@ -361,8 +396,6 @@ fun SearchDialog(
     }
 
     val titulo = remember { mutableStateOf(titulo) }
-    val precioMinimo = remember { mutableStateOf(precioMinimo?.toInt().toString()) }
-    val precioMaxima = remember { mutableStateOf(precioMaximo?.toInt().toString()) }
 
 
     val textoCategoria = if (categoria == null){
@@ -432,12 +465,12 @@ fun SearchDialog(
                                     sliderValue = newValue
                                     onDistanciaChange(newValue.toDouble())
                                 },
-                                valueRange = 0f..100f,
+                                valueRange = 0f..10f,
                                 steps = 100,
                                 modifier = Modifier
                                     .width(150.dp)
                             )
-                            Text(text = "%.1f".format(sliderValue / 10) + " Km")
+                            Text(text = "%.1f".format(sliderValue ) + " Km")
 
                         }
                         Row(
@@ -448,24 +481,31 @@ fun SearchDialog(
 
                                 value = textoPrecioMinimo.value,
                                 onValueChange = {
-
-                                    if ( it.isEmpty() || it.toDoubleOrNull() != null) {
-                                        precioMinimo.value = it
-                                        errorState = false
-                                        if (!it.isEmpty()){
-                                            onPrecioMinChange(it.toDouble())
-                                        }
-
-
-                                    } else {
-                                        errorState = true
-                                    }
+                                    textoPrecioMinimo.value = it
                                 },
                                 modifier = Modifier
                                     .height(70.dp)
                                     .width(65.dp)
                                     .onFocusChanged {
-                                                    
+                                        if (textoPrecioMinimo.value.toDoubleOrNull() != null) {
+                                            if (textoPrecioMaximo.value.toDoubleOrNull() != null) {
+                                                if (textoPrecioMinimo.value.toDouble() < textoPrecioMaximo.value.toDouble()){
+                                                    onPrecioMaxChange(textoPrecioMaximo.value.toDouble())
+                                                } else {
+                                                    Toast.makeText(
+                                                        context,
+                                                        "El precio minimo debe ser menor al precio maximo",
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+                                                    textoPrecioMinimo.value = ""
+                                                }
+                                            } else {
+                                                onPrecioMinChange(textoPrecioMinimo.value.toDouble())
+                                            }
+                                        }else {
+                                            textoPrecioMinimo.value = ""
+                                        }
+
                                     }
 
 
@@ -478,21 +518,33 @@ fun SearchDialog(
                             OutlinedTextField(
                                 value = textoPrecioMaximo.value,
                                 onValueChange = {
-                                    if ( it.isEmpty() || it.toDoubleOrNull() != null) {
-                                        precioMaxima.value = it
-                                        errorState = false
-                                        if (!it.isEmpty()){
-                                            onPrecioMaxChange(it.toDouble())
-                                        }
-
-
-                                    } else {
-                                        errorState = true
-                                    }
+                                    textoPrecioMaximo.value = it
                                 },
                                 modifier = Modifier
                                     .height(70.dp)
-                                    .width(65.dp),
+                                    .width(65.dp)
+                                    .onFocusChanged {
+                                        if (textoPrecioMaximo.value.toDoubleOrNull() != null) {
+                                            if (textoPrecioMinimo.value.toDoubleOrNull() != null) {
+                                               if (textoPrecioMinimo.value.toDouble() < textoPrecioMaximo.value.toDouble()){
+                                                   onPrecioMaxChange(textoPrecioMaximo.value.toDouble())
+                                               } else {
+                                                   Toast.makeText(
+                                                       context,
+                                                       "El precio minimo debe ser menor al precio maximo",
+                                                       Toast.LENGTH_SHORT
+                                                   ).show()
+                                                   textoPrecioMaximo.value = ""
+                                               }
+                                            } else {
+                                                onPrecioMaxChange(textoPrecioMaximo.value.toDouble())
+                                            }
+
+                                        } else {
+                                            textoPrecioMaximo.value = ""
+                                        }
+                                    }
+                                ,
                                 label = {Text(text = "Max")}
                             )
                             Text(text = " €")
@@ -526,8 +578,8 @@ fun SearchDialog(
                             .padding(horizontal = 5.dp),
                         onClick = { onRefresh()
                             titulo.value = ""
-                            precioMaxima.value = "0"
-                            precioMinimo.value = "0"
+                            textoPrecioMaximo.value = ""
+                            textoPrecioMaximo.value = ""
                             sliderValue = 0F
 
                         }
@@ -560,21 +612,35 @@ fun SearchDialog(
 
 
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun ListaOfertas(onItemClick: () -> Unit, listaPeticiones: List<ServicioPeticion>, mainViewModel: MainViewModel) {
-    //obtenemos la lista del viemodel
-    var listaEntrantes = createDealListExample()
-    //mostramos la lista
-    Column(
+fun ListaOfertas(onItemClick: () -> Unit, listaPeticiones: List<ServicioPeticion>, mainViewModel: MainViewModel, onRefresh: () -> Unit) {
+
+    val refreshState = rememberPullRefreshState(
+        refreshing = mainViewModel.isRefreshingSearch.value,
+        onRefresh = {onRefresh()}
+    )
+
+    Box(
         modifier = Modifier
             .fillMaxSize()
+            .fillMaxHeight()
             .padding(8.dp)
+            .pullRefresh(refreshState)
     ) {
+
         LazyColumn {
             items(listaPeticiones.size) { index ->
                 OfertasCard(peticion = listaPeticiones[index], onItemClick = onItemClick, mainViewModel)
             }
         }
+
+
+        PullRefreshIndicator(
+            refreshing = mainViewModel.isRefreshingSearch.value,
+            state = refreshState,
+            modifier = Modifier.align(Alignment.TopCenter)
+        )
     }
 }
 
@@ -593,7 +659,7 @@ fun OfertasCard(peticion: ServicioPeticion, onItemClick: () -> Unit, mainViewMod
 
     ) {
 
-        PeticionInfo(peticion = peticion)
+        PeticionInfo(peticion = peticion, mainViewModel = mainViewModel)
 
 
 
@@ -601,7 +667,8 @@ fun OfertasCard(peticion: ServicioPeticion, onItemClick: () -> Unit, mainViewMod
 }
 @Composable
 fun PeticionInfo(
-    peticion: ServicioPeticion
+    peticion: ServicioPeticion,
+    mainViewModel: MainViewModel
 ) {
     Row(
         modifier = Modifier
@@ -612,9 +679,11 @@ fun PeticionInfo(
 
         // foto de perfil del usuario
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(4.dp)
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.padding(4.dp).width(70.dp)
+
         ) {
-            //UserAvatar(username = "oier")
+            UserAvatar(username = peticion.username, mainViewModel)
             Text(text = peticion.username)
         }
 
@@ -627,245 +696,10 @@ fun PeticionInfo(
             Text(text = peticion.precio.toString()+" €", modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp))
         }
 
-    }
-}
-
-
-
-// BASURERO TEMPORAL
-
-/*
-@Composable
-fun CreateOferRequestFloatingButton(
-    onOpenCreateDialog: () -> Unit
-){
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight()
-            .wrapContentSize(Alignment.BottomEnd)
-            .padding(16.dp)
-    ) {
-        FloatingActionButton(
-            onClick = { onOpenCreateDialog() },
-
-            modifier = Modifier
-                .padding(16.dp)
-                .size(56.dp),
-            shape = CircleShape
-        ) {
-            Icon(Icons.Filled.Add, "Floating action button.")
+        Column {
+            CategoriasCirculos(nombresCategorias = peticion.categorias)
         }
+
     }
 }
-@Composable
-fun CreateDialog(
-    onDismissRequest: () -> Unit,
-    onConfirmation: () -> Unit,
-    onDescription: () -> Unit,
-    selectedTab: Int
-
-){
-
-    Dialog(onDismissRequest = { onDismissRequest() }) {
-        Card (
-            modifier = Modifier
-            //  .background(Color.White, shape = RoundedCornerShape(8.dp))
-        ){
-            Column {
-
-                if ( selectedTab == 0 ) {
-                    Text(
-                        text = "Crear Oferta",
-                        style = MaterialTheme.typography.headlineMedium,
-                        modifier = Modifier
-                            .padding(horizontal = 30.dp, vertical = 10.dp)
-                    )
-                } else {
-                    Text(
-                        text = "Crear Solicitud",
-                        style = MaterialTheme.typography.headlineMedium,
-                        modifier = Modifier
-                            .padding(horizontal = 30.dp, vertical = 10.dp)
-                    )
-                }
-
-                Divider(color = Color.Gray, thickness = 1.dp, modifier = Modifier.fillMaxWidth())
-                Box(
-                    modifier = Modifier
-                        .padding(horizontal = 30.dp, vertical = 20.dp)
-                ) {
-                    Column {
-
-                        Row(
-                            modifier = Modifier.padding(vertical = 5.dp),
-                        ) {
-                            OutlinedTextField(
-                                value = "", onValueChange = { }, modifier = Modifier.height(50.dp),
-                                label = {Text(text = "Titulo")}
-                            )
-                        }
-                        Row(
-                            modifier = Modifier.padding(vertical = 5.dp),
-                        ) {
-                            DropdownCategorias()
-                        }
-
-                        if ( selectedTab == 0 ) {
-                            Row(
-                                modifier = Modifier.padding(vertical = 5.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(text = "Precio: ", fontSize = 25.sp)
-                                OutlinedTextField(
-                                    value = "", onValueChange = { }, modifier = Modifier
-                                        .height(50.dp)
-                                        .width(65.dp),
-                                )
-                                Text(text = " €", fontSize = 25.sp)
-                            }
-                        }
-
-                        Row(
-                            modifier = Modifier.padding(vertical = 5.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(text = "Descripción: ", fontSize = 25.sp)
-
-                            OutlinedButton(
-                                modifier = Modifier
-                                    .padding(horizontal = 5.dp),
-                                onClick = { onDescription() }
-
-                            ) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.baseline_edit_square_24),
-                                    null
-                                )
-
-                            }
-                        }
-
-
-
-                    }
-                }
-                Divider(color = Color.Gray, thickness = 1.dp, modifier = Modifier.fillMaxWidth())
-                Row (
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 5.dp),
-                    horizontalArrangement = Arrangement.Center
-                ){
-                    OutlinedButton(
-                        modifier = Modifier
-                            .padding(horizontal = 5.dp),
-                        onClick = { onDismissRequest() }
-
-                    ) {
-                        Icon(
-                            Icons.Default.Close,
-                            null
-                        )
-
-                    }
-                    OutlinedButton(
-                        modifier = Modifier
-                            .padding(horizontal = 5.dp),
-                        onClick = { onConfirmation() }
-
-                    ) {
-
-                        Icon(
-                            Icons.Default.Add,
-                            null
-                        )
-                        Text(text = "Crear")
-                    }
-
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun EditDescriptionDialog(
-    onDismissRequest: () -> Unit,
-    onConfirmation: () -> Unit,
-){
-
-    var texto by remember {
-        mutableStateOf("")
-    }
-
-    Dialog(onDismissRequest = { onDismissRequest() }) {
-        Card(
-            modifier = Modifier
-            //.background(Color.White, shape = RoundedCornerShape(8.dp))
-        ) {
-
-            Column {
-                Text(
-                    text = "Editar Descripción",
-                    style = MaterialTheme.typography.headlineMedium,
-                    modifier = Modifier
-                        .padding(horizontal = 30.dp, vertical = 10.dp)
-                )
-
-                Box(
-                    modifier = Modifier
-                        .padding(horizontal = 30.dp, vertical = 20.dp)
-                ) {
-                    OutlinedTextField(
-                        value = texto, onValueChange = { texto = it},
-                        modifier = Modifier
-                            .verticalScroll(rememberScrollState())
-                            .height(250.dp)
-                            .fillMaxWidth()
-                    )
-                }
-                Divider(color = Color.Gray, thickness = 1.dp, modifier = Modifier.fillMaxWidth())
-                Row (
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 5.dp),
-                    horizontalArrangement = Arrangement.Center
-                ){
-
-                    OutlinedButton(
-                        modifier = Modifier
-                            .padding(horizontal = 5.dp),
-                        onClick = { onDismissRequest() }
-
-                    ) {
-                        Icon(
-                            Icons.Default.Close,
-                            null
-                        )
-
-                    }
-                    OutlinedButton(
-                        modifier = Modifier
-                            .padding(horizontal = 5.dp),
-                        onClick = { onConfirmation() }
-
-                    ) {
-                        Icon(
-                            Icons.Default.Done,
-                            null
-                        )
-
-                    }
-
-                }
-            }
-
-
-        }
-    }
-}
-
-
-*/
 
