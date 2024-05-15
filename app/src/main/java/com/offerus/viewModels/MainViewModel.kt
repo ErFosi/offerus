@@ -56,8 +56,10 @@ class MainViewModel @Inject constructor(
     private val servicioRepository: ServicioRepository,
 ) : ViewModel() {
 
+
     // pull refresh states
-    val isRefreshingHome = mutableStateOf(false)
+    var isRefreshingHome = mutableStateOf(false)
+    var isRefreshingMyOffers = mutableStateOf(false)
 
     // Recordar subpestañas
     var selectedTabIndexHome =
@@ -69,6 +71,7 @@ class MainViewModel @Inject constructor(
     var listaDeals = mutableStateOf(emptyList<Deal>())
     var listaEntrantes = mutableStateOf(emptyList<Deal>())
     var listaSalientes = mutableStateOf(emptyList<Deal>())
+    var listaValoracionesPendientes = mutableStateOf(emptyList<Deal>())
 
     var listaMisOfertas = mutableStateOf(emptyList<ServicioPeticion>())
     var listaMisPeticiones = mutableStateOf(emptyList<ServicioPeticion>())
@@ -95,6 +98,8 @@ class MainViewModel @Inject constructor(
 
     fun obtenerMisOfertas() {
         viewModelScope.launch {
+            isRefreshingMyOffers.value = true
+            delay(500)
             try {
                 val listaServicios = httpUserClient.obtenerPeticionesServicioUsuario()
                 Log.d("lista mis servicios", listaServicios.toString())
@@ -112,8 +117,11 @@ class MainViewModel @Inject constructor(
 
                 listaMisOfertas.value = listaActualO
                 listaMisPeticiones.value = listaActualP
+                isRefreshingMyOffers.value = false
 
             } catch (e: Exception) {
+                isRefreshingMyOffers.value = false
+
                 // Manejar cualquier excepción
                 Log.e("obtenerMisOfertas", "Error al obtener las ofertas: $e")
             }
@@ -123,6 +131,7 @@ class MainViewModel @Inject constructor(
     // variable to store the current user name
     var usuario by mutableStateOf("")
     var infoUsuario = mutableStateOf(UsuarioData("", "", 0, 0.0, 0.0, "", "", "", "", ""))
+
     // get the theme and language from the data store
     val tema = myPreferencesDataStore.preferencesStatusFlow.map {
         it.temaClaro
@@ -446,7 +455,9 @@ class MainViewModel @Inject constructor(
 
     // servicio para mostrar detalles
     var servicioDetalle = mutableStateOf<ServicioPeticion?>(null)
+    var infoUsuarioDetalle = mutableStateOf<UsuarioData?>(null)
     var listaServiciosApi = mutableStateOf(emptyList<ServicioPeticion>())
+
     // gestor del dialogo para hacer la review
     var dialogoReview = mutableStateOf(false)
     var dealReview: Deal? = null
@@ -464,33 +475,38 @@ class MainViewModel @Inject constructor(
                 Log.d("lista petis", listaIdPeticiones.toString())
 
 
-
                 // Filtrar deals entrantes y actualizar listaEntrantes
-                val nuevasEntrantes = nuevasDeals.filter { it.username_host == usuario && it.estado == "pendiente" }.toMutableList()
+                val nuevasEntrantes =
+                    nuevasDeals.filter { it.username_host == usuario && it.estado == "pendiente" }
+                        .toMutableList()
+                val nuevasValoracionesPendientes =
+                    nuevasDeals.filter { it.username_host == usuario && it.estado == "aceptado" }
+                        .toMutableList()
                 Log.d("lista entrantes", nuevasEntrantes.toString())
 
                 // Filtrar deals salientes y actualizar listaSalientes
-                val nuevasSalientes = nuevasDeals.filter { it.username_cliente == usuario }.toMutableList()
+                val nuevasSalientes =
+                    nuevasDeals.filter { it.username_cliente == usuario }.toMutableList()
                 Log.d("lista salientes", nuevasSalientes.toString())
 
                 // Actualizar los MutableState con las nuevas listas filtradas
                 listaDeals.value = nuevasDeals
                 listaEntrantes.value = nuevasEntrantes
+                listaValoracionesPendientes.value = nuevasValoracionesPendientes
                 listaSalientes.value = nuevasSalientes
 
                 if (listaIdPeticiones.isNotEmpty()) {
                     withContext(Dispatchers.IO) {
                         servicioRepository.deleteServicio()
-                        listaServiciosApi.value = httpUserClient.obtenerPeticiones(listaIdPeticiones)
+                        listaServiciosApi.value =
+                            httpUserClient.obtenerPeticiones(listaIdPeticiones)
                         listaServiciosApi.value.forEach { peticion ->
                             Log.d("peticion add", peticion.toString())
                             servicioRepository.addServicio(peticion)
                         }
                         isRefreshingHome.value = false
                     }
-                }
-
-                else{
+                } else {
                     isRefreshingHome.value = false
                 }
 
@@ -506,17 +522,12 @@ class MainViewModel @Inject constructor(
 
     var listaPeticiones = servicioRepository.getListaServicios()
 
-    //metodo para actualizar (update) el deal cuando se hace una review
-    fun enviarReview() {
-        if (dealReview == null) return
-        Log.d("review", dealReview.toString())
-        //httpUserClient.enviarReview(dealReview!!)
-    }
 
     fun cambiarServicioDetalle(idPeticion: Int) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 servicioDetalle.value = servicioRepository.getServicio(idPeticion)
+                obtenerInfoUsuario(servicioDetalle.value!!.username)
             }
         }
     }
@@ -635,7 +646,7 @@ class MainViewModel @Inject constructor(
             viewModelScope.launch {
                 httpUserClient.aceptarDeal(id, accept)
                 Log.e("KTOR", "Deals acceptado o rechazado correctamente")
-                obtenerMisOfertas()
+                actualizarListaDeals()
             }
         } catch (e: Exception) {
             Log.e("KTOR", e.toString())
@@ -643,8 +654,18 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun dealRate(id: Int, mark: Int) {
-        val rate = ValorarDeal(id, mark)
+    fun dealRate(deal: Deal) {
+        var nota: Int
+        if (deal.username_cliente == usuario) {
+            nota = deal.nota_cliente
+        } else {
+            nota = deal.nota_host
+        }
+
+        if (nota == -1) {
+            return
+        }
+        val rate = ValorarDeal(deal.id, nota)
         try {
             viewModelScope.launch {
                 httpUserClient.rateDeal(rate)
@@ -765,8 +786,6 @@ class MainViewModel @Inject constructor(
                 }
 
 
-
-
             }
         } catch (e: Exception) {
             Log.e("KTOR", e.toString())
@@ -780,6 +799,27 @@ class MainViewModel @Inject constructor(
         return (listaOfertasFavoritas.value.any { it.id == id } || listaSolicitudesFavoritas.value.any { it.id == id })
 
 
+    }
+
+    // obtener info cualquier usuario
+    fun obtenerInfoUsuario(username: String) {
+        try {
+            viewModelScope.launch {
+                infoUsuarioDetalle.value = httpUserClient.getDatosCualquierUsuario(username)
+                Log.e("KTOR", "Datos usuario conseguidos")
+            }
+        } catch (e: Exception) {
+            Log.e("KTOR", e.toString())
+
+        }
+    }
+
+    // obtener valoracion media
+    fun valoracionMedia(username: String): Pair<Int, Double> {
+        //val valoracion = httpUserClient.getValoracionMedia(username)
+        Log.e("KTOR", "Valoracion media conseguida")
+        //return Pair(valoracion.first, valoracion.second)
+        return Pair(4, 3.3)
     }
 
 

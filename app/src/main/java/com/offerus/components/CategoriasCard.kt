@@ -23,10 +23,10 @@ fun CategoriasCard(nombresCategorias: String) {
     var listaCategorias = obtenerCategorias(nombresCategorias)
 
     obtenerCategoriasDesdeNombres(listaCategorias).let { categorias ->
-        Row(modifier = Modifier.padding(vertical = 4.dp, horizontal = 4.dp), horizontalArrangement = Arrangement.spacedBy(3.dp)) {
+        Row(modifier = Modifier.padding(vertical = 4.dp), horizontalArrangement = Arrangement.spacedBy(5.dp)) {
             for (categoria in categorias.take(3)) {
                 // circulos con el color
-                Card(modifier = Modifier.padding(2.dp), colors = CardDefaults.cardColors(containerColor = categoria.color.copy(alpha = 0.45f))) {
+                Card(colors = CardDefaults.cardColors(containerColor = categoria.color.copy(alpha = 0.45f))) {
                     Row(modifier = Modifier.padding(vertical = 0.dp, horizontal = 4.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
                         Icon(imageVector = ImageVector.vectorResource(categoria.icono), contentDescription = null, modifier = Modifier.size(16.dp))
                         Text(

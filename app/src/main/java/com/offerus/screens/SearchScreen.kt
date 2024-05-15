@@ -545,6 +545,7 @@ fun OfertasCard(peticion: ServicioPeticion, onItemClick: () -> Unit, mainViewMod
             .clickable(onClick = {
 
                 mainViewModel.cambiarServicioDetalle(peticion)
+                mainViewModel.obtenerInfoUsuario(peticion.username)
                 onItemClick()
             })
 

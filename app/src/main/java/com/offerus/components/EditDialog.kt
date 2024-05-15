@@ -26,6 +26,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
@@ -59,7 +60,7 @@ fun EditDialog(
     peticion: ServicioPeticion?,
     onDismissRequest: () -> Unit,
     onConfirmation: () -> Unit,
-    ) {
+) {
 
     if (peticion == null) {
         return
@@ -97,8 +98,8 @@ fun EditDialog(
                             .padding(10.dp),
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
-                        fontSize = 20.sp
-                    )
+                        fontSize = 20.sp,
+                        )
 
                     Spacer(
                         modifier = Modifier
@@ -115,44 +116,86 @@ fun EditDialog(
                     ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
-                            // TIPO DE SERVICIO con switch
-                            Box(
-                                modifier = Modifier
-                                    .border(width = 1.dp, color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.25f), shape = MaterialTheme.shapes.medium)
-                                    .padding(4.dp)
-
+                            Row(
+                                verticalAlignment = Alignment.Bottom,
+                                horizontalArrangement = Arrangement.SpaceBetween
                             ) {
+                                // TIPO DE SERVICIO con switch
+                                Box(
+                                    modifier = Modifier
+                                        .border(
+                                            width = 1.dp,
+                                            color = MaterialTheme.colorScheme.outline,
+                                            shape = OutlinedTextFieldDefaults.shape
+                                        )
+                                        .padding(4.dp)
+
+                                ) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        modifier = Modifier.padding(
+                                            vertical = 0.dp,
+                                            horizontal = 2.dp
+                                        )
+                                    ) {
+
+                                        Switch(
+                                            checked = esPeticion,
+                                            onCheckedChange = { esPeticion = it },
+                                            colors = SwitchDefaults.colors(
+                                                checkedThumbColor = MaterialTheme.colorScheme.secondary,
+                                                checkedTrackColor = MaterialTheme.colorScheme.secondaryContainer,
+                                                uncheckedThumbColor = MaterialTheme.colorScheme.secondary,
+                                                uncheckedTrackColor = MaterialTheme.colorScheme.secondaryContainer,
+                                            )
+                                        )
+                                        Text(
+                                            text = if (esPeticion) "Petición" else "Oferta",
+                                            modifier = Modifier.padding(start = 8.dp),
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                    }
+                                }
+
+                                Spacer(modifier = Modifier.width(8.dp))
+
+                                // PRECIO
                                 Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier.padding(vertical = 0.dp, horizontal = 4.dp)
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
 
-                                    Switch(
-                                        checked = esPeticion,
-                                        onCheckedChange = { esPeticion = it },
-                                        colors = SwitchDefaults.colors(
-                                            checkedThumbColor = MaterialTheme.colorScheme.secondary,
-                                            checkedTrackColor = MaterialTheme.colorScheme.secondaryContainer,
-                                            uncheckedThumbColor = MaterialTheme.colorScheme.secondary,
-                                            uncheckedTrackColor = MaterialTheme.colorScheme.secondaryContainer,
-                                        )
+                                    OutlinedTextField(
+                                        value = precio,
+                                        onValueChange = { newValue ->
+                                            val regex =
+                                                Regex("""^\d{0,8}(\.\d{0,2})?$""") // Expresión regular para validar el formato
+                                            if (regex.matches(newValue)) {
+                                                precio = newValue
+                                            }
+                                        },
+                                        label = { Text(text = "Precio (€)") }
                                     )
-                                    Text(
-                                        text = if (esPeticion) "Petición" else "Oferta",
-                                        modifier = Modifier.padding(start = 8.dp),
-                                        fontWeight = FontWeight.Bold
-                                    )
+
                                 }
+
                             }
 
-                            Spacer(modifier = Modifier.height(4.dp))
+                            Spacer(modifier = Modifier.width(8.dp))
                             // TITULO
-                            Row(
+                            Column(
                                 modifier = Modifier.padding(vertical = 2.dp),
                             ) {
                                 OutlinedTextField(
-                                    value = texto, onValueChange = { texto = it },
+                                    value = texto, onValueChange = {
+                                        if (it.length <= 100) {
+                                            texto = it
+                                        }
+                                    },
                                     label = { Text(text = "Titulo") }
+                                )
+                                Text(
+                                    text = "${100 - texto.length}/100",
+                                    color = if (100 - texto.length <= 0) Color.Red else Color.Gray
                                 )
                             }
 
@@ -160,7 +203,6 @@ fun EditDialog(
 
                             // DESCRIPCION
                             Column{
-
                                 OutlinedTextField(
                                     value = desc,
                                     onValueChange = {
@@ -175,31 +217,8 @@ fun EditDialog(
                                     )
                                 Text(
                                     text = "${400 - desc.length}/400",
-                                    color = if (400 - desc.length < 0) Color.Red else Color.Gray
+                                    color = if (400 - desc.length <= 0) Color.Red else Color.Gray
                                 )
-                            }
-
-
-                            // PRECIO
-                            if (!esPeticion) {
-                                Spacer(modifier = Modifier.height(4.dp))
-                                Row(
-                                    modifier = Modifier
-                                        .padding(vertical = 5.dp)
-                                        .fillMaxWidth(),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Text(text = "Precio (€) : ")
-                                    OutlinedTextField(
-                                        value = precio,
-                                        onValueChange = { newValue ->
-                                            if (newValue.all { it.isDigit() || it == '.' }) {
-                                                precio = newValue
-                                            }
-                                        },
-                                    )
-
-                                }
                             }
 
                             Spacer(modifier = Modifier.height(4.dp))
@@ -209,8 +228,8 @@ fun EditDialog(
                             Text(
                                 text = "Categorías",
                                 fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(vertical = 5.dp)
                             )
+                            Spacer(modifier = Modifier.height(4.dp))
                             Column(modifier = Modifier.fillMaxWidth()) {
                                 CATEGORIAS.chunked(2).forEach { categoriesRow ->
                                     Row(
@@ -234,7 +253,9 @@ fun EditDialog(
                                                     modifier = Modifier.padding(4.dp)
                                                 ) {
                                                     Icon(
-                                                        imageVector = ImageVector.vectorResource(category.icono),
+                                                        imageVector = ImageVector.vectorResource(
+                                                            category.icono
+                                                        ),
                                                         contentDescription = null,
                                                         modifier = Modifier.size(20.dp)
                                                     )
@@ -281,7 +302,6 @@ fun EditDialog(
 
                         }
                     }
-
 
                     Spacer(
                         modifier = Modifier
