@@ -49,6 +49,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -96,6 +97,7 @@ import com.offerus.components.languageSwitcher
 import com.offerus.components.mapa
 import com.offerus.data.CATEGORIAS
 import com.offerus.navigation.AppScreens
+import com.offerus.services.suscribeToFCM
 import com.offerus.ui.theme.OfferUSTheme
 import com.offerus.utils.ContraseñaNoCoincideException
 import com.offerus.utils.isNetworkAvailable
@@ -159,6 +161,11 @@ fun UserScreenContent(
     val booleanState by viewModel.tema.collectAsState(initial = true)
     val coroutineScope = rememberCoroutineScope()
     val infoUsuario = viewModel.infoUsuario.value
+    var valoracion by remember { mutableStateOf<Pair<Int, Double>?>(Pair(0, 0.0)) }
+    LaunchedEffect(key1 = infoUsuario.username) {
+        val result = viewModel.valoracionMedia(infoUsuario.username)
+        valoracion = result
+    }
 
     Column(
         modifier = Modifier
@@ -256,14 +263,14 @@ fun UserScreenContent(
                             .padding(bottom = 20.dp, top = 15.dp, start = 0.dp, end = 0.dp)
                             //.scale(0.6F)
                             ,
-                        value = 3.5F, // TODO poner la valoracion del usuario
+                        value = valoracion!!.second.toFloat(),
                         style = RatingBarStyle.Fill(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.outline),
                         onValueChange = {},
                         onRatingChanged = {},
                         size = 20.dp,
                         spaceBetween = 4.dp
                     )
-                    Text(text = "(20)", modifier = Modifier.padding(start =5.dp , top = 13.dp))
+                    Text(text = "(${valoracion!!.first.toString()})", modifier = Modifier.padding(start =5.dp , top = 13.dp))
                 }
             }
             if (config.orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -667,6 +674,7 @@ fun UserScreenContent(
                                 sex = infoUsuario.sexo,
                                 suscriptions = obtenerCategoriasString(selectedCategories)
                             )
+                            suscribeToFCM(context) // Actualizar las suscripciones
                             Toast.makeText(context, R.string.datos_actualizados, Toast.LENGTH_SHORT).show()
                         }) {
                             Text(text = "")
@@ -970,6 +978,7 @@ fun UserScreenContent(
                         suscriptions = infoUsuario.suscripciones
                     )
                     //viewModel.actualizarInfoUsuario()
+                    suscribeToFCM(context)
                     ubicacionEdit = false
                     Toast.makeText(context, R.string.ubicacion_actualizada, Toast.LENGTH_SHORT).show()
                 }

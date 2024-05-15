@@ -265,7 +265,7 @@ class MainViewModel @Inject constructor(
      * @throws Exception if there is a problem with the server
      */
     @Throws(UserExistsException::class, Exception::class)
-    suspend fun register(username:String, password: String, fullName: String, age: Int, email: String, phone: String, sex: String) {
+    suspend fun register(username:String, password: String, fullName: String, age: Int, email: String, phone: String, sex: String, latitud: Double, longitud: Double) {
         val user = Usuario(username = username, nombre_apellido = fullName, edad = age, mail = email, telefono = phone, sexo = sex, contraseña = password, descripcion = "", latitud = 0.0, longitud = 0.0, suscripciones = "")
         httpAuthClient.register(user)
 

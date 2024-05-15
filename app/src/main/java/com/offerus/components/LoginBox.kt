@@ -1,7 +1,11 @@
 package com.offerus.components
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
@@ -60,12 +64,15 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
+import com.google.android.gms.maps.model.LatLng
 import com.offerus.R
 import com.offerus.navigation.AppScreens
 import com.offerus.services.suscribeToFCM
 import com.offerus.utils.AuthenticationException
 import com.offerus.utils.UserExistsException
+import com.offerus.utils.locationUtils
 import com.offerus.viewModels.MainViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -77,6 +84,12 @@ fun LoginBox(
     navController: NavController,
     onTabChange: (Boolean) -> Unit
 ) {
+    /* PEDIR PERMISO DE UBICACION */
+    var permisoUbicacion by rememberSaveable {
+        mutableStateOf(false)
+    }
+
+
     val context = LocalContext.current
     val screenWidth = LocalConfiguration.current.screenWidthDp
     val coroutineScope = rememberCoroutineScope()
@@ -229,11 +242,20 @@ fun LoginBox(
         ).show()
         mostrarErrorConexion = false
     }
-
+    var ubicacion by rememberSaveable {
+        mutableStateOf(LatLng(0.0, 0.0))
+    }
+    val locationUtils = locationUtils()
     val onRegister: () -> Unit = {
         coroutineScope.launch(Dispatchers.IO){
             try {
-                mainViewModel.register(usernameRegistro, passwordRegistro, fullName, age.toInt(),  email, phone, sex)
+                if (permisoUbicacion){
+                    val ubi = locationUtils.getLocation(context)
+                    if (ubi != null) {
+                        ubicacion = LatLng(ubi.latitude, ubi.longitude)
+                    }
+                }
+                mainViewModel.register(usernameRegistro, passwordRegistro, fullName, age.toInt(),  email, phone, sex, ubicacion.latitude, ubicacion.longitude)
                 registrado = true
                 mostrarErrorRegistro = false
             } catch (e: UserExistsException) {
@@ -358,6 +380,43 @@ fun LoginBox(
                     enter = slideInHorizontally(initialOffsetX = { 1000 }),
                     exit = slideOutHorizontally(targetOffsetX = { 1000 })
                 ) {
+                    // pedir permisos de ubicacion para hacer el registro
+                    val requestPermissionLauncher = rememberLauncherForActivityResult(
+                        ActivityResultContracts.RequestMultiplePermissions()
+                    ) { permissions ->
+                        if (permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
+                            permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+                        ) {
+                            // Permission is granted
+                            permisoUbicacion = true
+                        } else {
+                            // Permission is denied
+                            permisoUbicacion = false
+                        }
+                    }
+
+                    val permissions = arrayOf(
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                    )
+                    if (ContextCompat.checkSelfPermission(
+                            LocalContext.current,
+                            Manifest.permission.ACCESS_FINE_LOCATION
+                        ) == PackageManager.PERMISSION_GRANTED ||
+                        ContextCompat.checkSelfPermission(
+                            LocalContext.current,
+                            Manifest.permission.ACCESS_COARSE_LOCATION
+                        ) == PackageManager.PERMISSION_GRANTED
+                    ) {
+                        // Permission is already granted
+                        permisoUbicacion = true
+                    } else {
+                        // Request for permission
+                        LaunchedEffect(permissions) {
+                            requestPermissionLauncher.launch(permissions)
+                        }
+                    }
+
 
                     RegisterFieldView(
                         onUsernameChange = { newText -> usernameRegistro = newText},
