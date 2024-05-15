@@ -206,9 +206,9 @@ fun BotonesMyOffers(onEditClick: () -> Unit, onDeleteClick: () -> Unit) {
                 onEditClick() },
             modifier = Modifier.size(30.dp),  //avoid the oval shape
             shape = CircleShape,
-            border = BorderStroke(1.dp, MaterialTheme.colorScheme.tertiaryContainer),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.secondary),
             contentPadding = PaddingValues(0.dp),  //avoid the little icon
-            colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.tertiaryContainer)
+            colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.secondary)
         ) {
             Icon(
                 imageVector = Icons.Filled.Create,

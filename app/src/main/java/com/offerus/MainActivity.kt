@@ -1,6 +1,7 @@
 package com.offerus
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -10,6 +11,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -59,47 +61,39 @@ class MainActivity : AppCompatActivity() {
                     // show a toast
                     val mensaje = stringResource(R.string.no_internet)
                     Toast.makeText(this, mensaje, Toast.LENGTH_LONG).show()
+
                 }else {
+                    // comprobar si hay un usuario guardado en el datastore para hacer el login automatico
+                    logedIn = mainViewModel.obtenerUsuarioLogeado() != ""
+                    val context = this
 
-
-
-                        logedIn = mainViewModel.obtenerUsuarioLogeado() != ""
-                        val context = this
-                        if (logedIn) {
-
-                            if (!this::biometricAuthManager.isInitialized) {
-                                biometricAuthManager = BiometricAuthManager(
-                                    context = this,
-                                    onAuthenticationSucceeded = {
-                                        mainViewModel.loginUsuarioGuardado()
-                                        suscribeToFCM(context)
-                                        huella = true
-                                    }
-                                )
-                            }
-                            var huellaSupport=biometricAuthManager.checkBiometricSupport()
-                            if(huellaSupport== DeviceBiometricsSupport.SUPPORTED && !huella) {
-                                biometricAuthManager.submitBiometricAuthorization()
-                            }
-
-
+                    if (logedIn) {
+                        //si hay un usuario guardado en el datastore, intentar hacer login automatico con huella
+                        if (!this::biometricAuthManager.isInitialized) {
+                            biometricAuthManager = BiometricAuthManager(
+                                context = this,
+                                onAuthenticationSucceeded = {
+                                    mainViewModel.loginUsuarioGuardado()
+                                    suscribeToFCM(context)
+                                    huella = true
+                                }
+                            )
                         }
-
-
-                            /*LaunchedEffect(logedIn) {
-
+                        var huellaSupport=biometricAuthManager.checkBiometricSupport() //comprobar si el dispositivo soporta huella
+                        if(huellaSupport== DeviceBiometricsSupport.SUPPORTED && !huella) {
+                            //si el dispositivo soporta huella, hacer el logina automatico si la huella es correcta
+                            biometricAuthManager.submitBiometricAuthorization()
+                        }else{
+                            //si el dispositivo no soporta huella, hacer el login automatico sin huella
+                            LaunchedEffect(true) {
                                 Log.d("login", "Usuario logeado1: $logedIn")
                                 mainViewModel.loginUsuarioGuardado()
                                 suscribeToFCM(context)
-                            }*/
+                                huella = true
+                            }
+                        }
 
-
-
-
-
-
-
-
+                    }
                 }
 
                 // Update the app language, to restore the previous app language in case a different

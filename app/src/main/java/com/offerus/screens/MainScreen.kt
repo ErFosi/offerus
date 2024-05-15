@@ -3,6 +3,7 @@ package com.offerus.screens
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -237,6 +238,7 @@ fun UserAvatar(username: String, viewModel: MainViewModel) {
             coroutineScope.launch(Dispatchers.IO) {
                 val bitmap = viewModel.getUserProfile(username)
                 uri = context.createImageFileFromBitMap(bitmap, username)
+                Log.d("USERNAME FOTO AVATAR", username)
                 //Log.d("uri", uri.toString())
             }
         }
