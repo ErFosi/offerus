@@ -35,7 +35,6 @@ import com.offerus.utils.UserExistsException
 import com.offerus.utils.showToastOnMainThread
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -815,11 +814,10 @@ class MainViewModel @Inject constructor(
     }
 
     // obtener valoracion media
-    fun valoracionMedia(username: String): Pair<Int, Double> {
-        //val valoracion = httpUserClient.getValoracionMedia(username)
+    suspend fun valoracionMedia(username: String): Pair<Int, Double> {
+        val valoracion = httpUserClient.obtenerNotaUsuario(username)
+        return Pair(valoracion.cant, valoracion.nota)
         Log.e("KTOR", "Valoracion media conseguida")
-        //return Pair(valoracion.first, valoracion.second)
-        return Pair(4, 3.3)
     }
 
 

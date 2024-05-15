@@ -150,8 +150,8 @@ data class PeticionId(
 )
 @Serializable
 data class NotaUsuario(
-    val cant: Double,
-    val nota: Int
+    val nota: Double,
+    val cant: Int
 )
 
 @Serializable
