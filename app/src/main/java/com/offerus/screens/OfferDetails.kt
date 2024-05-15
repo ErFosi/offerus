@@ -1,6 +1,7 @@
 package com.offerus.screens
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.background
@@ -23,6 +24,7 @@ import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -56,11 +58,16 @@ import com.offerus.components.Marcador
 import com.offerus.components.TopBarSecundario
 import com.offerus.components.mapa
 import com.offerus.data.ServicioPeticion
+import com.offerus.data.UsuarioData
+import com.offerus.utils.UserClient
 import com.offerus.utils.crearContacto
 import com.offerus.utils.enviarEmail
 import com.offerus.utils.obtenerCategorias
 import com.offerus.utils.showToastOnMainThread
 import com.offerus.viewModels.MainViewModel
+import io.ktor.client.HttpClient
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
 fun OfferDetails(
@@ -72,14 +79,37 @@ fun OfferDetails(
     }
 }
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun OfferDetailsContent(paddingValues: PaddingValues, viewModel: MainViewModel) {
-
+    val coroutineScope = rememberCoroutineScope()
+    val httpUserClient = UserClient()
     var servicioPeticion = viewModel.servicioDetalle.value
-    val hostData = viewModel.infoUsuarioDetalle.value
+    var hostData by remember { mutableStateOf<UsuarioData?>(null) }
+    if (servicioPeticion != null) {
+        coroutineScope.launch(Dispatchers.IO) {
+            hostData = httpUserClient.getDatosCualquierUsuario(servicioPeticion.username)
+            Log.e("KTOR", "Datos usuario conseguidos")
+        }
+    }
 
     if (servicioPeticion == null || hostData == null) {
-        Text(text = "Cargando...")
+        //Text(text = "Cargando...")
+        Surface {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                CircularProgressIndicator(
+                    modifier = Modifier.width(64.dp),
+                    color = MaterialTheme.colorScheme.secondary,
+                    trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                )
+            }
+        }
     } else {
 
 
@@ -100,7 +130,7 @@ fun OfferDetailsContent(paddingValues: PaddingValues, viewModel: MainViewModel) 
             rememberSaveable { mutableStateOf(viewModel.esPeticionFavorita(servicioPeticion.id)) }
 
         LaunchedEffect(key1 = servicioPeticion.id) {
-            val result = viewModel.valoracionMedia(hostData.username)
+            val result = viewModel.valoracionMedia(hostData!!.username)
             valoracion = result
         }
 
@@ -250,10 +280,10 @@ fun OfferDetailsContent(paddingValues: PaddingValues, viewModel: MainViewModel) 
                                         horizontalAlignment = Alignment.CenterHorizontally
                                     ) {
                                         UserAvatar(
-                                            username = hostData.username,
+                                            username = hostData!!.username,
                                             viewModel = viewModel
                                         )
-                                        Text(text = hostData.username, textAlign = TextAlign.Center)
+                                        Text(text = hostData!!.username, textAlign = TextAlign.Center)
                                         if (valoracion != null) {
 
                                             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -291,13 +321,13 @@ fun OfferDetailsContent(paddingValues: PaddingValues, viewModel: MainViewModel) 
                                         horizontalAlignment = Alignment.CenterHorizontally
                                     ) {
                                         Text(
-                                            text = "${hostData.edad} años",
+                                            text = "${hostData!!.edad} años",
                                             textAlign = TextAlign.Center
                                         )
                                         //sexo
-                                        if (hostData.sexo == "M") {
+                                        if (hostData!!.sexo == "M") {
                                             Text(text = "Hombre", textAlign = TextAlign.Center)
-                                        } else if (hostData.sexo == "F") {
+                                        } else if (hostData!!.sexo == "F") {
                                             Text(text = "Mujer", textAlign = TextAlign.Center)
                                         } else {
                                             Text(text = "Otro", textAlign = TextAlign.Center)
@@ -317,7 +347,7 @@ fun OfferDetailsContent(paddingValues: PaddingValues, viewModel: MainViewModel) 
                                 )
                                 // sobre mi
                                 Text(
-                                    text = "Sobre mi: " + hostData.descripcion,
+                                    text = "Sobre mi: " + hostData!!.descripcion,
                                     textAlign = TextAlign.Justify,
                                     modifier = Modifier.padding(8.dp)
                                 )

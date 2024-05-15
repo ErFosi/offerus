@@ -105,6 +105,7 @@ import com.offerus.viewModels.MainViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
+import java.net.URI
 
 
 @Composable
@@ -197,7 +198,7 @@ fun UserScreenContent(
                         ).show()
                     }
                     //uri = "android.resource://com.offerus/drawable/baseline_adb_24".toUri()
-                    uri = "file:///storage/emulated/0/Android/data/com.offerus/cache/JPEG_default_.jpg".toUri()
+                    uri = "file:///storage/emulated/0/Android/data/com.offerus/cache/JPEG_${infoUsuario.username}_.jpg".toUri()
                 }
                 if (uri.toString() != "" || true) {
                     //image to show bottom sheet
@@ -207,6 +208,7 @@ fun UserScreenContent(
                         onSetUri = {
                             if (isNetworkAvailable(context)) context.getBipMapFromUri(it)
                                 ?.let { it1 ->
+                                    context.createImageFileFromBitMap(it1, infoUsuario.username)
                                     viewModel.uploadUserProfile(it1)
                                     uri = it
                                 }

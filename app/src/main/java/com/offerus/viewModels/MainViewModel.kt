@@ -343,6 +343,7 @@ class MainViewModel @Inject constructor(
     fun uploadUserProfile(bitmap: Bitmap) {
         try {
             viewModelScope.launch {
+                Log.d("uploadUserProfile", "uploading profile")
                 httpUserClient.uploadUserProfile(bitmap)
                 Log.e("KTOR", "Perfil subido con exito")
             }

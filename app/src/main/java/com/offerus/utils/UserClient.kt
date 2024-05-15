@@ -145,7 +145,7 @@ class UserClient @Inject constructor() {
         image.compress(Bitmap.CompressFormat.JPEG, 75, stream)
         val byteArray = stream.toByteArray()
         val token = bearerTokenStorage.last().accessToken
-
+        Log.d("KTOR", "Subiendo imagen de perfil")
         clienteHttp.submitFormWithBinaryData(
             url = "https://offerus.zapto.org/profile/image",
             formData = formData {
@@ -158,6 +158,7 @@ class UserClient @Inject constructor() {
             method = HttpMethod.Post
             header(HttpHeaders.Authorization, "Bearer $token")
         }
+        Log.d("KTOR", "Imagen de perfil subida")
     }
 
     /************************************************************************

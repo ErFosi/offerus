@@ -235,7 +235,7 @@ fun UserAvatar(username: String, viewModel: MainViewModel) {
     if (!file.exists() || true){
         if (isNetworkAvailable(context)) {
             coroutineScope.launch(Dispatchers.IO) {
-                val bitmap = viewModel.getUserProfile(viewModel.usuario)
+                val bitmap = viewModel.getUserProfile(username)
                 uri = context.createImageFileFromBitMap(bitmap, username)
                 //Log.d("uri", uri.toString())
             }
