@@ -309,8 +309,7 @@ class MainViewModel @Inject constructor(
         httpUserClient.changePassword(passwordChange)
         Log.e("KTOR", "Cambio de contrasena completado")
 
-        }
-
+    }
     fun updateUserData(fullName: String, age: Int, email: String, phone: String, sex: String,lat: Double, lon: Double, descr: String, suscriptions: String) {
         val update = UsuarioUpdate(fullName, age, lat, lon, email, phone, sex, descr, suscriptions)
         try {
@@ -372,8 +371,6 @@ class MainViewModel @Inject constructor(
         return respuesta
     }
 
-    fun getRequests(searchText: String, categories: String, maxDistance: Double, minPrice: Double, maxPrice: Double, asc: String) {
-        val filter = BusquedaPeticionServicio(searchText, null, 10000000000000.0, minPrice, maxPrice, 0.0, 0.0, "precio_asc")
     fun getRequests(searchText: String?, categories: String?, maxDistance: Double?, minPrice: Double?, maxPrice: Double?, asc: String) {
         val filter = BusquedaPeticionServicio(searchText, categories, maxDistance, minPrice, maxPrice, 0.0, 0.0, "precio_asc")
         Log.e("peticion", " $searchText , $maxDistance , $maxPrice")
@@ -476,15 +473,6 @@ class MainViewModel @Inject constructor(
                 val listaIdPeticiones = nuevasDeals.map { it.id_peticion }
                 Log.d("lista petis", listaIdPeticiones.toString())
 
-                if (listaIdPeticiones.isNotEmpty()) {
-                    withContext(Dispatchers.IO) {
-                        //servicioRepository.deleteServicio()
-                        httpUserClient.obtenerPeticiones(listaIdPeticiones).forEach { peticion ->
-                            Log.d("peticion add", peticion.toString())
-                           //servicioRepository.addServicio(peticion)
-                        }
-                    }
-                }
 
                 // Filtrar deals entrantes y actualizar listaEntrantes
                 val nuevasEntrantes =
@@ -795,8 +783,6 @@ class MainViewModel @Inject constructor(
                 if (!cargaInicialPeticionesFavoritas.value){
                     cargaInicialPeticionesFavoritas.value = true
                 }
-
-
 
 
             }
