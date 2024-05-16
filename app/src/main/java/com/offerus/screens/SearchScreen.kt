@@ -469,14 +469,15 @@ fun SearchDialog(
                                 valueRange = 0f..500f,
                                 steps = 1000,
                                 modifier = Modifier
-                                    .width(150.dp)
+                                    .width(200.dp)
                             )
                             Text(text = "%.1f".format(sliderValue ) + " Km")
 
                         }
                         Row(
                             modifier = Modifier.padding(vertical = 5.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
                         ) {
                             OutlinedTextField(
 
