@@ -40,12 +40,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.offerus.R
 import com.offerus.data.CATEGORIAS
 import com.offerus.utils.obtenerCategoriasString
 import com.offerus.utils.obtenerFechaHoy
@@ -83,7 +85,7 @@ fun CreateDialog(
             LazyColumn(horizontalAlignment = Alignment.CenterHorizontally) {
                 item {
                     Text(
-                        text = "Nuevo Servicio",
+                        text = stringResource(id = R.string.nuevo_servicio),
                         modifier = Modifier
                             .padding(10.dp),
                         fontWeight = FontWeight.Bold,
@@ -140,7 +142,7 @@ fun CreateDialog(
                                             )
                                         )
                                         Text(
-                                            text = if (esPeticion) "Petición" else "Oferta",
+                                            text = if (esPeticion) stringResource(id = R.string.peticion) else stringResource(id = R.string.oferta),
                                             modifier = Modifier.padding(start = 8.dp),
                                             fontWeight = FontWeight.Bold
                                         )
@@ -163,7 +165,7 @@ fun CreateDialog(
                                                 precio = newValue
                                             }
                                         },
-                                        label = { Text(text = "Precio (€)") }
+                                        label = { Text(text = stringResource(id = R.string.precio) +  "(€)") }
                                     )
 
                                 }
@@ -182,7 +184,7 @@ fun CreateDialog(
                                             texto = it
                                         }
                                     },
-                                    label = { Text(text = "Titulo") }
+                                    label = { Text(text = stringResource(id = R.string.titulo)) }
                                 )
                                 Text(
                                     text = "${100 - texto.length}/100",
@@ -203,7 +205,7 @@ fun CreateDialog(
 
                                         }
                                     },
-                                    label = { Text(text = "Descripción") },
+                                    label = { Text(text = stringResource(id = R.string.descripcion)) },
 
                                     )
                                 Text(
@@ -217,7 +219,7 @@ fun CreateDialog(
                             // CATEGORIAS
 
                             Text(
-                                text = "Categorías",
+                                text = stringResource(id = R.string.categorias),
                                 fontWeight = FontWeight.Bold,
                             )
                             Spacer(modifier = Modifier.height(4.dp))
@@ -252,7 +254,7 @@ fun CreateDialog(
                                                     )
                                                     Spacer(modifier = Modifier.width(2.dp))
                                                     Text(
-                                                        text = category.nombre,
+                                                        text = stringResource(id = category.nombreMostrar),
                                                         fontSize = 14.sp,
 
                                                         )

@@ -197,14 +197,14 @@ data class Favoritos(
 )
 
 
-data class Categoria(val nombre: String, val icono: Int, val color: Color)
+data class Categoria(val nombre: String, val icono: Int, val color: Color, val nombreMostrar: Int)
 
 val CATEGORIAS = listOf(
-    Categoria("gratis", R.drawable.gratis, Color.Green),
-    Categoria("deporte", R.drawable.deporte, Color.Yellow),
-    Categoria("hogar", R.drawable.hogar, Color.Magenta),
-    Categoria("academico", R.drawable.academico, Color.Blue),
-    Categoria("online", R.drawable.online, Color.Cyan),
-    Categoria("otros", R.drawable.otros, Color.Gray),
-    Categoria("entretenimiento", R.drawable.ocio, Color.Red),
+    Categoria("gratis", R.drawable.gratis, Color.Green, R.string.gratis),
+    Categoria("deporte", R.drawable.deporte, Color.Yellow, R.string.deporte),
+    Categoria("hogar", R.drawable.hogar, Color.Magenta, R.string.hogar),
+    Categoria("academico", R.drawable.academico, Color.Blue, R.string.academico),
+    Categoria("online", R.drawable.online, Color.Cyan, R.string.online),
+    Categoria("otros", R.drawable.otros, Color.Gray, R.string.otros),
+    Categoria("entretenimiento", R.drawable.ocio, Color.Red, R.string.entretenimiento),
 )
