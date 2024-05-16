@@ -466,8 +466,8 @@ fun SearchDialog(
                                     sliderValue = newValue
                                     onDistanciaChange(newValue.toDouble())
                                 },
-                                valueRange = 0f..1000f,
-                                steps = 10000,
+                                valueRange = 0f..500f,
+                                steps = 1000,
                                 modifier = Modifier
                                     .width(150.dp)
                             )
@@ -634,7 +634,7 @@ fun ListaOfertas(onItemClick: () -> Unit, listaPeticiones: List<ServicioPeticion
             .pullRefresh(refreshState)
     ) {
 
-        LazyColumn {
+        LazyColumn (modifier = Modifier.fillMaxSize()) {
             items(listaPeticiones.size) { index ->
                 OfertasCard(peticion = listaPeticiones[index], onItemClick = onItemClick, mainViewModel)
             }

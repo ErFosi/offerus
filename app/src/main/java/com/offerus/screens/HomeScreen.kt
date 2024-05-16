@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
@@ -559,8 +560,11 @@ fun OfferInfo(
     ) {
 
         // foto de perfil del usuario
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(4.dp)
+        Column (
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .padding(4.dp)
+                .width(70.dp)
         ) {
 
             if (viewModel.usuario == servicioPeticion.username) { // si yo soy el creador del servicio, muestro la foto del cliente
