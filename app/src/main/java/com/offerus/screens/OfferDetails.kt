@@ -44,6 +44,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -53,6 +54,7 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.gowtham.ratingbar.RatingBar
 import com.gowtham.ratingbar.RatingBarStyle
+import com.offerus.R
 import com.offerus.components.CategoriasCard
 import com.offerus.components.Marcador
 import com.offerus.components.TopBarSecundario
@@ -65,7 +67,6 @@ import com.offerus.utils.enviarEmail
 import com.offerus.utils.obtenerCategorias
 import com.offerus.utils.showToastOnMainThread
 import com.offerus.viewModels.MainViewModel
-import io.ktor.client.HttpClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -93,7 +94,7 @@ fun OfferDetailsContent(paddingValues: PaddingValues, viewModel: MainViewModel) 
         }
     }
 
-    if (servicioPeticion == null || hostData == null) {
+    if (servicioPeticion == null || hostData == null || viewModel.isRefreshingHome.value) {
         //Text(text = "Cargando...")
         Surface {
             Column(
@@ -218,7 +219,7 @@ fun OfferDetailsContent(paddingValues: PaddingValues, viewModel: MainViewModel) 
 
                             //fecha de publicacion de la oferta
                             Text(
-                                text = "Publicado el ${servicioPeticion.fecha}",
+                                text = stringResource(id = R.string.publicado) + " " + servicioPeticion.fecha,
                                 fontStyle = FontStyle.Italic,
                                 modifier = Modifier.padding(bottom = 8.dp)
                             )
@@ -321,16 +322,16 @@ fun OfferDetailsContent(paddingValues: PaddingValues, viewModel: MainViewModel) 
                                         horizontalAlignment = Alignment.CenterHorizontally
                                     ) {
                                         Text(
-                                            text = "${hostData!!.edad} años",
+                                            text = stringResource(id = R.string.age) + ": " + hostData!!.edad,
                                             textAlign = TextAlign.Center
                                         )
                                         //sexo
                                         if (hostData!!.sexo == "M") {
-                                            Text(text = "Hombre", textAlign = TextAlign.Center)
+                                            Text(text = stringResource(id = R.string.hombre), textAlign = TextAlign.Center)
                                         } else if (hostData!!.sexo == "F") {
-                                            Text(text = "Mujer", textAlign = TextAlign.Center)
+                                            Text(text = stringResource(id = R.string.mujer), textAlign = TextAlign.Center)
                                         } else {
-                                            Text(text = "Otro", textAlign = TextAlign.Center)
+                                            Text(text = stringResource(id = R.string.otros), textAlign = TextAlign.Center)
                                         }
                                     }
 
@@ -347,7 +348,13 @@ fun OfferDetailsContent(paddingValues: PaddingValues, viewModel: MainViewModel) 
                                 )
                                 // sobre mi
                                 Text(
-                                    text = "Sobre mi: " + hostData!!.descripcion,
+                                    text = stringResource(id = R.string.sobreMi),
+                                    textAlign = TextAlign.Justify,
+                                    modifier = Modifier.padding(4.dp),
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Text(
+                                    text = hostData!!.descripcion,
                                     textAlign = TextAlign.Justify,
                                     modifier = Modifier.padding(8.dp)
                                 )
@@ -366,10 +373,10 @@ fun OfferDetailsContent(paddingValues: PaddingValues, viewModel: MainViewModel) 
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.Center
                         ) {
-                            Text(text = "Solicitud pendiente", modifier = Modifier.padding(8.dp))
+                            Text(text = stringResource(id = R.string.solicitud_pendiente), modifier = Modifier.padding(8.dp))
                         }
                     } else {
-                        BotonesDetalles(viewModel, servicioPeticion)
+                        BotonesDetalles(viewModel, servicioPeticion, hostData!!)
                     }
                 }
             }
@@ -379,7 +386,11 @@ fun OfferDetailsContent(paddingValues: PaddingValues, viewModel: MainViewModel) 
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun BotonesDetalles(viewModel: MainViewModel, servicioPeticion: ServicioPeticion) {
+fun BotonesDetalles(
+    viewModel: MainViewModel,
+    servicioPeticion: ServicioPeticion,
+    hostData: UsuarioData
+) {
 
     val context = LocalContext.current
 
@@ -405,7 +416,7 @@ fun BotonesDetalles(viewModel: MainViewModel, servicioPeticion: ServicioPeticion
 
         //boton de llamar
         ElevatedButton(onClick = {
-            nuevoContacto(context)
+            nuevoContacto(context, hostData.telefono, hostData.nombre_apellido)
             showToastOnMainThread(context, "Contacto añadido")
         }) {
             Icon(Icons.Filled.Call, contentDescription = "Llamar")
@@ -415,6 +426,7 @@ fun BotonesDetalles(viewModel: MainViewModel, servicioPeticion: ServicioPeticion
 
         ElevatedButton(onClick = {
             viewModel.createDeal(servicioPeticion.id)
+            viewModel.actualizarListaDeals()
             showToastOnMainThread(context, "Solicitud enviada")
 
         }) {
@@ -432,8 +444,8 @@ fun BotonesDetalles(viewModel: MainViewModel, servicioPeticion: ServicioPeticion
         ElevatedButton(onClick = {
             enviarEmail(
                 context,
-                "ejemplo@gmail.com",
-                "Servicio de Offerus",
+                hostData.mail,
+                "Servicio de Offerus: ${servicioPeticion.titulo}",
                 "Hola, me gustaria tener mas información acerca de tu servicio."
             )
         }) {
@@ -443,10 +455,10 @@ fun BotonesDetalles(viewModel: MainViewModel, servicioPeticion: ServicioPeticion
 }
 
 
-fun nuevoContacto(context: Context) {
+fun nuevoContacto(context: Context, telefono: String, nombreApellido: String) {
     //var contactos = obtenerContactos(context.contentResolver)
     //Log.d("contactos", contactos.toString())
-    crearContacto(context.contentResolver, "Prueba Test", "123456789")
+    crearContacto(context.contentResolver, nombreApellido, telefono)
 }
 
 

@@ -2,8 +2,12 @@ package com.offerus.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -23,26 +27,33 @@ fun CategoriasCard(nombresCategorias: String) {
     var listaCategorias = obtenerCategorias(nombresCategorias)
 
     obtenerCategoriasDesdeNombres(listaCategorias).let { categorias ->
-        Row(modifier = Modifier.padding(vertical = 4.dp), horizontalArrangement = Arrangement.spacedBy(5.dp)) {
-            for (categoria in categorias.take(3)) {
-                // circulos con el color
-                Card(colors = CardDefaults.cardColors(containerColor = categoria.color.copy(alpha = 0.45f))) {
-                    Row(modifier = Modifier.padding(vertical = 0.dp, horizontal = 4.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
-                        Icon(imageVector = ImageVector.vectorResource(categoria.icono), contentDescription = null, modifier = Modifier.size(16.dp))
+        LazyRow(
+            modifier = Modifier.padding(vertical = 4.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(categorias) { categoria ->
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = categoria.color.copy(alpha = 0.45f)),
+                    modifier = Modifier.padding(vertical = 0.dp, horizontal = 0.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = ImageVector.vectorResource(categoria.icono),
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = categoria.nombre,
-                            modifier = Modifier.padding(
-                                top = 2.dp,
-                                start = 2.dp,
-                                end = 4.dp,
-                                bottom = 2.dp
-                            ),
-                            fontSize = 12.sp,
+                            fontSize = 12.sp
                         )
                     }
-
                 }
             }
         }
     }
 }
+
