@@ -22,6 +22,9 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 class FCMService: FirebaseMessagingService() {
+
+    override fun onNewToken(token: String) {}
+
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
         Log.d("FCM", "Message received")

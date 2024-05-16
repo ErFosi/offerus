@@ -48,4 +48,10 @@
     <string name="cancel">Cancel</string>
     <string name="no_ubicacion">Warning: You have not set your location yet</string>
     <string name="recordarUsuario">Remember credentials</string>
+    <string name="gratis">Free</string>
+    <string name="deporte">Sport</string>
+    <string name="hogar">House</string>
+    <string name="academico">Academic</string>
+    <string name="online">Online</string>
+    <string name="entretenimiento">Leisure</string>
 </resources>

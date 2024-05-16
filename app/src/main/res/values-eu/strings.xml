@@ -48,4 +48,10 @@
     <string name="cancel">Utzi</string>
     <string name="no_ubicacion">Adi: ez duzu kokapenik aukeratu</string>
     <string name="recordarUsuario">Gogoratu kredentzialak</string>
+    <string name="gratis">Dohainik</string>
+    <string name="deporte">Kirola</string>
+    <string name="hogar">Etxekoak</string>
+    <string name="academico">Ikasketak</string>
+    <string name="online">Online</string>
+    <string name="entretenimiento">Aisialdia</string>
 </resources>
