@@ -378,7 +378,7 @@ fun UserScreenContent(
                         modifier = Modifier.padding(top = 0.dp, end = 0.dp, bottom = 0.dp)
                     ) {
                         Icon(
-                            painter = painterResource(R.drawable.editar),
+                            painter = painterResource(R.drawable.baseline_edit_square_24),
                             contentDescription = "",
                             modifier = Modifier
                                 .size(20.dp)
@@ -469,7 +469,11 @@ fun UserScreenContent(
                             Icon(painter = painterResource(R.drawable.gender), contentDescription = null, modifier = Modifier
                                 .padding(end = 5.dp)
                                 .size(20.dp))
-                            Text(text = infoUsuario.sexo)
+                            Text(text = when (infoUsuario.sexo){
+                                "M" -> stringResource(id = R.string.hombre)
+                                "F" -> stringResource(id = R.string.mujer)
+                                else -> stringResource(id = R.string.otros)
+                            })
                         }
                     }
                     IconButton(
@@ -477,7 +481,7 @@ fun UserScreenContent(
                         modifier = Modifier.padding(top = 0.dp, end = 0.dp, bottom = 0.dp)
                     ) {
                         Icon(
-                            painter = painterResource(R.drawable.editar),
+                            painter = painterResource(R.drawable.baseline_edit_square_24),
                             contentDescription = "",
                             modifier = Modifier
                                 .size(20.dp)
@@ -904,7 +908,7 @@ fun UserScreenContent(
                 modifier = Modifier.padding(top = 8.dp, end = 30.dp, bottom = 0.dp)
             ) {
                 Icon(
-                    painter = painterResource(R.drawable.editar),
+                    painter = painterResource(R.drawable.baseline_edit_square_24),
                     contentDescription = "Edit",
                     modifier = Modifier
                         .size(20.dp)

@@ -60,7 +60,8 @@ fun languageSwitcher(
             modifier = Modifier
                 .padding(10.dp)
                 .fillMaxSize(),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
         )
         // LANGUAGE SELECTOR
         {
@@ -83,7 +84,7 @@ fun languageSwitcher(
                         )
                     Text(
                         if (size<70.dp) idiomaSeleccionado.codigo else idiomaSeleccionado.name,
-                        Modifier.fillMaxWidth().padding(start = 5.dp).align(Alignment.CenterVertically),
+                        Modifier.padding(start = 5.dp).align(Alignment.CenterVertically),
                     )
                 }
                 DropdownMenu(

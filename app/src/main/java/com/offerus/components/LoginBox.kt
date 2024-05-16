@@ -84,10 +84,24 @@ fun LoginBox(
     navController: NavController,
     onTabChange: (Boolean) -> Unit
 ) {
-    /* PEDIR PERMISO DE UBICACION */
+    /* COMPROBAR PERMISO DE UBICACION */
     var permisoUbicacion by rememberSaveable {
         mutableStateOf(false)
     }
+    if (ContextCompat.checkSelfPermission(
+            LocalContext.current,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED ||
+        ContextCompat.checkSelfPermission(
+            LocalContext.current,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+    ) {
+        // Permission is already granted
+        permisoUbicacion = true
+    } else {
+    }
+
 
 
     val context = LocalContext.current
@@ -380,43 +394,6 @@ fun LoginBox(
                     enter = slideInHorizontally(initialOffsetX = { 1000 }),
                     exit = slideOutHorizontally(targetOffsetX = { 1000 })
                 ) {
-                    // pedir permisos de ubicacion para hacer el registro
-                    val requestPermissionLauncher = rememberLauncherForActivityResult(
-                        ActivityResultContracts.RequestMultiplePermissions()
-                    ) { permissions ->
-                        if (permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
-                            permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
-                        ) {
-                            // Permission is granted
-                            permisoUbicacion = true
-                        } else {
-                            // Permission is denied
-                            permisoUbicacion = false
-                        }
-                    }
-
-                    val permissions = arrayOf(
-                        Manifest.permission.ACCESS_FINE_LOCATION,
-                        Manifest.permission.ACCESS_COARSE_LOCATION
-                    )
-                    if (ContextCompat.checkSelfPermission(
-                            LocalContext.current,
-                            Manifest.permission.ACCESS_FINE_LOCATION
-                        ) == PackageManager.PERMISSION_GRANTED ||
-                        ContextCompat.checkSelfPermission(
-                            LocalContext.current,
-                            Manifest.permission.ACCESS_COARSE_LOCATION
-                        ) == PackageManager.PERMISSION_GRANTED
-                    ) {
-                        // Permission is already granted
-                        permisoUbicacion = true
-                    } else {
-                        // Request for permission
-                        LaunchedEffect(permissions) {
-                            requestPermissionLauncher.launch(permissions)
-                        }
-                    }
-
 
                     RegisterFieldView(
                         onUsernameChange = { newText -> usernameRegistro = newText},

@@ -1,9 +1,13 @@
 package com.offerus
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,8 +22,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.offerus.navigation.MainNavigation
 import com.offerus.services.suscribeToFCM
@@ -48,6 +54,49 @@ class MainActivity : AppCompatActivity() {
                 // Select the app theme based on the theme salected by the user (dark/light)
                 darkTheme = mainViewModel.tema.collectAsState(initial = true).value
             ) {
+                /* Request location permision */
+                var permisoUbicacion by rememberSaveable {
+                    mutableStateOf(false)
+                }
+                // pedir permisos de ubicacion para hacer el registro
+                val requestPermissionLauncher = rememberLauncherForActivityResult(
+                    ActivityResultContracts.RequestMultiplePermissions()
+                ) { permissions ->
+                    if (permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
+                        permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+                    ) {
+                        // Permission is granted
+                        permisoUbicacion = true
+                    } else {
+                        // Permission is denied
+                        permisoUbicacion = false
+                    }
+                }
+
+                val permissions = arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                )
+                if (ContextCompat.checkSelfPermission(
+                        LocalContext.current,
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                    ) == PackageManager.PERMISSION_GRANTED ||
+                    ContextCompat.checkSelfPermission(
+                        LocalContext.current,
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                    ) == PackageManager.PERMISSION_GRANTED
+                ) {
+                    // Permission is already granted
+                    permisoUbicacion = true
+                } else {
+                    // Request for permission
+                    LaunchedEffect(permissions) {
+                        requestPermissionLauncher.launch(permissions)
+                    }
+                }
+
+
+
                 // Log in if there is a user saved in the datastore
 
                 var huella by rememberSaveable {

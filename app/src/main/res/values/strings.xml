@@ -41,7 +41,7 @@
     <string name="no_internet_pic">No se ha podido obtener la foto de perfil porque no se ha podido conectar con el servidor.</string>
     <string name="contrasena_incorrecta">Contraseña incorrecta, inténtalo otra vez</string>
     <string name="invalid_fields">La nueva contraseña debe tener al menos 6 dígitos y las contraseñas deben coincidir.</string>
-    <string name="ubicacion_actualizada" translatable="false">Ubicación actualizada correctamente</string>
+    <string name="ubicacion_actualizada">Ubicación actualizada correctamente</string>
     <string name="datos_actualizados" >Datos actualizados correctamente</string>
     <string name="biometric_auth_prompt_text">Introduzca la huella para iniciar sesión</string>
     <string name="biometric_auth_prompt_title">"Autenticación "</string>

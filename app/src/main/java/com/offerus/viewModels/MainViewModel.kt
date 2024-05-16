@@ -170,6 +170,7 @@ class MainViewModel @Inject constructor(
      * @param contrasena the password to be saved
      */
     fun setUsuarioLogueado(usuario: String, contrasena: String) = viewModelScope.launch {
+        Log.d("login", "guardando usuario logeado")
         myPreferencesDataStore.setUsuarioContraLogeado(
             usuario,
             contrasena
