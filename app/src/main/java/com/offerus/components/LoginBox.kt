@@ -168,6 +168,7 @@ fun LoginBox(
     }
     fun isValidUsername(): Boolean {
         val usernamePattern = Regex("^[a-zA-Z0-9]*$")
+        val trimmedUsername = usernameRegistro.trim()
         val valid = usernamePattern.matches(usernameRegistro)
         if (!valid) {
             Toast.makeText(
@@ -179,6 +180,7 @@ fun LoginBox(
         } else {
             invalidUsername = false
         }
+        usernameRegistro = trimmedUsername
         return valid
     }
     fun isValidPassword(): Boolean {
@@ -228,6 +230,7 @@ fun LoginBox(
     val onLogin: () -> Unit = {
         coroutineScope.launch(Dispatchers.IO){
             try {
+                username=username.trim()
                 mainViewModel.login(username, password)
                 sesionIniciada = true
                 mainViewModel.usuario = username // guardar el nombre de usuario en el viewmodel
