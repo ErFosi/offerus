@@ -20,7 +20,6 @@ import com.offerus.data.UsuarioUpdate
 import com.offerus.data.ValorarDeal
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.HttpResponseValidator
 import io.ktor.client.plugins.auth.providers.BearerTokens
@@ -31,7 +30,6 @@ import io.ktor.client.request.delete
 import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.forms.formData
 import io.ktor.client.request.forms.submitForm
-import io.ktor.client.request.forms.submitFormWithBinaryData
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.parameter
@@ -44,7 +42,6 @@ import io.ktor.client.statement.readBytes
 import io.ktor.http.ContentType
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
-import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.Parameters
 import io.ktor.http.contentType
@@ -52,7 +49,6 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.ByteArrayOutputStream
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -62,9 +58,8 @@ import javax.inject.Singleton
 
 @Singleton
 class UserClient @Inject constructor() {
-    private val clienteHttp = HttpClient(OkHttp) {
+    private val clienteHttp = HttpClient() {
         expectSuccess = true
-
         install(ContentNegotiation) {
             json(Json {
                 // Configura JSON para manejar adecuadamente las propiedades que podrían ser nulas
@@ -74,12 +69,14 @@ class UserClient @Inject constructor() {
             })
         }
         engine {
-            config {
+            //proxy = ProxyBuilder.http(Url("https://offerus.zapto.org/"))
+            /*config {
                 // Configura específicamente el cliente OkHttp si es necesario
                 connectTimeout(30, TimeUnit.SECONDS)
                 readTimeout(30, TimeUnit.SECONDS)
                 writeTimeout(30, TimeUnit.SECONDS)
-            }
+                retryOnConnectionFailure(true)
+            }*/
         }
 
         HttpResponseValidator {

@@ -120,7 +120,7 @@ dependencies {
     // geolocalizaccion
     implementation ("com.google.android.gms:play-services-location:21.0.1")
     //ktor para cliente http
-    val ktor_version="2.3.8"
+    val ktor_version="2.3.11"
 
     implementation ("io.ktor:ktor-client-android:$ktor_version")
     implementation ("io.ktor:ktor-client-content-negotiation:$ktor_version")

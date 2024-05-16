@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Matrix
+import android.media.ExifInterface
 import android.net.Uri
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -326,6 +328,59 @@ fun Context.getBipMapFromUri(uri: Uri): Bitmap? {
     return uri.let { uri ->
 
         val inputStream = contentResolver.openInputStream(uri)
+        inputStream?.use {
+            val exif = ExifInterface(it)
+            val orientation =
+                exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
+
+            val matrix = Matrix()
+            when (orientation) {
+                ExifInterface.ORIENTATION_ROTATE_90 -> matrix.postRotate(90f)
+                ExifInterface.ORIENTATION_ROTATE_180 -> matrix.postRotate(180f)
+                ExifInterface.ORIENTATION_ROTATE_270 -> matrix.postRotate(270f)
+            }
+
+            val bitmap = BitmapFactory.decodeStream(contentResolver.openInputStream(uri))
+            if (bitmap != null) {
+                val rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+                val outputStream = ByteArrayOutputStream()
+                return try {
+                    rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 50, outputStream)
+                    val compressedByteArray = outputStream.toByteArray()
+                    BitmapFactory.decodeByteArray(compressedByteArray, 0, compressedByteArray.size)
+                } catch (e: IOException) {
+                    Log.e("CompressImage", "Error al escribir el archivo comprimido: ${e.message}")
+                    null
+                } catch (e: Exception) {
+                    Log.e("CompressImage", "Error al escribir el archivo comprimido: ${e.message}")
+                    null
+                }
+            } else {
+                Log.e("DecodeBitmap", "Error al decodificar el bitmap desde el URI.")
+                null
+            }
+        }
+    }
+}
+
+
+/*fun Context.getBipMapFromUri(uri: Uri): Bitmap? {
+    return uri.let { uri ->
+
+        val inputStream = contentResolver.openInputStream(uri)
+
+        val exif = ExifInterface(inputStream!!)
+        val orientation =
+            exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
+
+        val matrix = Matrix()
+        when (orientation) {
+            ExifInterface.ORIENTATION_ROTATE_90 -> matrix.postRotate(90f)
+            ExifInterface.ORIENTATION_ROTATE_180 -> matrix.postRotate(180f)
+            ExifInterface.ORIENTATION_ROTATE_270 -> matrix.postRotate(270f)
+        }
+
+
         val bitmap = BitmapFactory.decodeStream(inputStream)
         val outputStream = ByteArrayOutputStream()
         
@@ -343,7 +398,7 @@ fun Context.getBipMapFromUri(uri: Uri): Bitmap? {
         }
 
     }
-}
+}*/
 
 fun Context.getFileFromUri(uri: Uri): File? {
     return uri.let { uri ->
