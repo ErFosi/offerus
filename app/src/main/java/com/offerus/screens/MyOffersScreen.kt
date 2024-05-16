@@ -43,9 +43,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.offerus.R
 import com.offerus.components.CategoriasCirculos
 import com.offerus.components.CreateDialog
 import com.offerus.components.EditDialog
@@ -64,7 +66,7 @@ fun MyOffersScreen(navController: NavController, viewModel: MainViewModel) {
     var editDialog = viewModel.editDialog
 
     // Lista de pestañas
-    val tabs = listOf("Mis Ofertas", " Mis Peticiones")
+    val tabs = listOf(stringResource(id = R.string.mis_ofertas), stringResource(id = R.string.mis_peticiones))
 
     // Superficie principal
     Box {
@@ -138,21 +140,23 @@ fun MisOfertas(viewModel: MainViewModel, onItemClick: () -> Unit) {
             .padding(8.dp)
     ) {
         LazyVerticalStaggeredGrid(
-            columns = StaggeredGridCells.Fixed(2),
+            columns = if (listaMisOfertas.isEmpty()) StaggeredGridCells.Fixed(1) else StaggeredGridCells.Fixed(2),
             //columns = GridCells.Fixed(2),
-            modifier = Modifier.fillMaxSize().pullRefresh(refreshState)
+            modifier = Modifier
+                .fillMaxSize()
+                .pullRefresh(refreshState)
         ) {
             if (listaMisOfertas.isEmpty()) {
                 item {
-                    Column(
+                    Column(horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally
+
                     ) {
                         Text(
-                            text = "No hay ofertas. Crea una nueva.",
+                            text = stringResource(id = R.string.no_servicios),
                             modifier = Modifier.padding(8.dp)
                         )
-                        Text(text = "Desliza hacia arriba para refrescar.")
+                        Text(text = stringResource(id = R.string.desliza))
                     }
                 }
             } else {
@@ -252,8 +256,10 @@ fun MisPeticiones(viewModel: MainViewModel, onItemClick: () -> Unit) {
             .padding(8.dp)
     ) {
         LazyVerticalStaggeredGrid(
-            columns = StaggeredGridCells.Fixed(2),
-            modifier = Modifier.fillMaxSize().pullRefresh(refreshState)
+            columns = if (listaMisPeticiones.isEmpty()) StaggeredGridCells.Fixed(1) else StaggeredGridCells.Fixed(2),
+            modifier = Modifier
+                .fillMaxSize()
+                .pullRefresh(refreshState)
         ) {
             if (listaMisPeticiones.isEmpty()) {
                 item {
@@ -262,10 +268,10 @@ fun MisPeticiones(viewModel: MainViewModel, onItemClick: () -> Unit) {
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = "No hay ofertas. Crea una nueva.",
+                            text = stringResource(id = R.string.no_servicios),
                             modifier = Modifier.padding(8.dp)
                         )
-                        Text(text = "Desliza hacia arriba para refrescar.")
+                        Text(text = stringResource(id = R.string.desliza))
                     }
                 }
             } else {

@@ -48,4 +48,27 @@
     <string name="cancel">Cancelar</string>
     <string name="no_ubicacion">Aviso: no has seleccionado tu ubicación</string>
     <string name="recordarUsuario">Recordar credenciales</string>
+    <string name="entrantes">Entrantes</string>
+    <string name="salientes">Salientes</string>
+    <string name="valoraciones_pendientes">Valoraciones pendientes</string>
+    <string name="desliza">Desliza hacia abajo para actualizar.</string>
+    <string name="no_valoracion">No hay valoraciones pendientes.</string>
+    <string name="no_solicitudes">No hay solicitudes.</string>
+    <string name="valoracion">Valoración del servicio</string>
+    <string name="valora_a">Valora a</string>
+    <string name="peticion_no_encontrada">Peticion no encontrada</string>
+    <string name="no_valorado">No valorado</string>
+    <string name="publicado">Publicado el</string>
+    <string name="solicitud_pendiente">Solicitud pendiente</string>
+    <string name="mis_ofertas">Mis Ofertas</string>
+    <string name="mis_peticiones">Mis Peticiones</string>
+    <string name="no_servicios">No hay Servicios. Crea uno nuevo.</string>
+    <string name="titulo">Titulo</string>
+    <string name="descripcion">Descripción</string>
+    <string name="precio">Precio</string>
+    <string name="categorias">Categorías</string>
+    <string name="nuevo_servicio">Nuevo Servicio</string>
+    <string name="editar_servicio">Editar Servicio</string>
+    <string name="oferta">Oferta</string>
+    <string name="peticion">Petición</string>
 </resources>

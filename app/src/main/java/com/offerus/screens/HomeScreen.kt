@@ -33,6 +33,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -52,7 +53,7 @@ fun HomeScreen(navController: NavController, viewModel: MainViewModel) {
     var selectedTabIndex = viewModel.selectedTabIndexHome
 
     // Lista de pestañas
-    val tabs = listOf("Entrantes", "Salientes", "Valoraciones pend.")
+    val tabs = listOf(stringResource(id = R.string.entrantes), stringResource(id = R.string.salientes), stringResource(id = R.string.valoraciones_pendientes))
 
     // Superficie principal
     Surface {
@@ -60,7 +61,7 @@ fun HomeScreen(navController: NavController, viewModel: MainViewModel) {
 
             // dialogo para realizar la review
             if (viewModel.dialogoReview.value) {
-                ReviewDialog(viewModel.usuario, viewModel.dealReview,
+                ReviewDialog(viewModel, viewModel.usuario, viewModel.dealReview,
                     onDismissRequest = { viewModel.dialogoReview.value = false }) {
                     //enviar la review
                     viewModel.dealRate(
@@ -130,12 +131,12 @@ fun ValoracionesPendientes(
         ) {
             if (listaValoracionesPendientes.isEmpty()) {
                 item {
-                    Column(modifier = Modifier.fillMaxSize()) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxSize()) {
                         Text(
-                            text = "No hay valoraciones pendientes.",
+                            text = stringResource(id = R.string.no_valoracion),
                             modifier = Modifier.padding(8.dp)
                         )
-                        Text(text = "Desliza hacia arriba para refrescar.")
+                        Text(text = stringResource(id = R.string.desliza))
                     }
 
                 }
@@ -287,10 +288,10 @@ fun Entrantes(viewModel: MainViewModel, onItemClick: () -> Unit) {
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = "No hay solicitudes entrantes.",
+                            text = stringResource(id = R.string.no_solicitudes),
                             modifier = Modifier.padding(8.dp)
                         )
-                        Text(text = "Desliza hacia arriba para refrescar.")
+                        Text(text = stringResource(id = R.string.desliza))
                     }
                 }
             } else {
@@ -444,12 +445,12 @@ fun Salientes(viewModel: MainViewModel, onMakeReview: () -> Unit, onItemClick: (
         ) {
             if (listaSalientes.isEmpty()) {
                 item {
-                    Column(modifier = Modifier.fillMaxSize()) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxSize()) {
                         Text(
-                            text = "No hay solicitudes salientes.",
+                            text = stringResource(id = R.string.no_solicitudes),
                             modifier = Modifier.padding(8.dp)
                         )
-                        Text(text = "Desliza hacia arriba para refrescar.")
+                        Text(text = stringResource(id = R.string.desliza))
                     }
 
                 }
