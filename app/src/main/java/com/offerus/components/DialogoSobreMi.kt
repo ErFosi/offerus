@@ -69,7 +69,7 @@ fun DialogoSobreMi(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(8.dp)
-                    .height(2.dp)
+                    .height(1.dp)
                     .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.25f))
             )
 
@@ -92,7 +92,7 @@ fun DialogoSobreMi(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(8.dp)
-                    .height(2.dp)
+                    .height(1.dp)
                     .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.25f))
             )
             Row(

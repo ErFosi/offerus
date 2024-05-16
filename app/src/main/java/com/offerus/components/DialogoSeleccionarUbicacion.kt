@@ -135,7 +135,7 @@ fun DialogoSeleccionarUbicacion(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 8.dp, bottom = 20.dp, start = 8.dp, end = 8.dp)
-                        .height(2.dp)
+                        .height(1.dp)
                         .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.25f))
                 )
                 if (permisoUbicacion) {
@@ -186,7 +186,7 @@ fun DialogoSeleccionarUbicacion(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 20.dp, bottom = 8.dp, start = 8.dp, end = 8.dp)
-                        .height(2.dp)
+                        .height(1.dp)
                         .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.25f))
                 )
 
