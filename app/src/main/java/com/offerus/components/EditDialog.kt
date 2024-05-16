@@ -263,7 +263,7 @@ fun EditDialog(
                                                     )
                                                     Spacer(modifier = Modifier.width(2.dp))
                                                     Text(
-                                                        text = category.nombre,
+                                                        text = stringResource(id = category.nombreMostrar),
                                                         fontSize = 14.sp,
 
                                                         )
