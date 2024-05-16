@@ -15,6 +15,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import com.offerus.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -30,7 +32,7 @@ fun DropdownCategorias(
     }
 
     if (categoria.contains(",")){
-        selectedText = "Todas las categorias"
+        selectedText = stringResource(id = R.string.all_categories)
     } else {
         selectedText = categoria
     }

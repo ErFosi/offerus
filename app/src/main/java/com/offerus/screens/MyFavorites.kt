@@ -44,6 +44,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -84,7 +85,7 @@ fun MyFavoritesPage(
 
     // PANTALLAS
     var selectedTabIndex by remember { mutableIntStateOf(0) }
-    val tabs = listOf("Ofertas", "Solicitudes")
+    val tabs = listOf( stringResource(id = R.string.offers), stringResource(id = R.string.requests))
 
     // FILTRO
     val titulo = remember { mutableStateOf<String?>(null) }
@@ -244,7 +245,7 @@ fun MyFavoritesPage(
                 if (listaOfertasFavoritas.value.isEmpty() && mainViewModel.cargaInicialPeticionesFavoritas.value){
 
                     Text(
-                        text = "No hay Resultados de Ofertas",
+                        text = stringResource(id = R.string.no_offers_found),
                         style =  MaterialTheme.typography.headlineMedium,
                         textAlign = TextAlign.Center,
                         modifier = Modifier
@@ -259,7 +260,7 @@ fun MyFavoritesPage(
             } else {
                 if (listaSolicitudesFavoritas.value.isEmpty() && mainViewModel.cargaInicialPeticionesFavoritas.value){
                     Text(
-                        text = "No hay Resultados de Solicitudes",
+                        text = stringResource(id = R.string.no_requests_found),
                         style =  MaterialTheme.typography.headlineMedium,
                         textAlign = TextAlign.Center,
                         modifier = Modifier

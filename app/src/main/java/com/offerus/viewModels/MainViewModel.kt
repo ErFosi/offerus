@@ -44,6 +44,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.coroutines.resume
+import kotlin.math.*
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
@@ -413,6 +414,7 @@ class MainViewModel @Inject constructor(
         var respuesta: List<ServicioPeticion>
         try {
             viewModelScope.launch {
+                isRefreshingSearch.value = true
                 respuesta = httpUserClient.buscarPeticionesServicio(filter).toMutableList()
                 respuesta = respuesta.sortedBy { it.precio }
 
@@ -425,11 +427,13 @@ class MainViewModel @Inject constructor(
 
 
                 cargaInicialPeticiones.value = true
+                isRefreshingSearch.value = false
 
 
             }
         } catch (e: Exception) {
             Log.e("KTOR", e.toString())
+            isRefreshingSearch.value = false
 
         }
 
@@ -798,6 +802,10 @@ class MainViewModel @Inject constructor(
                 }
                 //TODO filtrar por distancia maxima
 
+                if (distanciaMaxima !=null){
+                    resultado = resultado.filter { estanEnDistancia(it.latitud, it.longitud, infoUsuario.value.latitud,infoUsuario.value.longitud, distanciaMaxima) }
+                }
+
                 if (precioMinimo !=null){
                     resultado = resultado.filter { it.precio >= precioMinimo }
                 }
@@ -826,6 +834,24 @@ class MainViewModel @Inject constructor(
         }
 
 
+    }
+
+    fun estanEnDistancia(latitudPunto1: Double, longitudPunto1: Double, latitudPunto2: Double, longitudPunto2: Double, distanciaLimiteKm: Double): Boolean {
+        val radioTierra = 6371 // Radio de la Tierra en kilómetros
+
+        val latitud1 = Math.toRadians(latitudPunto1)
+        val latitud2 = Math.toRadians(latitudPunto2)
+        val longitud1 = Math.toRadians(longitudPunto1)
+        val longitud2 = Math.toRadians(longitudPunto2)
+
+        val diferenciaLatitud = latitud2 - latitud1
+        val diferenciaLongitud = longitud2 - longitud1
+
+        val a = sin(diferenciaLatitud / 2).pow(2) + cos(latitud1) * cos(latitud2) * sin(diferenciaLongitud / 2).pow(2)
+        val distancia = 2 * atan2(sqrt(a), sqrt(1 - a))
+
+        val distanciaEntrePuntos = radioTierra * distancia
+        return distanciaEntrePuntos <= distanciaLimiteKm
     }
 
     fun esPeticionFavorita(id: Int): Boolean{

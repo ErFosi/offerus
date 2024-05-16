@@ -48,4 +48,11 @@
     <string name="cancel">Cancelar</string>
     <string name="no_ubicacion">Aviso: no has seleccionado tu ubicación</string>
     <string name="recordarUsuario">Recordar credenciales</string>
+    <string name="offers">Ofertas</string>
+    <string name="requests">Solicitudes</string>
+    <string name="filter">Filtro</string>
+    <string name="title">Titulo</string>
+    <string name="all_categories">Todas las Categorias</string>
+    <string name="no_offers_found">No se han encontrado Ofertas</string>
+    <string name="no_requests_found">No se han encontrado Solicitudes</string>
 </resources>

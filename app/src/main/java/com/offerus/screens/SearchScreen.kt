@@ -70,6 +70,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -102,7 +103,7 @@ fun OffersScreen(
 
     // PANTALLAS
     var selectedTabIndex by remember { mutableIntStateOf(0) }
-    val tabs = listOf("Ofertas", "Solicitudes")
+    val tabs = listOf( stringResource(id = R.string.offers), stringResource(id = R.string.requests))
 
     // FILTRO
     val titulo = remember { mutableStateOf<String?>(null) }
@@ -197,7 +198,7 @@ fun OffersScreen(
                 if (selectedTabIndex == 0) {
                     if (listaOfertas.value.isEmpty() && mainViewModel.cargaInicialPeticiones.value) {
                         Text(
-                            text = "No hay Resultados de Ofertas",
+                            text = stringResource(id = R.string.no_offers_found),
                             style = MaterialTheme.typography.headlineMedium,
                             textAlign = TextAlign.Center,
                             modifier = Modifier
@@ -215,7 +216,7 @@ fun OffersScreen(
                 } else {
                     if (listaSolicitudes.value.isEmpty() && mainViewModel.cargaInicialPeticiones.value) {
                         Text(
-                            text = "No hay Resultados de Solicitudes",
+                            text = stringResource(id = R.string.no_requests_found),
                             style = MaterialTheme.typography.headlineMedium,
                             textAlign = TextAlign.Center,
                             modifier = Modifier
@@ -419,7 +420,7 @@ fun SearchDialog(
 
 
                 Text(
-                    text = "Filtro",
+                    text = stringResource(id = R.string.filter),
                     style = MaterialTheme.typography.headlineMedium,
                     modifier = Modifier
                         .padding(horizontal = 30.dp, vertical = 10.dp)
@@ -443,7 +444,7 @@ fun SearchDialog(
                                     },
                                     modifier = Modifier
                                         .height(70.dp),
-                                    label = {Text(text = "Titulo")}
+                                    label = {Text(stringResource(id = R.string.title))}
                                 )
 
 
@@ -465,8 +466,8 @@ fun SearchDialog(
                                     sliderValue = newValue
                                     onDistanciaChange(newValue.toDouble())
                                 },
-                                valueRange = 0f..10f,
-                                steps = 100,
+                                valueRange = 0f..1000f,
+                                steps = 10000,
                                 modifier = Modifier
                                     .width(150.dp)
                             )
@@ -489,20 +490,22 @@ fun SearchDialog(
                                     .onFocusChanged {
                                         if (textoPrecioMinimo.value.toDoubleOrNull() != null) {
                                             if (textoPrecioMaximo.value.toDoubleOrNull() != null) {
-                                                if (textoPrecioMinimo.value.toDouble() < textoPrecioMaximo.value.toDouble()){
+                                                if (textoPrecioMinimo.value.toDouble() < textoPrecioMaximo.value.toDouble()) {
                                                     onPrecioMaxChange(textoPrecioMaximo.value.toDouble())
                                                 } else {
-                                                    Toast.makeText(
-                                                        context,
-                                                        "El precio minimo debe ser menor al precio maximo",
-                                                        Toast.LENGTH_SHORT
-                                                    ).show()
+                                                    Toast
+                                                        .makeText(
+                                                            context,
+                                                            "El precio minimo debe ser menor al precio maximo",
+                                                            Toast.LENGTH_SHORT
+                                                        )
+                                                        .show()
                                                     textoPrecioMinimo.value = ""
                                                 }
                                             } else {
                                                 onPrecioMinChange(textoPrecioMinimo.value.toDouble())
                                             }
-                                        }else {
+                                        } else {
                                             textoPrecioMinimo.value = ""
                                         }
 
@@ -526,16 +529,18 @@ fun SearchDialog(
                                     .onFocusChanged {
                                         if (textoPrecioMaximo.value.toDoubleOrNull() != null) {
                                             if (textoPrecioMinimo.value.toDoubleOrNull() != null) {
-                                               if (textoPrecioMinimo.value.toDouble() < textoPrecioMaximo.value.toDouble()){
-                                                   onPrecioMaxChange(textoPrecioMaximo.value.toDouble())
-                                               } else {
-                                                   Toast.makeText(
-                                                       context,
-                                                       "El precio minimo debe ser menor al precio maximo",
-                                                       Toast.LENGTH_SHORT
-                                                   ).show()
-                                                   textoPrecioMaximo.value = ""
-                                               }
+                                                if (textoPrecioMinimo.value.toDouble() < textoPrecioMaximo.value.toDouble()) {
+                                                    onPrecioMaxChange(textoPrecioMaximo.value.toDouble())
+                                                } else {
+                                                    Toast
+                                                        .makeText(
+                                                            context,
+                                                            "El precio minimo debe ser menor al precio maximo",
+                                                            Toast.LENGTH_SHORT
+                                                        )
+                                                        .show()
+                                                    textoPrecioMaximo.value = ""
+                                                }
                                             } else {
                                                 onPrecioMaxChange(textoPrecioMaximo.value.toDouble())
                                             }
@@ -680,7 +685,9 @@ fun PeticionInfo(
         // foto de perfil del usuario
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(4.dp).width(70.dp)
+            modifier = Modifier
+                .padding(4.dp)
+                .width(70.dp)
 
         ) {
             UserAvatar(username = peticion.username, mainViewModel)

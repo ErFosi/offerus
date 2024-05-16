@@ -48,4 +48,11 @@
     <string name="cancel">Utzi</string>
     <string name="no_ubicacion">Adi: ez duzu kokapenik aukeratu</string>
     <string name="recordarUsuario">Gogoratu kredentzialak</string>
+    <string name="offers">Eskaintzak</string>
+    <string name="requests">Aplikazioak</string>
+    <string name="filter">Iragazki</string>
+    <string name="title">Izenburu</string>
+    <string name="all_categories">Kategoria Guztiak</string>
+    <string name="no_offers_found">Ez dira Eskaintzak aurkitu</string>
+    <string name="no_requests_found">Ez dira Aplikazioak aurkitu</string>
 </resources>
