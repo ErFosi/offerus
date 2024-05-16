@@ -84,4 +84,5 @@
     <string name="academico">Ikasketak</string>
     <string name="online">Online</string>
     <string name="entretenimiento">Aisialdia</string>
+    <string name="username_invalido">Erabiltzaileak ezin du karaktere bereziak izan</string>
 </resources>

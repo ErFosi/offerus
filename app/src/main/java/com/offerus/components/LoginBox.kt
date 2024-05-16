@@ -4,8 +4,6 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.util.Log
 import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
@@ -21,7 +19,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -139,6 +136,7 @@ fun LoginBox(
     ///////////////  VALIDACION DE CAMPOS DE REGISTRO ///////////////
     var invalidEmail by rememberSaveable { mutableStateOf(false) }
     var invalidPhone by rememberSaveable { mutableStateOf(false) }
+    var invalidUsername by rememberSaveable { mutableStateOf(false) }
     var invalidPassword by rememberSaveable { mutableStateOf(false) }
     var invalidConfirmPassword by rememberSaveable { mutableStateOf(false) }
 
@@ -166,6 +164,21 @@ fun LoginBox(
             ).show()
             invalidPhone = true
         }else invalidPhone = false
+        return valid
+    }
+    fun isValidUsername(): Boolean {
+        val usernamePattern = Regex("^[a-zA-Z0-9]*$")
+        val valid = usernamePattern.matches(usernameRegistro)
+        if (!valid) {
+            Toast.makeText(
+                context,
+                R.string.username_invalido,
+                Toast.LENGTH_SHORT
+            ).show()
+            invalidUsername = true
+        } else {
+            invalidUsername = false
+        }
         return valid
     }
     fun isValidPassword(): Boolean {
@@ -197,7 +210,7 @@ fun LoginBox(
 
     // comprobar todos
     fun isValidRegister(): Boolean {
-        return isValidPassword() && passwordsMatch() && isValidEmail() && isValidPhone()
+        return isValidPassword() && passwordsMatch() && isValidEmail() && isValidPhone()&& isValidUsername()
     }
 
     /////////////////////////////////////////////////////////////////
