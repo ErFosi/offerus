@@ -86,4 +86,5 @@
     <string name="entretenimiento">Entretenimiento</string>
     <string name="username_invalido">El usuario no puede contener caracteres especiales ni espacios</string>
     <string name="nombre">Nombre</string>
+    <string name="distancia">Distancia:</string>
 </resources>

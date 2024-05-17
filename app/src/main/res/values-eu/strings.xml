@@ -86,4 +86,5 @@
     <string name="entretenimiento">Aisialdia</string>
     <string name="username_invalido">Erabiltzaileak ezin du karakterebereziak ezta ezpazioak izan</string>
     <string name="nombre">Izena</string>
+    <string name="distancia">"Distantzia: "</string>
 </resources>

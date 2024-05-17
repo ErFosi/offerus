@@ -3,7 +3,6 @@ package com.offerus.components
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.Paint
 import android.location.Location
 import android.util.Log
@@ -22,12 +21,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.alpha
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
@@ -40,7 +37,6 @@ import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerInfoWindow
 import com.google.maps.android.compose.MarkerState
-import com.offerus.R
 import com.offerus.data.CATEGORIAS
 import com.offerus.utils.locationUtils
 import com.offerus.utils.obtenerCategoriasString
@@ -79,7 +75,7 @@ fun mapa(
     sePuedeDesplazar: Boolean,
     lat: Double = 43.1842,
     lon: Double = -2.4821,
-
+    zoom: Float = 10f
 ){
     val context = LocalContext.current
     var ubicacion: Location? by rememberSaveable { mutableStateOf(null) }
@@ -120,7 +116,7 @@ fun mapa(
         )
     }
     val cameraPositionState = CameraPositionState (
-        position = if (lat != 0.0 && lon != 0.0) CameraPosition(LatLng(lat, lon), 10f, 0f, 0f) else CameraPosition(LatLng(0.00, 0.00), 10f, 0f, 0f)
+        position = if (lat != 0.0 && lon != 0.0) CameraPosition(LatLng(lat, lon), zoom, 0f, 0f) else CameraPosition(LatLng(0.00, 0.00), zoom, 0f, 0f)
     )
 
     GoogleMap(

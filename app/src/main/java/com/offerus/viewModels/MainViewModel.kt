@@ -44,7 +44,11 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.coroutines.resume
-import kotlin.math.*
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.pow
+import kotlin.math.sin
+import kotlin.math.sqrt
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
@@ -56,7 +60,7 @@ class MainViewModel @Inject constructor(
     private val servicioRepository: ServicioRepository,
 ) : ViewModel() {
 
-
+    var haEntrado= mutableStateOf(false)
     // pull refresh states
     var isRefreshingHome = mutableStateOf(false)
     var isRefreshingMyOffers = mutableStateOf(false)

@@ -12,6 +12,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
+import androidx.glance.GlanceTheme
 import androidx.glance.Image
 import androidx.glance.ImageProvider
 import androidx.glance.action.ActionParameters
@@ -38,6 +39,8 @@ import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.layout.size
+import androidx.glance.layout.width
+import androidx.glance.material3.ColorProviders
 import androidx.glance.state.PreferencesGlanceStateDefinition
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
@@ -46,6 +49,10 @@ import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
 import com.offerus.R
 import com.offerus.model.repositories.UserDataRepository
+import com.offerus.ui.theme.darkScheme
+import com.offerus.ui.theme.inversePrimaryLight
+import com.offerus.ui.theme.lightScheme
+import com.offerus.ui.theme.primaryLight
 import com.offerus.widget.AppWidgetReceiver.Companion.clienteDealsKey
 import com.offerus.widget.AppWidgetReceiver.Companion.logged
 import com.offerus.widget.AppWidgetReceiver.Companion.pendingHostDealsKey
@@ -58,6 +65,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+
 
 class AppWidget: GlanceAppWidget(){
 
@@ -76,7 +84,7 @@ class AppWidget: GlanceAppWidget(){
         if ((!userDataAvailable || logged == "false")){
 
             Box(
-                modifier = GlanceModifier.fillMaxSize().background(Color.DarkGray),
+                modifier = GlanceModifier.fillMaxSize().background(Color.DarkGray).cornerRadius(10.dp),
                 contentAlignment = Alignment.Center
             ) {
 
@@ -84,12 +92,12 @@ class AppWidget: GlanceAppWidget(){
                     Row(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = GlanceModifier.cornerRadius(10.dp)
+
                     ) {
 
 
                         Text(
-                            text = "Reload Deals",
+                            text = "Reload ",
                             style = TextStyle(
                                 color = ColorProvider(Color.White),
                                 fontSize = 18.sp,
@@ -124,157 +132,173 @@ class AppWidget: GlanceAppWidget(){
             }
             return
         }
-        Column {
-            Column(modifier = GlanceModifier.cornerRadius(8.dp).fillMaxSize().padding(8.dp)) {
-                // Encabezado
-                Box(
-                    modifier = GlanceModifier.fillMaxWidth().padding(4.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Row(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = GlanceModifier.cornerRadius(10.dp)
+        Column(modifier = GlanceModifier.cornerRadius(10.dp)) {
+
+            Box(modifier = GlanceModifier.cornerRadius(10.dp)){
+                Column(modifier = GlanceModifier.fillMaxSize().padding(8.dp)) {
+                    Box(
+                        modifier = GlanceModifier.fillMaxWidth().padding(4.dp).background(primaryLight),
+                        contentAlignment = Alignment.Center
                     ) {
+                        Row(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
 
 
-                        Text(
-                            text = "Reload Deals",
-                            style = TextStyle(
-                                color = ColorProvider(Color.White),
-                                fontSize = 20.sp,
-                                fontWeight = FontWeight.Bold,
-                                textAlign = TextAlign.Center
-                            ),
-                            modifier = GlanceModifier.padding(6.dp)
-                        )
-                        Image(
-                            provider = ImageProvider(R.drawable.refresh),
-                            contentDescription = null,
-                            modifier = GlanceModifier.size(24.dp)
-                                .clickable(actionRunCallback<RefreshActionCallback>())
-                        )
-                    }
-                }
-                LazyColumn(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = GlanceModifier.background(Color.DarkGray)
-                        .cornerRadius(10.dp)
-                ) {
-                    item {
-                        Text(
-                            text = "Cliente Deals",
-                            style = TextStyle(
-                                color = ColorProvider(Color.Black),
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 18.sp
-                            ),
-                            modifier = GlanceModifier.padding(8.dp)
-                        )
-                    }
+                            Text(
+                                text = "My Deals",
+                                style = TextStyle(
+                                    color = ColorProvider(Color.White),
+                                    fontSize = 15.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    textAlign = TextAlign.Center,
 
-                    clienteDeals.forEach { deal ->
-                        item {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = GlanceModifier.padding(8.dp)
-                            ) {
-                                Text(
-                                    text = "Peticion: ${deal.nombrePeticion}",
-                                    style = TextStyle(
-                                        color = ColorProvider(Color.Black),
-                                        fontSize = 14.sp
                                     ),
-                                    modifier = GlanceModifier.padding(start = 8.dp)
-                                )
-                                when (deal.estado) {
-                                    "pendiente" -> {
-
-                                        Image(
-                                            provider = ImageProvider(R.drawable.pending),
-                                            contentDescription = "pendiente",
-                                            modifier = GlanceModifier
-                                                .padding(11.dp)
-                                                .size(50.dp),
-                                        )
-                                    }
-
-                                    "aceptado" -> {
-                                        Image(
-                                            provider = ImageProvider(R.drawable.logorecortado),
-                                            contentDescription = null,
-                                            modifier = GlanceModifier
-                                                .padding(11.dp)
-                                                .size(50.dp),
-                                        )
-
-                                    }
-
-                                    "rechazado" -> {
-                                        Image(
-                                            provider = ImageProvider(R.drawable.logo_rojo_wdgt),
-                                            contentDescription = null,
-                                            modifier = GlanceModifier
-                                                .padding(11.dp)
-                                                .size(50.dp),
-
-                                            )
-                                    }
-                                } // Display icon based on estado
-
-                            }
+                                modifier = GlanceModifier.padding(4.dp)
+                            )
+                            Image(
+                                provider = ImageProvider(R.drawable.refresh),
+                                contentDescription = null,
+                                modifier = GlanceModifier.size(16.dp)
+                                    .clickable(actionRunCallback<RefreshActionCallback>())
+                            )
                         }
-
                     }
+                    LazyColumn(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = GlanceModifier.background(inversePrimaryLight)
 
-
-
-
-
-                    item { Spacer(modifier = GlanceModifier.height(4.dp)) }
-
-                    item {
-                        Text(
-                            text = "Pending Host Deals:",
-                            style = TextStyle(
-                                color = ColorProvider(Color.Black),
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 18.sp
-                            ),
-                            modifier = GlanceModifier.padding(8.dp)
-                        )
-                    }
-
-
-                    pendingHostDeals.forEach { deal ->
+                    ) {
                         item {
                             Text(
-                                text = "Cliente: ${deal.username}, Petición: ${deal.titulo}",
+                                text = "Client Deals",
                                 style = TextStyle(
                                     color = ColorProvider(Color.Black),
-                                    fontSize = 14.sp
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 15.sp,
                                 ),
                                 modifier = GlanceModifier.padding(8.dp)
                             )
                         }
 
+                        clienteDeals.forEach { deal ->
+                            item {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    modifier = GlanceModifier.padding(8.dp).fillMaxWidth()
+                                ) {
+                                    Text(
+                                        text = "${deal.nombrePeticion}",
+                                        style = TextStyle(
+                                            color = ColorProvider(Color.Black),
+                                            fontSize = 12.sp
+                                        ),
+                                        modifier = GlanceModifier.padding(start = 4.dp).width(width = 200.dp)
+                                    )
+                                    when (deal.estado) {
+                                        "pendiente" -> {
+
+                                            Image(
+                                                provider = ImageProvider(R.drawable.pending),
+                                                contentDescription = "pendiente",
+                                                modifier = GlanceModifier
+                                                    .padding(11.dp)
+                                                    .size(40.dp),
+                                            )
+                                        }
+
+                                        "aceptado" -> {
+                                            Image(
+                                                provider = ImageProvider(R.drawable.logorecortado),
+                                                contentDescription = null,
+                                                modifier = GlanceModifier
+                                                    .padding(11.dp)
+                                                    .size(40.dp),
+                                            )
+
+                                        }
+
+                                        "rechazado" -> {
+                                            Image(
+                                                provider = ImageProvider(R.drawable.logo_rojo_wdgt),
+                                                contentDescription = null,
+                                                modifier = GlanceModifier
+                                                    .padding(11.dp)
+                                                    .width(40.dp),
+
+                                                )
+                                        }
+                                    } // Display icon based on estado
+
+                                }
+                            }
+
+                        }
+
+
+
+
+
+                        item { Spacer(modifier = GlanceModifier.height(4.dp)) }
+
+                        item {
+                            Text(
+                                text = "Pending Host Deals:",
+                                style = TextStyle(
+                                    color = ColorProvider(Color.Black),
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 16.sp
+                                ),
+                                modifier = GlanceModifier.padding(8.dp)
+                            )
+                        }
+
+
+                        pendingHostDeals.forEach { deal ->
+                            item {
+                                Text(
+                                    text = "Client: ${deal.username}, Petition: ${deal.titulo}",
+                                    style = TextStyle(
+                                        color = ColorProvider(Color.Black),
+                                        fontSize = 12.sp
+                                    ),
+                                    modifier = GlanceModifier.padding(8.dp).width(width = 240.dp)
+                                )
+                            }
+
+                        }
                     }
+
                 }
+                // Encabezado
+
             }
         }
     }
 
+    object MyAppWidgetGlanceColorScheme {
 
+        val colors = ColorProviders(
+            light = lightScheme,
+            dark = darkScheme
+        )
+    }
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         // In this method, load data needed to render the AppWidget.
         // Use `withContext` to switch to another thread for long running
         // operations.
 
         provideContent {
+            GlanceTheme(colors = MyAppWidgetGlanceColorScheme.colors) {
+                Content()
+            }
             // create your AppWidget here
-            Content()
+
         }
     }
+
 }
 
 @EntryPoint

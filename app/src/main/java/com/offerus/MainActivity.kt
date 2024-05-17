@@ -1,6 +1,7 @@
 package com.offerus
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
@@ -115,8 +116,8 @@ class MainActivity : AppCompatActivity() {
                     // comprobar si hay un usuario guardado en el datastore para hacer el login automatico
                     logedIn = mainViewModel.obtenerUsuarioLogeado() != ""
                     val context = this
-
-                    if (logedIn) {
+                    Log.d("login", "Usuario logeado: $logedIn y huella: $huella")
+                    if (logedIn && !huella) {
                         //si hay un usuario guardado en el datastore, intentar hacer login automatico con huella
                         if (!this::biometricAuthManager.isInitialized) {
                             biometricAuthManager = BiometricAuthManager(
@@ -135,6 +136,7 @@ class MainActivity : AppCompatActivity() {
                         }else{
                             //si el dispositivo no soporta huella, hacer el login automatico sin huella
                             LaunchedEffect(true) {
+                                //mainViewModel.haEntrado=true
                                 Log.d("login", "Usuario logeado1: $logedIn")
                                 mainViewModel.loginUsuarioGuardado()
                                 suscribeToFCM(context)
@@ -159,6 +161,31 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+    override fun onResume() {
+        super.onResume()
+
+        // Verificar si el usuario ha iniciado sesión
+        val loggedIn = mainViewModel.obtenerUsuarioLogeado() != ""
+
+
+        // Si el usuario no ha iniciado sesión, reiniciar la aplicación
+        if (!loggedIn) {
+            restartApp()
+        }
+        else{
+            mainViewModel.loginUsuarioGuardado()
+        }
+    }
+    private fun restartApp() {
+        // Crea un Intent para reiniciar la aplicación
+        val intent = Intent(this, MainActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        startActivity(intent)
+
+        // Finaliza esta actividad
+        finish()
+    }
+
 }
 
 @Composable
