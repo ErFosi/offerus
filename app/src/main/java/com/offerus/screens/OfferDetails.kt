@@ -284,7 +284,7 @@ fun OfferDetailsContent(paddingValues: PaddingValues, viewModel: MainViewModel) 
                                             username = hostData!!.username,
                                             viewModel = viewModel
                                         )
-                                        Text(text = hostData!!.nombre_apellido, textAlign = TextAlign.Center)
+                                        Text(text = hostData!!.username, textAlign = TextAlign.Center)
                                         if (valoracion != null) {
 
                                             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -321,6 +321,11 @@ fun OfferDetailsContent(paddingValues: PaddingValues, viewModel: MainViewModel) 
                                         verticalArrangement = Arrangement.Center,
                                         horizontalAlignment = Alignment.CenterHorizontally
                                     ) {
+                                        Text(
+                                            text = hostData!!.nombre_apellido,
+                                            textAlign = TextAlign.Center,
+                                            fontWeight = FontWeight.Bold
+                                        )
                                         Text(
                                             text = stringResource(id = R.string.age) + ": " + hostData!!.edad,
                                             textAlign = TextAlign.Center

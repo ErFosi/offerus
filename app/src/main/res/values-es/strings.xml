@@ -85,4 +85,5 @@
     <string name="online">Online</string>
     <string name="entretenimiento">Entretenimiento</string>
     <string name="username_invalido">El usuario no puede contener caracteres especiales ni espacios</string>
+    <string name="nombre">Nombre</string>
 </resources>
