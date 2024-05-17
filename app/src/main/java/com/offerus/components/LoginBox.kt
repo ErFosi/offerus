@@ -285,6 +285,7 @@ fun LoginBox(
                         ubicacion = LatLng(ubi.latitude, ubi.longitude)
                     }
                 }
+                Log.d("UBICACION", ubicacion.toString())
                 mainViewModel.register(usernameRegistro, passwordRegistro, fullName, age.toInt(),  email, phone, sex, ubicacion.latitude, ubicacion.longitude)
                 registrado = true
                 mostrarErrorRegistro = false

@@ -170,13 +170,14 @@ class MainActivity : AppCompatActivity() {
 
         // Si el usuario no ha iniciado sesión, reiniciar la aplicación
         if (!loggedIn) {
-            restartApp()
+            //restartApp()
         }
         else{
             mainViewModel.loginUsuarioGuardado()
         }
     }
     private fun restartApp() {
+        Log.d("login", "Reiniciando la aplicación")
         // Crea un Intent para reiniciar la aplicación
         val intent = Intent(this, MainActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)

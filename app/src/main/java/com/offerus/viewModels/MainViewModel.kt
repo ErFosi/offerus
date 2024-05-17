@@ -278,7 +278,7 @@ class MainViewModel @Inject constructor(
      */
     @Throws(UserExistsException::class, Exception::class)
     suspend fun register(username:String, password: String, fullName: String, age: Int, email: String, phone: String, sex: String, latitud: Double, longitud: Double) {
-        val user = Usuario(username = username, nombre_apellido = fullName, edad = age, mail = email, telefono = phone, sexo = sex, contraseña = password, descripcion = "", latitud = 0.0, longitud = 0.0, suscripciones = "")
+        val user = Usuario(username = username, nombre_apellido = fullName, edad = age, mail = email, telefono = phone, sexo = sex, contraseña = password, descripcion = "", latitud = latitud, longitud = longitud, suscripciones = "")
         httpAuthClient.register(user)
 
     }
