@@ -25,7 +25,7 @@ fun DropdownCategorias(
     categoria: String
 ) {
     val context = LocalContext.current
-    val idiomas = arrayOf("gratis", "deporte", "hogar", "entrenamiento", "academico", "online", "otros")
+    val idiomas = arrayOf(stringResource(id = R.string.gratis), stringResource(id = R.string.deporte), stringResource(id = R.string.hogar), stringResource(id = R.string.entretenimiento), stringResource(id = R.string.academico), stringResource(id = R.string.online), stringResource(id = R.string.otros))
     var expanded by remember { mutableStateOf(false) }
     var selectedText by remember {
         mutableStateOf("Categoria")

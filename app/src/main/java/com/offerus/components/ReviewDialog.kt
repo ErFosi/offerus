@@ -117,7 +117,7 @@ fun ReviewDialog(
                                     .background(MaterialTheme.colorScheme.outline.copy(alpha = 0.25f))
                             )
                             Text(
-                                text = if (currentUserRole == "cliente") stringResource(id = R.string.valora_a) + " " + deal.username_host else stringResource(id = R.string.valora_a) + deal.username_cliente,
+                                text = if (currentUserRole == "cliente") stringResource(id = R.string.valora_a) + " " + deal.username_host else stringResource(id = R.string.valora_a) + " " + deal.username_cliente,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 16.sp,
                                 modifier = Modifier.padding(vertical = 8.dp)

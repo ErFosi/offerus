@@ -242,14 +242,13 @@ fun MyFavoritesPage(
             if (selectedTabIndex == 0) {
                 if (listaOfertasFavoritas.value.isEmpty() && mainViewModel.cargaInicialPeticionesFavoritas.value){
 
-                    Text(
-                        text = stringResource(id = R.string.no_offers_found),
-                        style =  MaterialTheme.typography.headlineMedium,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(60.dp)
-                    )
+                    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxSize()) {
+                        Text(
+                            text = stringResource(id = R.string.no_offers_found),
+                            modifier = Modifier.padding(8.dp)
+                        )
+                        Text(text = stringResource(id = R.string.desliza))
+                    }
                 } else {
                     ListaOfertasFavoritas(onItemClick = {navController.navigate(AppScreens.OfferDetailsScreen.route)} ,listaOfertasFavoritas.value, mainViewModel,
                         {  mainViewModel.filtrarFavoritas(titulo.value,categoria.value,distanciaMaxima.value,precioMinimo.value,precioMaxima.value) })
@@ -257,14 +256,13 @@ fun MyFavoritesPage(
 
             } else {
                 if (listaSolicitudesFavoritas.value.isEmpty() && mainViewModel.cargaInicialPeticionesFavoritas.value){
-                    Text(
-                        text = stringResource(id = R.string.no_requests_found),
-                        style =  MaterialTheme.typography.headlineMedium,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(60.dp)
-                    )
+                    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxSize()) {
+                        Text(
+                            text = stringResource(id = R.string.no_requests_found),
+                            modifier = Modifier.padding(8.dp)
+                        )
+                        Text(text = stringResource(id = R.string.desliza))
+                    }
                 } else {
                     ListaOfertasFavoritas(onItemClick = {navController.navigate(AppScreens.OfferDetailsScreen.route)} ,listaSolicitudesFavoritas.value, mainViewModel,
                         {  mainViewModel.filtrarFavoritas(titulo.value,categoria.value,distanciaMaxima.value,precioMinimo.value,precioMaxima.value)})

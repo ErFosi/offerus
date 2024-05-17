@@ -40,6 +40,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -172,14 +173,13 @@ fun OffersScreen(
 
                 if (selectedTabIndex == 0) {
                     if (listaOfertas.value.isEmpty() && mainViewModel.cargaInicialPeticiones.value) {
-                        Text(
-                            text = stringResource(id = R.string.no_offers_found),
-                            style = MaterialTheme.typography.headlineMedium,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(60.dp)
-                        )
+                        Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxSize()) {
+                            Text(
+                                text = stringResource(id = R.string.no_offers_found),
+                                modifier = Modifier.padding(8.dp)
+                            )
+                            Text(text = stringResource(id = R.string.desliza))
+                        }
                     } else {
                         ListaOfertas(onItemClick = { navController.navigate(AppScreens.OfferDetailsScreen.route) },
                             listaOfertas.value,
@@ -190,14 +190,13 @@ fun OffersScreen(
 
                 } else {
                     if (listaSolicitudes.value.isEmpty() && mainViewModel.cargaInicialPeticiones.value) {
-                        Text(
-                            text = stringResource(id = R.string.no_requests_found),
-                            style = MaterialTheme.typography.headlineMedium,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(60.dp)
-                        )
+                        Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxSize()) {
+                            Text(
+                                text = stringResource(id = R.string.no_requests_found),
+                                modifier = Modifier.padding(8.dp)
+                            )
+                            Text(text = stringResource(id = R.string.desliza))
+                        }
                     } else {
                         ListaOfertas(onItemClick = { navController.navigate(AppScreens.OfferDetailsScreen.route) },
                             listaSolicitudes.value,
@@ -349,7 +348,7 @@ fun SearchDialog(
 ){
 
     val context = LocalContext.current
-    var sliderValue by if (distanciaMaxima == null) {
+    var internalSliderValue by if (distanciaMaxima == null) {
         remember { mutableStateOf(0.0F)}
     } else {
         remember { mutableStateOf(distanciaMaxima.toFloat()) }
@@ -382,6 +381,15 @@ fun SearchDialog(
 
 
     var errorState by remember { mutableStateOf(false) }
+
+
+    val transformedValue = if (internalSliderValue <= 200f) {
+        internalSliderValue / 2f  // Velocidad baja en la primera mitad
+    } else if (internalSliderValue <= 300f) {
+        internalSliderValue / 1.5f
+    } else {
+        internalSliderValue// Doble velocidad en la segunda mitad
+    }
 
 
 
@@ -435,6 +443,20 @@ fun SearchDialog(
                             modifier = Modifier.padding(vertical = 5.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
+
+                            Slider(
+                                value = internalSliderValue,
+                                onValueChange = { newValue ->
+                                    internalSliderValue = newValue
+                                },
+                                valueRange = 0f..400f,
+                                steps = 10000,
+                                modifier = Modifier
+                                    .width(190.dp)
+                            )
+                            Text(text = "%d Km".format(transformedValue.toInt()))
+
+                            /*
                             Slider(
                                 value = sliderValue,
                                 onValueChange = { newValue ->
@@ -448,7 +470,10 @@ fun SearchDialog(
                             )
                             Text(text = "%.1f".format(sliderValue ) + " Km")
 
+                             */
+
                         }
+
                         Row(
                             modifier = Modifier.padding(vertical = 5.dp),
                             verticalAlignment = Alignment.CenterVertically,
@@ -561,7 +586,7 @@ fun SearchDialog(
                             titulo.value = ""
                             textoPrecioMaximo.value = ""
                             textoPrecioMaximo.value = ""
-                            sliderValue = 0F
+                            internalSliderValue = 0F
 
                         }
 
