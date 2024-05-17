@@ -4,8 +4,6 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.util.Log
 import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
@@ -21,7 +19,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -84,10 +81,24 @@ fun LoginBox(
     navController: NavController,
     onTabChange: (Boolean) -> Unit
 ) {
-    /* PEDIR PERMISO DE UBICACION */
+    /* COMPROBAR PERMISO DE UBICACION */
     var permisoUbicacion by rememberSaveable {
         mutableStateOf(false)
     }
+    if (ContextCompat.checkSelfPermission(
+            LocalContext.current,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED ||
+        ContextCompat.checkSelfPermission(
+            LocalContext.current,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+    ) {
+        // Permission is already granted
+        permisoUbicacion = true
+    } else {
+    }
+
 
 
     val context = LocalContext.current
@@ -125,6 +136,7 @@ fun LoginBox(
     ///////////////  VALIDACION DE CAMPOS DE REGISTRO ///////////////
     var invalidEmail by rememberSaveable { mutableStateOf(false) }
     var invalidPhone by rememberSaveable { mutableStateOf(false) }
+    var invalidUsername by rememberSaveable { mutableStateOf(false) }
     var invalidPassword by rememberSaveable { mutableStateOf(false) }
     var invalidConfirmPassword by rememberSaveable { mutableStateOf(false) }
 
@@ -152,6 +164,23 @@ fun LoginBox(
             ).show()
             invalidPhone = true
         }else invalidPhone = false
+        return valid
+    }
+    fun isValidUsername(): Boolean {
+        val usernamePattern = Regex("^[a-zA-Z0-9]*$")
+        val trimmedUsername = usernameRegistro.trim()
+        val valid = usernamePattern.matches(usernameRegistro)
+        if (!valid) {
+            Toast.makeText(
+                context,
+                R.string.username_invalido,
+                Toast.LENGTH_SHORT
+            ).show()
+            invalidUsername = true
+        } else {
+            invalidUsername = false
+        }
+        usernameRegistro = trimmedUsername
         return valid
     }
     fun isValidPassword(): Boolean {
@@ -183,7 +212,7 @@ fun LoginBox(
 
     // comprobar todos
     fun isValidRegister(): Boolean {
-        return isValidPassword() && passwordsMatch() && isValidEmail() && isValidPhone()
+        return isValidPassword() && passwordsMatch() && isValidEmail() && isValidPhone()&& isValidUsername()
     }
 
     /////////////////////////////////////////////////////////////////
@@ -201,6 +230,7 @@ fun LoginBox(
     val onLogin: () -> Unit = {
         coroutineScope.launch(Dispatchers.IO){
             try {
+                username=username.trim()
                 mainViewModel.login(username, password)
                 sesionIniciada = true
                 mainViewModel.usuario = username // guardar el nombre de usuario en el viewmodel
@@ -255,6 +285,7 @@ fun LoginBox(
                         ubicacion = LatLng(ubi.latitude, ubi.longitude)
                     }
                 }
+                Log.d("UBICACION", ubicacion.toString())
                 mainViewModel.register(usernameRegistro, passwordRegistro, fullName, age.toInt(),  email, phone, sex, ubicacion.latitude, ubicacion.longitude)
                 registrado = true
                 mostrarErrorRegistro = false
@@ -380,43 +411,6 @@ fun LoginBox(
                     enter = slideInHorizontally(initialOffsetX = { 1000 }),
                     exit = slideOutHorizontally(targetOffsetX = { 1000 })
                 ) {
-                    // pedir permisos de ubicacion para hacer el registro
-                    val requestPermissionLauncher = rememberLauncherForActivityResult(
-                        ActivityResultContracts.RequestMultiplePermissions()
-                    ) { permissions ->
-                        if (permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
-                            permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
-                        ) {
-                            // Permission is granted
-                            permisoUbicacion = true
-                        } else {
-                            // Permission is denied
-                            permisoUbicacion = false
-                        }
-                    }
-
-                    val permissions = arrayOf(
-                        Manifest.permission.ACCESS_FINE_LOCATION,
-                        Manifest.permission.ACCESS_COARSE_LOCATION
-                    )
-                    if (ContextCompat.checkSelfPermission(
-                            LocalContext.current,
-                            Manifest.permission.ACCESS_FINE_LOCATION
-                        ) == PackageManager.PERMISSION_GRANTED ||
-                        ContextCompat.checkSelfPermission(
-                            LocalContext.current,
-                            Manifest.permission.ACCESS_COARSE_LOCATION
-                        ) == PackageManager.PERMISSION_GRANTED
-                    ) {
-                        // Permission is already granted
-                        permisoUbicacion = true
-                    } else {
-                        // Request for permission
-                        LaunchedEffect(permissions) {
-                            requestPermissionLauncher.launch(permissions)
-                        }
-                    }
-
 
                     RegisterFieldView(
                         onUsernameChange = { newText -> usernameRegistro = newText},

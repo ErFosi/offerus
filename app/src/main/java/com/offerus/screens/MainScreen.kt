@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -270,31 +271,38 @@ fun UserAvatar(username: String, viewModel: MainViewModel) {
 
 @Composable
 fun OfferusNavigationRail(currentRoute: String, onNavigate: (String) -> Unit) {
-    NavigationRail {
-        SECTIONS.forEach { destinations ->
-            when (destinations.route) {
-                BottomBarRoute.HOME -> {
-                    NavigationRailItem(
-                        icon = { Icon(painter = painterResource(destinations.selectedIcon), contentDescription = null, modifier = Modifier.size(32.dp)) },
-                        selected = currentRoute == destinations.route,
-                        onClick = { onNavigate(destinations.route) }
-                    )
-                }
-                BottomBarRoute.SEARCH -> {
-                    NavigationRailItem(
-                        icon = { Icon(ImageVector.vectorResource(id = destinations.selectedIcon), contentDescription = null) },
-                        selected = currentRoute == destinations.route,
-                        onClick = { onNavigate(destinations.route) }
-                    )
-                }
-                BottomBarRoute.MYOFFERS -> {
-                    NavigationRailItem(
-                        icon = { Icon(ImageVector.vectorResource(id = destinations.selectedIcon), contentDescription = null) },
-                        selected = currentRoute == destinations.route,
-                        onClick = { onNavigate(destinations.route) }
-                    )
+    NavigationRail() {
+        Column(verticalArrangement = Arrangement.Center, modifier = Modifier.fillMaxHeight()) {
+            SECTIONS.forEach { destinations ->
+                when (destinations.route) {
+                    BottomBarRoute.HOME -> {
+                        NavigationRailItem(
+                            modifier = Modifier.weight(0.25f),
+                            icon = { Icon(painter = painterResource(destinations.selectedIcon), contentDescription = null, modifier = Modifier.size(32.dp)) },
+                            selected = currentRoute == destinations.route,
+                            onClick = { onNavigate(destinations.route) }
+                        )
+                    }
+                    BottomBarRoute.SEARCH -> {
+                        NavigationRailItem(
+                            modifier = Modifier.weight(0.25f),
+                            icon = { Icon(ImageVector.vectorResource(id = destinations.selectedIcon), contentDescription = null) },
+                            selected = currentRoute == destinations.route,
+                            onClick = { onNavigate(destinations.route) }
+                        )
+                    }
+                    BottomBarRoute.MYOFFERS -> {
+                        NavigationRailItem(
+                            modifier = Modifier.weight(0.25f),
+                            icon = { Icon(ImageVector.vectorResource(id = destinations.selectedIcon), contentDescription = null) },
+                            selected = currentRoute == destinations.route,
+                            onClick = { onNavigate(destinations.route) }
+                        )
+                    }
                 }
             }
+
         }
+
     }
 }

@@ -44,7 +44,11 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.coroutines.resume
-import kotlin.math.*
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.pow
+import kotlin.math.sin
+import kotlin.math.sqrt
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
@@ -56,7 +60,7 @@ class MainViewModel @Inject constructor(
     private val servicioRepository: ServicioRepository,
 ) : ViewModel() {
 
-
+    var haEntrado= mutableStateOf(false)
     // pull refresh states
     var isRefreshingHome = mutableStateOf(false)
     var isRefreshingMyOffers = mutableStateOf(false)
@@ -170,6 +174,7 @@ class MainViewModel @Inject constructor(
      * @param contrasena the password to be saved
      */
     fun setUsuarioLogueado(usuario: String, contrasena: String) = viewModelScope.launch {
+        Log.d("login", "guardando usuario logeado")
         myPreferencesDataStore.setUsuarioContraLogeado(
             usuario,
             contrasena
@@ -273,7 +278,7 @@ class MainViewModel @Inject constructor(
      */
     @Throws(UserExistsException::class, Exception::class)
     suspend fun register(username:String, password: String, fullName: String, age: Int, email: String, phone: String, sex: String, latitud: Double, longitud: Double) {
-        val user = Usuario(username = username, nombre_apellido = fullName, edad = age, mail = email, telefono = phone, sexo = sex, contraseña = password, descripcion = "", latitud = 0.0, longitud = 0.0, suscripciones = "")
+        val user = Usuario(username = username, nombre_apellido = fullName, edad = age, mail = email, telefono = phone, sexo = sex, contraseña = password, descripcion = "", latitud = latitud, longitud = longitud, suscripciones = "")
         httpAuthClient.register(user)
 
     }

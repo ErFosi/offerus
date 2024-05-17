@@ -2,13 +2,13 @@ package com.offerus.screens
 
 
 
-import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -18,7 +18,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
@@ -48,7 +47,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
 import com.offerus.R
 import com.offerus.components.TopBarSecundario
 import com.offerus.data.ServicioPeticion
@@ -162,7 +160,7 @@ fun MyFavoritesPage(
 
             Spacer(modifier = Modifier.height(20.dp))
             Row ( modifier = Modifier
-                .padding(horizontal = 35.dp, vertical = 3.dp)
+                .padding(horizontal = 35.dp, vertical = 3.dp).fillMaxWidth()
             ){
                 var campoBuscar by remember {
                     mutableStateOf("")
@@ -171,8 +169,8 @@ fun MyFavoritesPage(
                 TextField(value = campoBuscar,
                     onValueChange = {
                         campoBuscar = it
-                        titulo.value = it},
-                    modifier = Modifier.width(260.dp),
+                        titulo.value=it },
+                    modifier = /*Modifier.width(260.dp)*/Modifier.weight(0.83f),
                     shape = RoundedCornerShape(20.dp),
                     trailingIcon = {
                         IconButton(

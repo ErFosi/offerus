@@ -84,4 +84,7 @@
     <string name="academico">Academic</string>
     <string name="online">Online</string>
     <string name="entretenimiento">Leisure</string>
+    <string name="username_invalido">The username cannot contain special characters or blank spaces</string>
+    <string name="nombre">Name</string>
+    <string name="distancia">"Distance: "</string>
 </resources>

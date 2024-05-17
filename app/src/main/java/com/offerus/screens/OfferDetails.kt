@@ -58,6 +58,7 @@ import com.offerus.R
 import com.offerus.components.CategoriasCard
 import com.offerus.components.Marcador
 import com.offerus.components.TopBarSecundario
+import com.offerus.components.distanciaEntrePuntos
 import com.offerus.components.mapa
 import com.offerus.data.ServicioPeticion
 import com.offerus.data.UsuarioData
@@ -251,11 +252,28 @@ fun OfferDetailsContent(paddingValues: PaddingValues, viewModel: MainViewModel) 
                                     marcadores = listOf(marcador),
                                     sePuedeDesplazar = false,
                                     lat = servicioPeticion.latitud,
-                                    lon = servicioPeticion.longitud
+                                    lon = servicioPeticion.longitud,
+                                    zoom = 12.5f
                                 )
+
                             }
+                            val distancia= distanciaEntrePuntos(
+                                servicioPeticion.latitud,
+                                servicioPeticion.longitud,
+                                viewModel.infoUsuario.value.latitud,
+                                viewModel.infoUsuario.value.longitud)
+                            Text(
+                                text = "${stringResource(id = R.string.distancia)}${String.format("%.2f", distancia)} km",
+                                fontStyle = FontStyle.Italic,
+                                modifier = Modifier.padding(
+                                    vertical = 4.dp,
+                                    horizontal = 8.dp
+                                )
+                            )
                         }
                     }
+
+
 
                     // informacion de contacto
                     item {
@@ -321,6 +339,11 @@ fun OfferDetailsContent(paddingValues: PaddingValues, viewModel: MainViewModel) 
                                         verticalArrangement = Arrangement.Center,
                                         horizontalAlignment = Alignment.CenterHorizontally
                                     ) {
+                                        Text(
+                                            text = hostData!!.nombre_apellido,
+                                            textAlign = TextAlign.Center,
+                                            fontWeight = FontWeight.Bold
+                                        )
                                         Text(
                                             text = stringResource(id = R.string.age) + ": " + hostData!!.edad,
                                             textAlign = TextAlign.Center
