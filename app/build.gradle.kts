@@ -4,7 +4,7 @@ plugins {
     id ("kotlin-kapt")
     id ("com.google.dagger.hilt.android")
     id ("org.jetbrains.kotlin.plugin.serialization")
-    //id("com.google.gms.google-services")
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -63,6 +63,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.compose.material)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -92,4 +93,63 @@ dependencies {
 
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+
+    //NAVIGATION
+    val navVersion = "2.7.7"
+    implementation("androidx.navigation:navigation-compose:$navVersion")
+
+    //WINDOW SIZE
+    implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("androidx.compose.material3:material3:1.2.1")
+    implementation("com.google.android.material:material:1.11.0")
+    implementation("androidx.compose.material3:material3-window-size-class-android:1.2.1")
+
+    // coil
+    implementation("io.coil-kt:coil-compose:2.6.0")
+
+    // splash screen
+    implementation("androidx.core:core-splashscreen:1.0.1")
+
+    // rating bar
+    implementation("com.github.a914-gowtham:compose-ratingbar:1.3.4")
+
+    // maps
+    implementation ("com.google.maps.android:maps-compose:2.11.4")
+    implementation ("com.google.android.gms:play-services-maps:18.1.0")
+
+    // geolocalizaccion
+    implementation ("com.google.android.gms:play-services-location:21.0.1")
+    //ktor para cliente http
+    val ktor_version="2.3.11"
+
+    implementation ("io.ktor:ktor-client-android:$ktor_version")
+    implementation ("io.ktor:ktor-client-content-negotiation:$ktor_version")
+    implementation ("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
+    implementation ("io.ktor:ktor-client-auth:$ktor_version")
+    implementation ("io.ktor:ktor-client-cio:$ktor_version")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
+    implementation ("io.ktor:ktor-client-serialization-jvm:$ktor_version")
+    implementation ("io.ktor:ktor-client-okhttp:$ktor_version")
+    // firebase
+    // Import the Firebase BoM
+    implementation(platform("com.google.firebase:firebase-bom:32.8.0"))
+    // When using the BoM, don't specify versions in Firebase dependencies
+    implementation("com.google.firebase:firebase-analytics")
+    // Add the dependencies for any other desired Firebase products
+    // https://firebase.google.com/docs/android/setup#available-libraries
+    implementation("com.google.firebase:firebase-messaging-ktx")
+
+    //PERMISSIONS
+    implementation("com.google.accompanist:accompanist-permissions:0.24.13-rc")
+
+    implementation("androidx.compose.material:material-android:1.6.7")
+
+    // For AppWidgets support
+    implementation( "androidx.glance:glance-appwidget:1.0.0" )
+
+    // For interop APIs with Material 3
+    implementation( "androidx.glance:glance-material3:1.0.0" )
+
+    //huella
+    implementation("androidx.biometric:biometric:1.1.0")
 }
