@@ -1,5 +1,6 @@
 package com.offerus.components
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,6 +36,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -55,6 +57,7 @@ fun DialogoDatosPersonales(
     onDismissRequest: () -> Unit,
     onConfirmation: (UsuarioData) -> Unit
 ) {
+    val context = LocalContext.current
     val keyboardController = LocalSoftwareKeyboardController.current
     var sexExpanded by rememberSaveable {
         mutableStateOf(false)
@@ -69,6 +72,45 @@ fun DialogoDatosPersonales(
     var sexo by rememberSaveable { mutableStateOf(infoUsuario.sexo) }
     var telefono by rememberSaveable { mutableStateOf(infoUsuario.telefono) }
     var email by rememberSaveable { mutableStateOf(infoUsuario.mail) }
+
+
+    ///////////////  VALIDACION DE CAMPOS DE REGISTRO ///////////////
+    var invalidEmail by rememberSaveable { mutableStateOf(false) }
+    var invalidPhone by rememberSaveable { mutableStateOf(false) }
+
+    fun isValidEmail(): Boolean {
+        val valid = android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+        if (!valid) {
+            // Show error message
+            Toast.makeText(
+                context,
+                R.string.email_invalido,
+                Toast.LENGTH_SHORT
+            ).show()
+            invalidEmail = true
+        }else invalidEmail = false
+        return valid
+    }
+    fun isValidPhone(): Boolean {
+        var valid = android.util.Patterns.PHONE.matcher(telefono).matches()
+        valid = valid && telefono.length == 9
+        if (!valid) {
+            // Show error message
+            Toast.makeText(
+                context,
+                R.string.phone_invalido,
+                Toast.LENGTH_SHORT
+            ).show()
+            invalidPhone = true
+        }else invalidPhone = false
+        return valid
+    }
+
+    // comprobar todos
+    fun isValidRegister(): Boolean {
+        return isValidEmail() && isValidPhone() && nombreYapellido.isNotEmpty() && edad > 0 && sexo.isNotEmpty()
+    }
+
 
     Dialog(
         onDismissRequest = { onDismissRequest() },
@@ -232,20 +274,22 @@ fun DialogoDatosPersonales(
                 }
 
                 Button(onClick = {
-                    onConfirmation(
-                        UsuarioData(
-                            nombre_apellido = nombreYapellido,
-                            edad = edad,
-                            sexo = sexo,
-                            telefono = telefono,
-                            mail = email,
-                            descripcion = infoUsuario.descripcion,
-                            latitud = infoUsuario.latitud,
-                            longitud = infoUsuario.longitud,
-                            suscripciones = infoUsuario.suscripciones,
-                            username = infoUsuario.username
+                    if (isValidRegister()) {
+                        onConfirmation(
+                            UsuarioData(
+                                nombre_apellido = nombreYapellido,
+                                edad = edad,
+                                sexo = sexo,
+                                telefono = telefono,
+                                mail = email,
+                                descripcion = infoUsuario.descripcion,
+                                latitud = infoUsuario.latitud,
+                                longitud = infoUsuario.longitud,
+                                suscripciones = infoUsuario.suscripciones,
+                                username = infoUsuario.username
+                            )
                         )
-                    )
+                    }
                 }) {
                     Text(text = "")
                     Icon(
