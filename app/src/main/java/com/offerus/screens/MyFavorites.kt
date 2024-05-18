@@ -48,6 +48,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.offerus.R
+import com.offerus.components.SearchDialog
 import com.offerus.components.TopBarSecundario
 import com.offerus.data.ServicioPeticion
 import com.offerus.navigation.AppScreens
