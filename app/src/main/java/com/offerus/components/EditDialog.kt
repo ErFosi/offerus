@@ -33,7 +33,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -69,26 +69,26 @@ fun EditDialog(
     }
 
     val context = LocalContext.current
-    var esPeticion by remember {
+    var esPeticion by rememberSaveable {
         mutableStateOf(peticion.peticion)
     }
 
-    var texto by remember {
+    var texto by rememberSaveable {
         mutableStateOf(peticion.titulo)
     }
 
-    var precio by remember {
+    var precio by rememberSaveable {
         mutableStateOf(peticion.precio.toString())
     }
 
-    var categoria by remember {
+    var categoria by rememberSaveable {
         mutableStateOf(peticion.categorias)
     }
 
     var listaCategorias = obtenerCategorias(peticion.categorias)
-    var selectedCategories by remember { mutableStateOf(listaCategorias) }
+    var selectedCategories by rememberSaveable { mutableStateOf(listaCategorias) }
 
-    var desc by remember { mutableStateOf(peticion.descripcion) }
+    var desc by rememberSaveable { mutableStateOf(peticion.descripcion) }
 
     Dialog(onDismissRequest = { onDismissRequest() }) {
         Card(modifier = Modifier.padding(vertical = 64.dp)) {

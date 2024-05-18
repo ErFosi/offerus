@@ -27,7 +27,6 @@ import com.offerus.model.repositories.ServicioRepository
 import com.offerus.model.repositories.UserDataRepository
 import com.offerus.utils.AuthClient
 import com.offerus.utils.AuthenticationException
-import com.offerus.utils.BiometricAuthenticationStatus
 import com.offerus.utils.CambioDeIdioma
 import com.offerus.utils.ContraseñaNoCoincideException
 import com.offerus.utils.UserClient
@@ -60,7 +59,6 @@ class MainViewModel @Inject constructor(
     private val servicioRepository: ServicioRepository,
 ) : ViewModel() {
 
-    var haEntrado= mutableStateOf(false)
     // pull refresh states
     var isRefreshingHome = mutableStateOf(false)
     var isRefreshingMyOffers = mutableStateOf(false)
@@ -94,9 +92,7 @@ class MainViewModel @Inject constructor(
 
     var selectedTabIndex by mutableStateOf(0)
 
-    //huella
 
-    var biometricAuthenticationStatus: BiometricAuthenticationStatus by mutableStateOf( BiometricAuthenticationStatus.NOT_AUTHENTICATED_YET)
     fun iniciarListas() {
         Log.d("iniciarListas", "INICIO - iniciando listas...")
         actualizarListaDeals()
