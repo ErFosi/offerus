@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -85,9 +84,9 @@ fun SearchDialog(
 
     val titulo = remember { mutableStateOf(titulo) }
 
-
+    val all_cat=stringResource(id = R.string.all_categories)
     val textoCategoria = if (categoria == null){
-        remember { mutableStateOf("Todas las Categorias") }
+        remember { mutableStateOf(all_cat) }
     } else {
         remember { mutableStateOf(categoria) }
     }
