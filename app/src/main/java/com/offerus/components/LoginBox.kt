@@ -154,7 +154,8 @@ fun LoginBox(
         return valid
     }
     fun isValidPhone(): Boolean {
-        val valid = android.util.Patterns.PHONE.matcher(phone).matches()
+        var valid = android.util.Patterns.PHONE.matcher(phone).matches()
+        valid = valid && phone.length == 9
         if (!valid) {
             // Show error message
             Toast.makeText(
@@ -623,8 +624,7 @@ fun RegisterFieldView(
         )
         OutlinedTextField(
             value = age,
-            onValueChange = {
-                            onAgeChange(it)},
+            onValueChange = {if (it.length <=2) onAgeChange(it)},
             label = { Text(stringResource(R.string.age)) },
             singleLine = true,
             leadingIcon = {
@@ -660,8 +660,7 @@ fun RegisterFieldView(
         OutlinedTextField(
             value = phone,
             isError = invalidPhone,
-            onValueChange = {
-                            onPhoneChange(it)},
+            onValueChange = {if (it.length <= 9) onPhoneChange(it)},
             label = { Text(stringResource(R.string.phone)) },
             singleLine = true,
             leadingIcon = {

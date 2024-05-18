@@ -150,7 +150,7 @@ fun mapa(
                         categoria.let {
                             MarkerInfoWindow(
                                 state = MarkerState(position = marker),
-                                icon = bitmapDescriptor(context, categoria.icono, categoria.color.copy(alpha = 0.45f)),
+                                icon = bitmapDescriptor(context, categoria.icono, categoria.color),
                             ) {
                                 Card {
                                     Column(
@@ -206,7 +206,7 @@ fun mapa(
                     categoria.let {
                         MarkerInfoWindow(
                             state = MarkerState(position = marker),
-                            icon = bitmapDescriptor(context, categoria.icono, categoria.color.copy(alpha = 0.45f)),
+                            icon = bitmapDescriptor(context, categoria.icono, categoria.color),
                         ){
                             Card {
                                 Column(
