@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
@@ -53,127 +54,135 @@ fun ReviewDialog(
         onDismissRequest = { onDismissRequest() }
     ) {
         Card(modifier = Modifier.padding(16.dp)) {
-            Column(
+            LazyColumn(
                 modifier = Modifier.padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    text = stringResource(id = R.string.valoracion),
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp,
-                    modifier = Modifier.padding(vertical = 8.dp)
-                )
-
-                Spacer(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 16.dp, horizontal = 8.dp)
-                        .height(1.dp)
-                        .background(MaterialTheme.colorScheme.outline.copy(alpha = 0.25f))
-                )
-
-                if (deal != null) {
-                    Column(modifier = Modifier
-                        .padding(16.dp)
-                        .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                        ValoracionUsuario(
-                            nombreUsuario = deal.username_cliente,
-                            nota = deal.nota_cliente,
-                            viewModel = viewModel
-                        )
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        ValoracionUsuario(
-                            nombreUsuario = deal.username_host,
-                            nota = deal.nota_host,
-                            viewModel = viewModel
-                        )
-                    }
+                item {
 
 
-                    val currentUserRole = when (usuario) {
-                        deal.username_cliente -> "cliente"
-                        deal.username_host -> "host"
-                        else -> null
-                    }
+                    Text(
+                        text = stringResource(id = R.string.valoracion),
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp,
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    )
 
-                    if (currentUserRole != null) {
-                        val nota = if (currentUserRole == "cliente") {
-                            deal.nota_cliente
-                        } else {
-                            deal.nota_host
+                    Spacer(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 16.dp, horizontal = 8.dp)
+                            .height(1.dp)
+                            .background(MaterialTheme.colorScheme.outline.copy(alpha = 0.25f))
+                    )
+
+                    if (deal != null) {
+                        Column(
+                            modifier = Modifier
+                                .padding(16.dp)
+                                .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            ValoracionUsuario(
+                                nombreUsuario = deal.username_cliente,
+                                nota = deal.nota_cliente,
+                                viewModel = viewModel
+                            )
+
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            ValoracionUsuario(
+                                nombreUsuario = deal.username_host,
+                                nota = deal.nota_host,
+                                viewModel = viewModel
+                            )
                         }
 
 
+                        val currentUserRole = when (usuario) {
+                            deal.username_cliente -> "cliente"
+                            deal.username_host -> "host"
+                            else -> null
+                        }
 
-
-                        if (nota == -1) {
-                            Spacer(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 16.dp, horizontal = 8.dp)
-                                    .height(1.dp)
-                                    .background(MaterialTheme.colorScheme.outline.copy(alpha = 0.25f))
-                            )
-                            Text(
-                                text = if (currentUserRole == "cliente") stringResource(id = R.string.valora_a) + " " + deal.username_host else stringResource(id = R.string.valora_a) + " " + deal.username_cliente,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 16.sp,
-                                modifier = Modifier.padding(vertical = 8.dp)
-                            )
-
-
-                            RatingBar(
-                                modifier = Modifier
-                                    .padding(bottom = 20.dp)
-                                    .scale(0.75F),
-                                value = valoracion,
-                                style = RatingBarStyle.Fill(
-                                    MaterialTheme.colorScheme.primary,
-                                    MaterialTheme.colorScheme.outline
-                                ),
-                                onValueChange = {
-                                    valoracion = it
-                                },
-                                onRatingChanged = {}
-                            )
-                            Row {
-                                OutlinedButton(
-                                    modifier = Modifier
-                                        .padding(horizontal = 5.dp),
-                                    onClick = { onDismissRequest() }
-
-                                ) {
-                                    Icon(
-                                        Icons.Default.Close,
-                                        null
-                                    )
-                                }
-
-                                Button(
-                                    modifier = Modifier
-                                        .padding(horizontal = 5.dp),
-                                    onClick = {
-                                        if (deal.username_host == usuario) {
-                                            deal.nota_host = valoracion.toInt()
-                                        } else {
-                                            deal.nota_cliente = valoracion.toInt()
-                                        }
-                                        onConfirmation()
-                                    }
-                                ) {
-                                    Icon(
-                                        Icons.Default.Check,
-                                        null
-                                    )
-                                }
+                        if (currentUserRole != null) {
+                            val nota = if (currentUserRole == "cliente") {
+                                deal.nota_cliente
+                            } else {
+                                deal.nota_host
                             }
 
+
+
+
+                            if (nota == -1) {
+                                Spacer(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 16.dp, horizontal = 8.dp)
+                                        .height(1.dp)
+                                        .background(MaterialTheme.colorScheme.outline.copy(alpha = 0.25f))
+                                )
+                                Text(
+                                    text = if (currentUserRole == "cliente") stringResource(id = R.string.valora_a) + " " + deal.username_host else stringResource(
+                                        id = R.string.valora_a
+                                    ) + " " + deal.username_cliente,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 16.sp,
+                                    modifier = Modifier.padding(vertical = 8.dp)
+                                )
+
+
+                                RatingBar(
+                                    modifier = Modifier
+                                        .padding(bottom = 20.dp)
+                                        .scale(0.75F),
+                                    value = valoracion,
+                                    style = RatingBarStyle.Fill(
+                                        MaterialTheme.colorScheme.primary,
+                                        MaterialTheme.colorScheme.outline
+                                    ),
+                                    onValueChange = {
+                                        valoracion = it
+                                    },
+                                    onRatingChanged = {}
+                                )
+                                Row {
+                                    OutlinedButton(
+                                        modifier = Modifier
+                                            .padding(horizontal = 5.dp),
+                                        onClick = { onDismissRequest() }
+
+                                    ) {
+                                        Icon(
+                                            Icons.Default.Close,
+                                            null
+                                        )
+                                    }
+
+                                    Button(
+                                        modifier = Modifier
+                                            .padding(horizontal = 5.dp),
+                                        onClick = {
+                                            if (deal.username_host == usuario) {
+                                                deal.nota_host = valoracion.toInt()
+                                            } else {
+                                                deal.nota_cliente = valoracion.toInt()
+                                            }
+                                            onConfirmation()
+                                        }
+                                    ) {
+                                        Icon(
+                                            Icons.Default.Check,
+                                            null
+                                        )
+                                    }
+                                }
+
+                            }
                         }
+                    } else {
+                        Text(text = stringResource(id = R.string.peticion_no_encontrada))
                     }
-                } else {
-                    Text(text = stringResource(id = R.string.peticion_no_encontrada))
                 }
             }
         }
@@ -184,7 +193,7 @@ fun ReviewDialog(
 fun ValoracionUsuario(nombreUsuario: String, nota: Int, viewModel: MainViewModel) {
     Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.Start) {
 
-        Row (verticalAlignment = Alignment.CenterVertically) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
             UserAvatar(username = nombreUsuario, viewModel = viewModel)
             Spacer(modifier = Modifier.width(8.dp))
             Column {
@@ -206,6 +215,7 @@ fun ValoracionUsuario(nombreUsuario: String, nota: Int, viewModel: MainViewModel
                 } else {
                     Text(stringResource(id = R.string.no_valorado))
                 }
+
             }
         }
 
