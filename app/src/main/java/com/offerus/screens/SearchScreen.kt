@@ -93,9 +93,7 @@ fun OffersScreen(
     val listaOfertas = mainViewModel.listaOfertas
     val listaSolicitudes =  mainViewModel.listaSolicitudes
 
-    if (!mainViewModel.cargaInicialPeticiones.value) {
-        mainViewModel.cargarListasPeticiones()
-    }
+
 
 
 
@@ -172,7 +170,7 @@ fun OffersScreen(
                 )
 
                 if (selectedTabIndex == 0) {
-                    if (listaOfertas.value.isEmpty() && mainViewModel.cargaInicialPeticiones.value) {
+                    if (listaOfertas.value.isEmpty() ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxSize()) {
                             Text(
                                 text = stringResource(id = R.string.no_offers_found),
@@ -189,7 +187,7 @@ fun OffersScreen(
                     }
 
                 } else {
-                    if (listaSolicitudes.value.isEmpty() && mainViewModel.cargaInicialPeticiones.value) {
+                    if (listaSolicitudes.value.isEmpty() ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxSize()) {
                             Text(
                                 text = stringResource(id = R.string.no_requests_found),

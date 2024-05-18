@@ -83,13 +83,11 @@ class MainViewModel @Inject constructor(
     var listaMisPeticiones = mutableStateOf(emptyList<ServicioPeticion>())
 
     // Variables pantalla search
-    var cargaInicialPeticiones = mutableStateOf(false)
     var listaSolicitudes = mutableStateOf(emptyList<ServicioPeticion>())
     var listaOfertas = mutableStateOf(emptyList<ServicioPeticion>())
     var ordenAscendenteSearch = mutableStateOf(true)
 
     // Variables pantalla favoritos
-    var cargaInicialPeticionesFavoritas = mutableStateOf(false)
     var listaSolicitudesFavoritas = mutableStateOf(emptyList<ServicioPeticion>())
     var listaOfertasFavoritas = mutableStateOf(emptyList<ServicioPeticion>())
     var ordenAscendenteFavoritas = mutableStateOf(true)
@@ -103,6 +101,8 @@ class MainViewModel @Inject constructor(
         Log.d("iniciarListas", "INICIO - iniciando listas...")
         actualizarListaDeals()
         obtenerMisOfertas()
+        getMyFavorites()
+        cargarListasPeticiones()
         Log.d("iniciarListas", "FIN - iniciado listas")
     }
 
@@ -431,7 +431,7 @@ class MainViewModel @Inject constructor(
                 Log.e("KTOR", listaSolicitudes.value.size.toString())
 
 
-                cargaInicialPeticiones.value = true
+
                 isRefreshingSearch.value = false
 
 
@@ -724,9 +724,7 @@ class MainViewModel @Inject constructor(
 
                 Log.e("KTOR", "Peticion get favoritas completada ")
 
-                if (!cargaInicialPeticionesFavoritas.value){
-                    cargaInicialPeticionesFavoritas.value = true
-                }
+
             }
         } catch (e: Exception) {
             Log.e("KTOR", e.toString())
@@ -826,9 +824,7 @@ class MainViewModel @Inject constructor(
 
                 Log.e("KTOR", "Peticion getMyOffers completada")
 
-                if (!cargaInicialPeticionesFavoritas.value){
-                    cargaInicialPeticionesFavoritas.value = true
-                }
+
                 isRefreshingFavorites.value = false
 
 

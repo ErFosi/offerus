@@ -101,12 +101,6 @@ fun MyFavoritesPage(
     val listaSolicitudesFavoritas = mainViewModel.listaSolicitudesFavoritas
 
 
-    //PRECARGAR PETICIONES
-    if (!mainViewModel.cargaInicialPeticionesFavoritas.value) {
-
-        mainViewModel.getMyFavorites()
-        mainViewModel.cargaInicialPeticionesFavoritas.value = true
-    }
 
 
 
@@ -240,7 +234,7 @@ fun MyFavoritesPage(
             }
 
             if (selectedTabIndex == 0) {
-                if (listaOfertasFavoritas.value.isEmpty() && mainViewModel.cargaInicialPeticionesFavoritas.value){
+                if (listaOfertasFavoritas.value.isEmpty()){
 
                     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxSize()) {
                         Text(
@@ -255,7 +249,7 @@ fun MyFavoritesPage(
                 }
 
             } else {
-                if (listaSolicitudesFavoritas.value.isEmpty() && mainViewModel.cargaInicialPeticionesFavoritas.value){
+                if (listaSolicitudesFavoritas.value.isEmpty()){
                     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxSize()) {
                         Text(
                             text = stringResource(id = R.string.no_requests_found),
