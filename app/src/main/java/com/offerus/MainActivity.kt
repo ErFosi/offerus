@@ -145,7 +145,8 @@ class MainActivity : AppCompatActivity() {
                         }
 
                     }
-                    huella = true
+
+
                 }
 
                 // Update the app language, to restore the previous app language in case a different
