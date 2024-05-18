@@ -3,18 +3,10 @@
 ## Descripción
 
 **OfferUS** es una plataforma que conecta a personas que necesitan servicios con aquellas que los ofrecen. Con una interfaz intuitiva, los usuarios pueden publicar solicitudes detalladas de servicios que requieren o promocionar sus propias ofertas.
-
-Las funcionalidades clave incluyen:
-- Publicación de solicitudes y ofertas
-- Contacto directo entre usuarios
-- Valoraciones post-servicio
-- Geolocalización para facilitar búsquedas locales
-- Opción de marcar favoritos para un acceso rápido
-
 OfferUS destaca por equilibrar la visibilidad de las demandas y ofertas, fomentando una comunidad dinámica y confiable para el intercambio de servicios.
 
 ## Características
-
+Las funcionalidades clave incluyen:
 - **Publicación de Solicitudes y Ofertas**: Los usuarios pueden crear y gestionar publicaciones de servicios que necesitan o que ofrecen.
 - **Contacto Directo**: Posibilidad de contactar directamente a otros usuarios para coordinar servicios.
 - **Valoraciones Post-Servicio**: Los usuarios pueden calificar y dejar comentarios después de completar un servicio.
