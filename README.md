@@ -23,7 +23,8 @@ OfferUS destaca por equilibrar la visibilidad de las demandas y ofertas, fomenta
 
 ## Uso
 
-Para utilizar la aplicación hay que descargar e instalar el .apk en un teléfono con Android. La aplicación requiere una versión de API 26 como mínimo (Android 8.0 Oreo)
+Para utilizar la aplicación hay que descargar e instalar el .apk en un teléfono con Android. La aplicación requiere una versión de API 26 como mínimo (Android 8.0 Oreo).
+Una explicación detallada del funcionamiento de la aplicación se puede encontrar en el manual de usuario.
 
 1. **Registro**: Crea una cuenta o inicia sesión si ya tienes una.
 2. **Explorar Servicios**: Navega a través de las solicitudes y ofertas disponibles. Puedes explorar las ofertas en el mapa.
