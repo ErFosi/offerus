@@ -624,7 +624,7 @@ fun RegisterFieldView(
         )
         OutlinedTextField(
             value = age,
-            onValueChange = {if (it.length <=2) onAgeChange(it)},
+            onValueChange = {if (it.length <=2 && (it.toIntOrNull()!=null || it == "")) onAgeChange(it)},
             label = { Text(stringResource(R.string.age)) },
             singleLine = true,
             leadingIcon = {
