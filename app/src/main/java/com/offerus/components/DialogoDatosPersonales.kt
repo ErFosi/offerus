@@ -68,7 +68,7 @@ fun DialogoDatosPersonales(
         stringResource(id = R.string.otros))
 
     var nombreYapellido by rememberSaveable { mutableStateOf(infoUsuario.nombre_apellido) }
-    var edad by rememberSaveable { mutableStateOf(infoUsuario.edad) }
+    var edad by rememberSaveable { mutableStateOf(infoUsuario.edad.toString()) }
     var sexo by rememberSaveable { mutableStateOf(infoUsuario.sexo) }
     var telefono by rememberSaveable { mutableStateOf(infoUsuario.telefono) }
     var email by rememberSaveable { mutableStateOf(infoUsuario.mail) }
@@ -108,7 +108,7 @@ fun DialogoDatosPersonales(
 
     // comprobar todos
     fun isValidRegister(): Boolean {
-        return isValidEmail() && isValidPhone() && nombreYapellido.isNotEmpty() && edad > 0 && sexo.isNotEmpty()
+        return isValidEmail() && isValidPhone() && nombreYapellido.isNotEmpty() && edad.isNotEmpty() && sexo.isNotEmpty()
     }
 
 
@@ -155,7 +155,7 @@ fun DialogoDatosPersonales(
                 modifier = Modifier
                     .padding(start = 20.dp, top = 5.dp, bottom = 5.dp, end = 20.dp) ,
                 value = edad.toString(),
-                onValueChange = { if (it.length <=2) edad = it.toInt() },
+                onValueChange = { if (it.length <=2 && (it.toIntOrNull()!=null || it == "")) edad = it },
                 label = { Text(stringResource(R.string.age)) },
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done, keyboardType = KeyboardType.Number),
                 keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
@@ -278,7 +278,7 @@ fun DialogoDatosPersonales(
                         onConfirmation(
                             UsuarioData(
                                 nombre_apellido = nombreYapellido,
-                                edad = edad,
+                                edad = edad.toInt(),
                                 sexo = sexo,
                                 telefono = telefono,
                                 mail = email,
